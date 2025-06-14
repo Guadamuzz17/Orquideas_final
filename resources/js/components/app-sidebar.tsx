@@ -31,7 +31,7 @@ const menuItems = [
   },
   {
     title: "Gestionar Orquídeas",
-    url: "/orquideas",
+    url: "/registro_orquideas",
     icon: Plus,
   },
   {
