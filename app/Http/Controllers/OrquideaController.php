@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Clase;
+use App\Models\Grupo;
 use App\Models\Orquidea;
+use App\Models\Participante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class OrquideaController extends Controller
 {
@@ -13,19 +17,50 @@ class OrquideaController extends Controller
      */
     public function index()
     {
-        return response()->json(Orquidea::with(['grupo', 'clase', 'participante'])->get());
+        if (request()->wantsJson()) {
+            return Orquidea::with(['grupo', 'clase', 'participante'])->get();
+        }
+
+        $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])->paginate(10);
+        return Inertia::render('orquideas/index', [
+            'orquideas' => $orquideas,
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('orquideas/form', [
+            'grupos' => Grupo::select('id_grupo', 'nombre_grupo')->get(),
+            'clases' => Clase::select('id_case', 'nombre_clase', 'id_grupp')->get(),
+            'participantes' => Participante::select('id', 'nombre')->get(),
+        ]);
     }
 
     /**
      * Obtener una orquídea específica por ID
      */
-    public function show($id)
+    public function show(Orquidea $orquidea)
     {
-        $orquidea = Orquidea::with(['grupo', 'clase', 'participante'])->find($id);
-        if (!$orquidea) {
-            return response()->json(['status' => 'error', 'message' => 'Orquídea no encontrada'], 404);
+        $orquidea->load(['grupo', 'clase', 'participante']);
+
+        if (request()->wantsJson()) {
+            return response()->json($orquidea);
         }
-        return response()->json($orquidea);
+
+        return Inertia::render('orquideas/show', [
+            'orquidea' => $orquidea,
+        ]);
+    }
+
+    public function edit(Orquidea $orquidea)
+    {
+        $orquidea->load(['grupo', 'clase', 'participante']);
+        return Inertia::render('orquideas/form', [
+            'orquidea' => $orquidea,
+            'grupos' => Grupo::select('id_grupo', 'nombre_grupo')->get(),
+            'clases' => Clase::select('id_case', 'nombre_clase', 'id_grupp')->get(),
+            'participantes' => Participante::select('id', 'nombre')->get(),
+        ]);
     }
 
     /**
@@ -66,18 +101,18 @@ class OrquideaController extends Controller
             'gr_code'       => null, // Columna para QR (ahora null)
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $orquidea
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json(['status' => 'success', 'data' => $orquidea]);
+        }
+
+        return redirect()->route('orquideas.index');
     }
 
     /**
      * Actualizar una orquídea existente
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Orquidea $orquidea)
     {
-        $orquidea = Orquidea::find($id);
         if (!$orquidea) {
             return response()->json([
                 'status' => 'error',
@@ -108,18 +143,18 @@ class OrquideaController extends Controller
             'a'            => $request->a,
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $orquidea
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json(['status' => 'success', 'data' => $orquidea]);
+        }
+
+        return redirect()->route('orquideas.index');
     }
 
     /**
      * Eliminar una orquídea
      */
-    public function destroy($id)
+    public function destroy(Orquidea $orquidea)
     {
-        $orquidea = Orquidea::find($id);
         if (!$orquidea) {
             return response()->json([
                 'status' => 'error',
@@ -128,9 +163,11 @@ class OrquideaController extends Controller
         }
 
         $orquidea->delete();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Orquídea eliminada'
-        ]);
+
+        if (request()->wantsJson()) {
+            return response()->json(['status' => 'success']);
+        }
+
+        return redirect()->route('orquideas.index');
     }
 }
