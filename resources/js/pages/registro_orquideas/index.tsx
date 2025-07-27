@@ -33,8 +33,7 @@ interface DropdownData {
 export default function OrchidRegistration() {
 
   const API_BASE =
-    import.meta.env.VITE_API_BASE_URL ??
-    (typeof window !== 'undefined' ? window.location.origin : '')
+    import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
   const [quantity, setQuantity] = useState(1)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
