@@ -35,6 +35,11 @@ const menuItems = [
     icon: Plus,
   },
   {
+    title: "Ver Orquídeas",
+    url: "/orquideas",
+    icon: Eye,
+  },
+  {
     title: "Identificación",
     url: "/identificacion",
     icon: Search,
