@@ -21,6 +21,10 @@ Route::get('/registro_orquideas', function () {
     return Inertia::render('registro_orquideas/index'); // Asegúrate de que coincida con la estructura de tu carpeta
 })->name('registro_orquideas');
 
+Route::get('/orquideas', function () {
+    return Inertia::render('orquideas/index');
+})->name('orquideas.index');
+
 //routes para los controladores
 
 require __DIR__.'/settings.php';
