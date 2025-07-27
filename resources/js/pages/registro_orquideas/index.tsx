@@ -53,7 +53,7 @@ export default function OrchidRegistration() {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const response = await fetch('/api/dropdowns')
+        const response = await fetch(`${API_BASE}/api/dropdowns`)
         if (!response.ok) {
           throw new Error('Error al cargar los datos')
         }
@@ -103,7 +103,7 @@ export default function OrchidRegistration() {
         formDataToSend.append('foto', formData.foto)
       }
 
-      const response = await fetch('/api/orquideas', {
+      const response = await fetch(`${API_BASE}/api/orquideas`, {
         method: 'POST',
         body: formDataToSend,
       })
