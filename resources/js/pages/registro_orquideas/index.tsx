@@ -20,7 +20,7 @@ interface Grupo {
 }
 
 interface Clase {
-  id_case: number
+  id_clase: number
   nombre_clase: string
   id_grupp: number
 }
@@ -31,6 +31,7 @@ interface DropdownData {
 }
 
 export default function OrchidRegistration() {
+  const API_BASE = typeof window !== 'undefined' ? window.location.origin : ''
   const [quantity, setQuantity] = useState(1)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [dropdownData, setDropdownData] = useState<DropdownData | null>(null)
@@ -48,7 +49,7 @@ export default function OrchidRegistration() {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const response = await fetch('/api/dropdowns')
+        const response = await fetch(`${API_BASE}/api/dropdowns`)
         if (!response.ok) {
           throw new Error('Error al cargar los datos')
         }
@@ -98,7 +99,7 @@ export default function OrchidRegistration() {
         formDataToSend.append('foto', formData.foto)
       }
 
-      const response = await fetch('/api/orquideas', {
+      const response = await fetch(`${API_BASE}/api/orquideas`, {
         method: 'POST',
         body: formDataToSend,
       })
@@ -295,7 +296,7 @@ export default function OrchidRegistration() {
                         {dropdownData?.clases
                           .filter(clase => clase.id_grupp.toString() === formData.id_grupo)
                           .map(clase => (
-                            <SelectItem key={clase.id_case} value={clase.id_case.toString()}>
+                            <SelectItem key={clase.id_clase} value={clase.id_clase.toString()}>
                               {clase.nombre_clase}
                             </SelectItem>
                           ))}
