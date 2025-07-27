@@ -97,7 +97,7 @@ export default function OrchidRegistration() {
       formDataToSend.append('origen', formData.origen)
       formDataToSend.append('id_grupo', formData.id_grupo)
       formDataToSend.append('id_case', formData.id_case)
-      formDataToSend.append('a', quantity.toString())
+      formDataToSend.append('a', formData.a.toString())
       if (formData.foto) {
         formDataToSend.append('foto', formData.foto)
       }
@@ -248,10 +248,8 @@ export default function OrchidRegistration() {
                         <SelectValue placeholder="Selecciona el Origen" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="colombia">Colombia</SelectItem>
-                        <SelectItem value="ecuador">Ecuador</SelectItem>
-                        <SelectItem value="peru">Perú</SelectItem>
-                        <SelectItem value="brasil">Brasil</SelectItem>
+                        <SelectItem value="especie">Especie</SelectItem>
+                        <SelectItem value="hibrida">Híbrida</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -325,7 +323,6 @@ export default function OrchidRegistration() {
                         onChange={(e) => {
                           const newQuantity = Math.max(1, Number.parseInt(e.target.value) || 1)
                           setQuantity(newQuantity)
-                          setFormData(prev => ({ ...prev, a: newQuantity }))
                         }}
                         className="h-11 text-center"
                         min="1"
