@@ -15,4 +15,9 @@ class Grupo extends Model
         'nombre_grupo',
         'Cod_Grupo'
     ];
+
+    public function clases()
+    {
+        return $this->hasMany(Clase::class, 'id_grupo', 'id_grupo');
+    }
 }

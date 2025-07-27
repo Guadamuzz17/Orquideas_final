@@ -36,4 +36,5 @@ class Orquidea extends Model
     {
         return $this->belongsTo(Participante::class, 'a');
     }
+
 }
