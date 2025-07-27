@@ -10,14 +10,11 @@ class Grupo extends Model
     use HasFactory;
 
     protected $table = 'tb_grupo';
-    protected $primaryKey = 'id_grupo';
-    protected $fillable = [
-        'nombre_grupo',
-        'Cod_Grupo'
-    ];
+protected $primaryKey = 'id_grupo';
+protected $fillable = ['nombre_grupo', 'Cod_Grupo'];
 
-    public function clases()
-    {
-        return $this->hasMany(Clase::class, 'id_grupo', 'id_grupo');
-    }
+public function clases()
+{
+    return $this->hasMany(Clase::class, 'id_grupp', 'id_grupo');
+}
 }

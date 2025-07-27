@@ -84,13 +84,17 @@ class GrupoController extends Controller
         ]);
     }
 
-    public function dropdownData()
-    {
-        return response()->json([
-            'grupos' => Grupo::all(),
-            'clases' => Clase::all()
-        ]);
-    }
+ public function dropdownData()
+{
+    return response()->json([
+        'grupos' => Grupo::select('id_grupo', 'nombre_grupo', 'Cod_Grupo')->get(),
+        'clases' => Clase::select(
+            'id_clase as id_case',
+            'nombre_clase',
+            'id_grupp'
+        )->get()
+    ]);
+}
 
     // === CLASES ===
 
