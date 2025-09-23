@@ -111,21 +111,35 @@ const ActionCard = ({ title, description, icon, color, onClick }: ActionCardProp
   )
 }
 
-export default function Dashboard() {
-  const currentYear = new Date().getFullYear()
+interface DashboardProps {
+  stats?: {
+    participantes: number;
+    orquideas: number;
+    year: number;
+  };
+}
 
-  const stats = [
+export default function Dashboard({ stats }: DashboardProps) {
+  // Valores por defecto en caso de que no se pasen los stats
+  const defaultStats = {
+    participantes: 0,
+    orquideas: 0,
+    year: new Date().getFullYear()
+  };
+  
+  const currentStats = stats || defaultStats;
+  const statsCards = [
     {
-      title: `Participantes Registrados (${currentYear})`,
-      value: "0",
-      subtitle: "Participantes",
+      title: `Participantes Registrados (${currentStats.year})`,
+      value: currentStats.participantes.toLocaleString(),
+      subtitle: currentStats.participantes === 1 ? "Participante" : "Participantes",
       color: "blue" as const,
       icon: <Users className="w-6 h-6" />,
     },
     {
-      title: `Orquídeas Registradas (${currentYear})`,
-      value: "0",
-      subtitle: "Orquídeas",
+      title: `Orquídeas Registradas (${currentStats.year})`,
+      value: currentStats.orquideas.toLocaleString(),
+      subtitle: currentStats.orquideas === 1 ? "Orquídea" : "Orquídeas",
       color: "green" as const,
       icon: <Leaf className="w-6 h-6" />,
     },
@@ -138,14 +152,14 @@ export default function Dashboard() {
         "Gestiona los perfiles de los usuarios y administra la información de los participantes del sistema.",
       icon: <Users className="w-6 h-6" />,
       color: "from-blue-500 to-blue-600",
-      onClick: () => console.log("Navegando a Participantes"),
+      onClick: () => window.location.href = "/participantes",
     },
     {
       title: "Gestionar Orquídeas",
       description: "Registra, edita y administra el catálogo completo de orquídeas en el sistema.",
       icon: <Plus className="w-6 h-6" />,
       color: "from-green-500 to-green-600",
-      onClick: () => console.log("Navegando a Gestionar Orquídeas"),
+      onClick: () => window.location.href = "/orquideas",
     },
     {
       title: "Identificación de Orquídeas",
@@ -225,7 +239,7 @@ export default function Dashboard() {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"
         >
-          {stats.map((stat, index) => (
+          {statsCards.map((stat, index) => (
             <motion.div
               key={stat.title}
               initial={{ opacity: 0, x: index === 0 ? -50 : 50 }}
@@ -265,7 +279,7 @@ export default function Dashboard() {
         >
           <div className="inline-flex items-center space-x-2 text-gray-500 text-sm mb-4">
             <Calendar className="w-4 h-4" />
-            <span>Sistema de Gestión de Orquídeas - {currentYear}</span>
+            <span>Sistema de Gestión de Orquídeas - {currentStats.year}</span>
           </div>
         </motion.div>
 

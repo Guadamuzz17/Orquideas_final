@@ -16,24 +16,17 @@ class Orquidea extends Model
         'origen',
         'foto',
         'id_grupo',
-        'id_case',
-        'gr_code',
-        'codigo_orquide',
-        'a'
+        'id_case'
     ];
 
     public function grupo()
     {
-        return $this->belongsTo(Grupo::class, 'id_grupo');
+        return $this->belongsTo(Grupo::class, 'id_grupo', 'id_grupo');
     }
 
     public function clase()
     {
-        return $this->belongsTo(Clase::class, 'id_case');
+        return $this->belongsTo(Clase::class, 'id_case', 'id_clase');
     }
 
-    public function participante()
-    {
-        return $this->belongsTo(Participante::class, 'a');
-    }
 }

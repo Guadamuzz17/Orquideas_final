@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('tb_inscripcion', function (Blueprint $table) {
             $table->id('id_nscr');
             $table->foreignId('id_participante')->constrained('tb_participante');
-            $table->foreignId('id_orgudea')->constrained('tb_orquidea', 'id_orquidea');
+            $table->foreignId('id_orquidea')->constrained('tb_orquidea', 'id_orquidea');
             $table->string('correlativo', 150);
             $table->timestamps();
         });

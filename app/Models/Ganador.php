@@ -12,26 +12,46 @@ class Ganador extends Model
     protected $table = 'tb_ganadores';
     protected $primaryKey = 'id_ganador';
     protected $fillable = [
-        'id_proudsa',
-        'id_grupo',
-        'id_case',
+        'id_inscripcion',
         'posicion',
         'empate',
         'fecha_ganador'
     ];
 
-    public function participante()
+    protected $casts = [
+        'empate' => 'boolean',
+        'fecha_ganador' => 'datetime'
+    ];
+
+    // Relación con inscripción (que contiene orquídea, participante y correlativo)
+    public function inscripcion()
     {
-        return $this->belongsTo(Participante::class, 'id_proudsa');
+        return $this->belongsTo(Inscripcion::class, 'id_inscripcion', 'id_nscr');
     }
 
-    public function grupo()
+    // Accessor para obtener datos de la inscripción fácilmente
+    public function getParticipanteAttribute()
     {
-        return $this->belongsTo(Grupo::class, 'id_grupo');
+        return $this->inscripcion?->participante;
     }
 
-    public function clase()
+    public function getOrquideaAttribute()
     {
-        return $this->belongsTo(Clase::class, 'id_case');
+        return $this->inscripcion?->orquidea;
+    }
+
+    public function getCorrelativoAttribute()
+    {
+        return $this->inscripcion?->correlativo;
+    }
+
+    public function getGrupoAttribute()
+    {
+        return $this->inscripcion?->orquidea?->grupo;
+    }
+
+    public function getClaseAttribute()
+    {
+        return $this->inscripcion?->orquidea?->clase;
     }
 }

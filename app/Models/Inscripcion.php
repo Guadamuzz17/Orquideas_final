@@ -11,11 +11,20 @@ class Inscripcion extends Model
 
     protected $table = 'tb_inscripcion';
     protected $primaryKey = 'id_nscr';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    
     protected $fillable = [
         'id_participante',
-        'id_orgudea',
+        'id_orquidea',
         'correlativo'
     ];
+
+    // Accessor para que el modelo también responda a 'id'
+    public function getIdAttribute()
+    {
+        return $this->id_nscr;
+    }
 
     public function participante()
     {
@@ -24,6 +33,11 @@ class Inscripcion extends Model
 
     public function orquidea()
     {
-        return $this->belongsTo(Orquidea::class, 'id_orgudea');
+        return $this->belongsTo(Orquidea::class, 'id_orquidea', 'id_orquidea');
+    }
+
+    public function ganador()
+    {
+        return $this->hasOne(Ganador::class, 'id_inscripcion', 'id_nscr');
     }
 }
