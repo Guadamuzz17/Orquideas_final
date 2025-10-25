@@ -13,7 +13,7 @@ class GrupoSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('tb_grupo')->insert([
+        $grupos = [
             ['id_grupo' => 1, 'nombre_grupo' => 'Grupo A: Epidendrum y géneros aliados', 'Cod_Grupo' => 'A'],
             ['id_grupo' => 2, 'nombre_grupo' => 'Grupo B: Género Guarianthe especie e híbrido', 'Cod_Grupo' => 'B'],
             ['id_grupo' => 3, 'nombre_grupo' => 'Grupo C: Género Cattleya', 'Cod_Grupo' => 'C'],
@@ -28,6 +28,13 @@ class GrupoSeeder extends Seeder
             ['id_grupo' => 12, 'nombre_grupo' => 'Grupo L: Arreglos florales', 'Cod_Grupo' => 'L'],
             ['id_grupo' => 13, 'nombre_grupo' => 'Grupo M: Exhibiciones educacionales', 'Cod_Grupo' => 'M'],
             ['id_grupo' => 14, 'nombre_grupo' => 'Grupo Otros', 'Cod_Grupo' => 'O'],
-        ]);
+        ];
+
+        foreach ($grupos as $grupo) {
+            DB::table('tb_grupo')->updateOrInsert(
+                ['id_grupo' => $grupo['id_grupo']],
+                $grupo
+            );
+        }
     }
 }
