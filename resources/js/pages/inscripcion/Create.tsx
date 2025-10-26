@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Search, Plus, Trash2, CheckCircle, AlertTriangle, User, Leaf, Calendar } from "lucide-react";
+import { Autocomplete, type AutocompleteOption } from "@/components/ui/autocomplete";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -56,6 +57,8 @@ interface Orquidea {
   nombre_planta: string;
   origen: string;
   cantidad: number;
+  inscripciones_count?: number;
+  disponibles?: number;
   grupo?: Grupo;
   clase?: Clase;
 }
@@ -86,6 +89,10 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
   }>({ available: true, message: '', checking: false });
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [ultimoCorrelativo, setUltimoCorrelativo] = useState<number>(0);
+  const [isAddingOrquidea, setIsAddingOrquidea] = useState(false);
+  const [autocompleteOptions, setAutocompleteOptions] = useState<AutocompleteOption[]>([]);
+  const [isSearchingOrquideas, setIsSearchingOrquideas] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const { data, setData, post, processing, reset } = useForm({
     inscripciones: [] as any[]
@@ -113,7 +120,7 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
           setOrquideasFiltradas(data);
         })
         .catch(error => {
-          console.error('Error al cargar orquídeas:', error); 
+          console.error('Error al cargar orquídeas:', error);
           toast.error('Error al cargar las orquídeas del participante');
         });
     }
@@ -122,19 +129,19 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
   // Filtrar orquídeas por búsqueda y excluir las ya seleccionadas
   useEffect(() => {
     let filtradas = orquideasDisponibles;
-    
+
     // Excluir orquídeas ya seleccionadas
-    filtradas = filtradas.filter(orquidea => 
+    filtradas = filtradas.filter(orquidea =>
       !orquideasSeleccionadas.some(selected => selected.id_orquidea === orquidea.id_orquidea)
     );
-    
+
     // Filtrar por búsqueda
     if (searchOrquidea.trim() !== '') {
       filtradas = filtradas.filter(orquidea =>
         orquidea.nombre_planta.toLowerCase().includes(searchOrquidea.toLowerCase())
       );
     }
-    
+
     setOrquideasFiltradas(filtradas);
   }, [searchOrquidea, orquideasDisponibles, orquideasSeleccionadas]);
 
@@ -150,7 +157,7 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
     try {
       const response = await fetch(`/inscripcion/check-correlativo?correlativo=${correlativoValue}`);
       const result = await response.json();
-      
+
       setCorrelativoStatus({
         available: result.available,
         message: result.message,
@@ -174,6 +181,15 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
     return () => clearTimeout(timeoutId);
   }, [correlativo]);
 
+  // Limpiar timeout al desmontar el componente
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
+
   const handleParticipanteSelect = (participanteId: string) => {
     const participante = participantes.find(p => p.id.toString() === participanteId);
     setSelectedParticipante(participante || null);
@@ -183,6 +199,14 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
     setSelectedOrquidea(null);
     setSearchOrquidea('');
     setCorrelativo('');
+    setAutocompleteOptions([]);
+    setIsSearchingOrquideas(false);
+
+    // Limpiar timeout si existe
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+      setSearchTimeout(null);
+    }
   };
 
   const handleOrquideaSelect = (orquideaId: string) => {
@@ -190,47 +214,140 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
     setSelectedOrquidea(orquidea || null);
   };
 
-  const agregarOrquidea = () => {
+  // Función para buscar orquídeas con autocompletado
+  const searchOrquideasAutocomplete = async (searchTerm: string) => {
+    if (!selectedParticipante || searchTerm.trim().length < 2) {
+      setAutocompleteOptions([]);
+      return;
+    }
+
+    setIsSearchingOrquideas(true);
+
+    try {
+      const response = await fetch(
+        `/inscripcion/search-orquideas?participante_id=${selectedParticipante.id}&search=${encodeURIComponent(searchTerm)}`
+      );
+      const orquideas: Orquidea[] = await response.json();
+
+      // El backend ya filtra por disponibilidad basado en inscripciones guardadas en BD
+      // Aquí solo filtramos las que están en proceso de ser inscritas en esta sesión
+      const orquideasFiltradas = orquideas.filter(orquidea => {
+        // Contar cuántas veces esta orquídea está seleccionada actualmente
+        const vecesSeleccionada = orquideasSeleccionadas.filter(
+          selected => selected.id_orquidea === orquidea.id_orquidea
+        ).length;
+
+        // Verificar si aún quedan cupos después de las selecciones actuales
+        const disponiblesRestantes = (orquidea.disponibles || orquidea.cantidad) - vecesSeleccionada;
+        return disponiblesRestantes > 0;
+      });
+
+      // Convertir a opciones de autocompletado
+      const options: AutocompleteOption[] = orquideasFiltradas.map(orquidea => {
+        const vecesSeleccionada = orquideasSeleccionadas.filter(
+          selected => selected.id_orquidea === orquidea.id_orquidea
+        ).length;
+        const disponiblesRestantes = (orquidea.disponibles || orquidea.cantidad) - vecesSeleccionada;
+
+        return {
+          id: orquidea.id_orquidea,
+          label: orquidea.nombre_planta,
+          value: orquidea,
+          description: `${orquidea.grupo?.nombre_grupo || 'Sin grupo'} - ${orquidea.clase?.nombre_clase || 'Sin clase'}`,
+          badge: `Disponibles: ${disponiblesRestantes}`
+        };
+      });
+
+      setAutocompleteOptions(options);
+    } catch (error) {
+      console.error('Error al buscar orquídeas:', error);
+      toast.error('Error al buscar orquídeas');
+      setAutocompleteOptions([]);
+    } finally {
+      setIsSearchingOrquideas(false);
+    }
+  };
+
+  // Manejar selección del autocompletado
+  const handleAutocompleteSelect = (option: AutocompleteOption) => {
+    const orquidea = option.value as Orquidea;
+    setSelectedOrquidea(orquidea);
+    setSearchOrquidea(orquidea.nombre_planta);
+    setAutocompleteOptions([]);
+  };
+
+  // Manejar búsqueda con debounce
+  const handleAutocompleteSearch = (searchTerm: string) => {
+    setSearchOrquidea(searchTerm);
+
+    // Limpiar timeout anterior
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Crear nuevo timeout
+    const timeout = setTimeout(() => {
+      searchOrquideasAutocomplete(searchTerm);
+    }, 300); // 300ms de debounce
+
+    setSearchTimeout(timeout);
+  };
+
+  const agregarOrquidea = async () => {
+    // Prevenir dobles clics
+    if (isAddingOrquidea) {
+      return;
+    }
+
     if (!selectedParticipante || !selectedOrquidea || !correlativo || !correlativoStatus.available) {
       toast.error('Por favor completa todos los campos correctamente');
       return;
     }
 
-    // Verificar que no se repita la orquídea
-    const orquideaYaSeleccionada = orquideasSeleccionadas.find(
-      o => o.id_orquidea === selectedOrquidea.id_orquidea
-    );
+    setIsAddingOrquidea(true);
 
-    if (orquideaYaSeleccionada) {
-      toast.error('Esta orquídea ya ha sido seleccionada');
-      return;
+    try {
+      // Verificar disponibilidad de la orquídea
+      const vecesYaSeleccionada = orquideasSeleccionadas.filter(
+        o => o.id_orquidea === selectedOrquidea.id_orquidea
+      ).length;
+
+      const disponiblesRestantes = (selectedOrquidea.disponibles || selectedOrquidea.cantidad) - vecesYaSeleccionada;
+
+      if (disponiblesRestantes <= 0) {
+        toast.error('No quedan cupos disponibles para esta orquídea');
+        return;
+      }
+
+      // Verificar que no se repita el correlativo en la selección actual
+      const correlativoYaUsado = orquideasSeleccionadas.find(
+        o => o.correlativo === parseInt(correlativo)
+      );
+
+      if (correlativoYaUsado) {
+        toast.error('Este correlativo ya está siendo usado en esta inscripción');
+        return;
+      }
+
+      const nuevaOrquidea: OrquideaSeleccionada = {
+        id_orquidea: selectedOrquidea.id_orquidea,
+        nombre_planta: selectedOrquidea.nombre_planta,
+        correlativo: parseInt(correlativo),
+        id_participante: selectedParticipante.id
+      };
+
+      setOrquideasSeleccionadas([...orquideasSeleccionadas, nuevaOrquidea]);
+
+      // Reset selection
+      setSelectedOrquidea(null);
+      setCorrelativo('');
+      setSearchOrquidea('');
+      setAutocompleteOptions([]);
+
+      toast.success('Orquídea agregada exitosamente');
+    } finally {
+      setIsAddingOrquidea(false);
     }
-
-    // Verificar que no se repita el correlativo en la selección actual
-    const correlativoYaUsado = orquideasSeleccionadas.find(
-      o => o.correlativo === parseInt(correlativo)
-    );
-
-    if (correlativoYaUsado) {
-      toast.error('Este correlativo ya está siendo usado en esta inscripción');
-      return;
-    }
-
-    const nuevaOrquidea: OrquideaSeleccionada = {
-      id_orquidea: selectedOrquidea.id_orquidea,
-      nombre_planta: selectedOrquidea.nombre_planta,
-      correlativo: parseInt(correlativo),
-      id_participante: selectedParticipante.id
-    };
-
-    setOrquideasSeleccionadas([...orquideasSeleccionadas, nuevaOrquidea]);
-    
-    // Reset selection
-    setSelectedOrquidea(null);
-    setCorrelativo('');
-    setSearchOrquidea('');
-    
-    toast.success('Orquídea agregada exitosamente');
   };
 
   const quitarOrquidea = (index: number) => {
@@ -248,8 +365,13 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
   };
 
   const confirmarInscripcion = () => {
+    // Prevenir dobles envíos
+    if (processing) {
+      return;
+    }
+
     setData('inscripciones', orquideasSeleccionadas);
-    
+
     post(route('inscripcion.store'), {
       onSuccess: () => {
         toast.success('Inscripción realizada exitosamente');
@@ -259,20 +381,21 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
         setSelectedOrquidea(null);
         setCorrelativo('');
         setSearchOrquidea('');
+        setIsAddingOrquidea(false);
       },
       onError: (errors) => {
         console.error('Errores:', errors);
         toast.error('Error al procesar la inscripción');
       }
     });
-    
+
     setShowConfirmDialog(false);
   };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Inscripción de Orquídeas" />
-      
+
       <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-10">
         <div className="flex items-center justify-between">
           <div>
@@ -358,42 +481,41 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label htmlFor="search-orquidea">Buscar por nombre</Label>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="search-orquidea"
-                        placeholder="Escribe el nombre de la orquídea..."
-                        value={searchOrquidea}
-                        onChange={(e) => setSearchOrquidea(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="orquidea">Selecciona una orquídea</Label>
-                    <Select onValueChange={handleOrquideaSelect} value={selectedOrquidea?.id_orquidea.toString() || ""}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una orquídea" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {orquideasFiltradas.length === 0 ? (
-                          <div className="p-2 text-sm text-gray-500">
-                            {orquideasDisponibles.length === 0 
-                              ? "No hay orquídeas registradas" 
-                              : "Todas las orquídeas ya han sido seleccionadas"
-                            }
+                    <Label htmlFor="search-orquidea">Buscar orquídea</Label>
+                    <Autocomplete
+                      options={autocompleteOptions}
+                      onSelect={handleAutocompleteSelect}
+                      onSearch={handleAutocompleteSearch}
+                      searchValue={searchOrquidea}
+                      onSearchChange={setSearchOrquidea}
+                      loading={isSearchingOrquideas}
+                      placeholder="Escribe el nombre de la orquídea..."
+                      noResultsText="No se encontraron orquídeas"
+                      className="w-full"
+                    />
+                    {selectedOrquidea && (
+                      <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium text-green-900">{selectedOrquidea.nombre_planta}</div>
+                            <div className="text-sm text-green-700">
+                              {selectedOrquidea.grupo?.nombre_grupo} - {selectedOrquidea.clase?.nombre_clase}
+                            </div>
                           </div>
-                        ) : (
-                          orquideasFiltradas.map((orquidea) => (
-                            <SelectItem key={orquidea.id_orquidea} value={orquidea.id_orquidea.toString()}>
-                              {orquidea.nombre_planta}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
+                          <div className="flex gap-2">
+                            <Badge variant="secondary">Total: {selectedOrquidea.cantidad}</Badge>
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                              Disponibles: {(() => {
+                                const vecesSeleccionada = orquideasSeleccionadas.filter(
+                                  selected => selected.id_orquidea === selectedOrquidea.id_orquidea
+                                ).length;
+                                return (selectedOrquidea.disponibles || selectedOrquidea.cantidad) - vecesSeleccionada;
+                              })()}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {selectedOrquidea && (
@@ -407,7 +529,7 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
                           value={correlativo}
                           onChange={(e) => setCorrelativo(e.target.value)}
                           className={`${
-                            correlativo && !correlativoStatus.available ? 'border-red-500' : 
+                            correlativo && !correlativoStatus.available ? 'border-red-500' :
                             correlativo && correlativoStatus.available ? 'border-green-500' : ''
                           }`}
                         />
@@ -423,13 +545,19 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
                         )}
                       </div>
 
-                      <Button 
+                      <Button
                         onClick={agregarOrquidea}
-                        disabled={!correlativo || !correlativoStatus.available || correlativoStatus.checking}
+                        disabled={
+                          !correlativo ||
+                          !correlativoStatus.available ||
+                          correlativoStatus.checking ||
+                          isAddingOrquidea ||
+                          !selectedOrquidea
+                        }
                         className="w-full"
                       >
                         <Plus className="mr-2 h-4 w-4" />
-                        Agregar Orquídea
+                        {isAddingOrquidea ? 'Agregando...' : 'Agregar Orquídea'}
                       </Button>
                     </div>
                   )}
@@ -484,7 +612,7 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
                       </p>
                     </div>
 
-                    <Button 
+                    <Button
                       onClick={finalizarInscripcion}
                       className="w-full bg-green-600 hover:bg-green-700"
                       disabled={processing}
@@ -504,7 +632,7 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
             <AlertDialogHeader>
               <AlertDialogTitle>Confirmar Inscripción</AlertDialogTitle>
               <AlertDialogDescription>
-                ¿Estás seguro de que deseas finalizar la inscripción de {orquideasSeleccionadas.length} orquídea{orquideasSeleccionadas.length !== 1 ? 's' : ''} 
+                ¿Estás seguro de que deseas finalizar la inscripción de {orquideasSeleccionadas.length} orquídea{orquideasSeleccionadas.length !== 1 ? 's' : ''}
                 para {selectedParticipante?.nombre}?
               </AlertDialogDescription>
             </AlertDialogHeader>

@@ -1,20 +1,24 @@
 "use client"
 
 import * as React from "react"
-import { 
-  Users, 
-  Plus, 
-  Award, 
-  BarChart3, 
-  Search, 
-  Eye, 
-  FileText, 
-  Trophy, 
+import {
+  Users,
+  Plus,
+  Award,
+  BarChart3,
+  Search,
+  Eye,
+  FileText,
+  Trophy,
   UserPlus,
   LayoutGrid,
   ChevronUp,
   Settings2,
-  Leaf
+  Leaf,
+  FolderTree,
+  Tags,
+  Download,
+  Camera
 } from "lucide-react"
 import {
   Sidebar,
@@ -98,8 +102,20 @@ const data = {
           url: "/orquideas/create",
         },
         {
-          title: "Grupos y Clases",
-          url: "/grupos-clases",
+          title: "Grupos de Orquídeas",
+          url: "/grupos",
+          icon: FolderTree,
+        },
+        {
+          title: "Clases de Orquídeas",
+          url: "/clases",
+          icon: Tags,
+        },
+        {
+          title: "Descargar Clases PDF",
+          url: "#",
+          action: "download",
+          icon: Download,
         },
       ],
     },
@@ -129,7 +145,9 @@ const data = {
         },
         {
           title: "Formato Inscripción",
-          url: "/formato-inscripcion",
+          url: "#",
+          action: "download-inscripcion",
+          icon: Download,
         },
         {
           title: "Designar Ganadores",
@@ -139,19 +157,64 @@ const data = {
           title: "Asignar Trofeos",
           url: "/trofeos",
         },
+        {
+          title: "Otorgar Listones",
+          url: "/listones",
+        },
+      ],
+    },
+    {
+      title: "Fotografías",
+      url: "/fotos",
+      icon: Camera,
+      items: [
+        {
+          title: "Ver Fotografías",
+          url: "/fotos",
+        },
+        {
+          title: "Subir Nueva Foto",
+          url: "/fotos/create",
+        },
       ],
     },
     {
       title: "Reportes y Análisis",
       url: "/reportes",
       icon: BarChart3,
+      items: [
+        {
+          title: "Reportes de Listones",
+          url: "/reportes/listones",
+        },
+      ],
     },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { url } = usePage()
-  
+
+  // Función para descargar PDF de Clases Orquídeas
+  const handleDownloadPDF = () => {
+    const link = document.createElement('a');
+    link.href = '/docsDonwload/ClasesOrquideas.pdf';
+    link.download = 'ClasesOrquideas.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Función para descargar PDF de Formato de Inscripción
+  const handleDownloadFormatoInscripcion = () => {
+    const link = document.createElement('a');
+    link.href = '/docsDonwload/FormatoInscripcion.pdf';
+    link.download = 'FormatoInscripcion.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -196,15 +259,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navegación Principal</SidebarGroupLabel>
           <SidebarMenu>
             {data.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton 
-                  asChild 
+                <SidebarMenuButton
+                  asChild
                   tooltip={item.title}
                   isActive={url === item.url || (item.items && item.items.some(subItem => url === subItem.url || url.startsWith(subItem.url + '/')))}
                 >
@@ -217,13 +280,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuSub>
                     {item.items.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton 
-                          asChild
+                        <SidebarMenuSubButton
+                          asChild={!subItem.action}
                           isActive={url === subItem.url || url.startsWith(subItem.url + '/')}
+                          onClick={
+                            subItem.action === 'download' ? handleDownloadPDF :
+                            subItem.action === 'download-inscripcion' ? handleDownloadFormatoInscripcion :
+                            undefined
+                          }
                         >
-                          <Link href={subItem.url}>
-                            <span>{subItem.title}</span>
-                          </Link>
+                          {subItem.action === 'download' || subItem.action === 'download-inscripcion' ? (
+                            <div className="flex items-center cursor-pointer">
+                              <Download className="mr-2 h-4 w-4" />
+                              <span>{subItem.title}</span>
+                            </div>
+                          ) : (
+                            <Link href={subItem.url}>
+                              <span>{subItem.title}</span>
+                            </Link>
+                          )}
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
@@ -234,11 +309,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      
+
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
-      
+
       <SidebarRail />
     </Sidebar>
   )

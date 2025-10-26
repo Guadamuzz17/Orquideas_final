@@ -5,7 +5,7 @@ import { columns } from "./Columns"
 import { DataTable } from "./data-table"
 import React from 'react';
 import { Button } from "@/components/ui/button"
-import { Slash, Plus } from "lucide-react"
+import { Slash, Plus, Download } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbLink,
@@ -95,12 +95,21 @@ export default function OrquideasIndex({ orquideas }: OrquideasIndexProps) {
             Total de orquídeas registradas: {tableData.length}
           </div>
 
-          <Button asChild className="bg-green-600 hover:bg-green-700">
-            <Link href={route('orquideas.create')}>
-              <Plus className="mr-2 h-4 w-4" />
-              Registrar Orquídea
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild className="bg-blue-600 hover:bg-blue-700">
+              <a href="/docsDonwload/ClasesOrquideas.pdf" target="_blank" rel="noopener noreferrer" download>
+                <Download className="mr-2 h-4 w-4" />
+                Descargar Formato Inscripción
+              </a>
+            </Button>
+
+            <Button asChild className="bg-green-600 hover:bg-green-700">
+              <Link href={route('orquideas.create')}>
+                <Plus className="mr-2 h-4 w-4" />
+                Registrar Orquídea
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="container mx-auto">

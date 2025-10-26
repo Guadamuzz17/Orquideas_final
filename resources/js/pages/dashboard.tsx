@@ -9,14 +9,14 @@ import {
   Leaf,
   Award,
   BarChart3,
-  Search,
   Calendar,
-  Eye,
   ChevronRight,
   Home,
   Trophy,
   FileText,
   UserPlus,
+  FolderTree,
+  Tags,
 } from "lucide-react";
 //comentario
 const breadcrumbs: BreadcrumbItem[] = [
@@ -126,7 +126,7 @@ export default function Dashboard({ stats }: DashboardProps) {
     orquideas: 0,
     year: new Date().getFullYear()
   };
-  
+
   const currentStats = stats || defaultStats;
   const statsCards = [
     {
@@ -162,11 +162,18 @@ export default function Dashboard({ stats }: DashboardProps) {
       onClick: () => window.location.href = "/orquideas",
     },
     {
-      title: "Identificación de Orquídeas",
-      description: "Sistema inteligente para identificar y clasificar orquídeas mediante características específicas.",
-      icon: <Search className="w-6 h-6" />,
-      color: "from-amber-500 to-orange-500",
-      onClick: () => console.log("Navegando a Identificación"),
+      title: "Grupos de Orquídeas",
+      description: "Gestiona los grupos y categorías principales de clasificación de orquídeas.",
+      icon: <FolderTree className="w-6 h-6" />,
+      color: "from-orange-500 to-red-500",
+      onClick: () => window.location.href = "/grupos",
+    },
+    {
+      title: "Clases de Orquídeas",
+      description: "Administra las clases específicas de orquídeas dentro de cada grupo.",
+      icon: <Tags className="w-6 h-6" />,
+      color: "from-violet-500 to-purple-600",
+      onClick: () => window.location.href = "/clases",
     },
     {
       title: "Designar Ganadores",
@@ -183,13 +190,6 @@ export default function Dashboard({ stats }: DashboardProps) {
       onClick: () => console.log("Navegando a Reportes"),
     },
     {
-      title: "Estado de Orquídeas",
-      description: "Monitorea el estado actual, condiciones y progreso de las orquídeas en competición.",
-      icon: <Eye className="w-6 h-6" />,
-      color: "from-red-500 to-red-600",
-      onClick: () => console.log("Navegando a Estado"),
-    },
-    {
       title: "Asignar Trofeos",
       description: "Gestiona y otorga los premios de las orquídeas en las diferentes categorías de competición.",
       icon: <Trophy className="w-6 h-6" />,
@@ -201,7 +201,16 @@ export default function Dashboard({ stats }: DashboardProps) {
       description: "Descargar los formatos de inscripción para registrarse de forma manuscrita en el sistema.",
       icon: <FileText className="w-6 h-6" />,
       color: "from-teal-500 to-cyan-500",
-      onClick: () => console.log("Navegando a Formato Inscripción"),
+      onClick: () => {
+        // Descargar el PDF FormatoInscripcion.pdf
+        const link = document.createElement('a');
+        link.href = '/docsDonwload/FormatoInscripcion.pdf';
+        link.download = 'FormatoInscripcion.pdf';
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
     },
     {
       title: "Inscripción",
@@ -311,9 +320,9 @@ export default function Dashboard({ stats }: DashboardProps) {
                   <p className="mb-0">Alta Verapaz</p>
                   <p>Guatemala</p>
                 </div>
-                <img 
-                  src="/images/SISTEMAS_UMG-removebg-preview.png" 
-                  alt="Logo Universidad" 
+                <img
+                  src="/images/SISTEMAS_UMG-removebg-preview.png"
+                  alt="Logo Universidad"
                   className="responsive-img w-48 md:w-56 lg:w-64"
                   style={{ marginRight: '-1rem' }}
                 />

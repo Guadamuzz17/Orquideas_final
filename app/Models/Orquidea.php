@@ -36,6 +36,11 @@ class Orquidea extends Model
         return $this->belongsTo(Participante::class, 'id_participante', 'id');
     }
 
+    public function inscripciones()
+    {
+        return $this->hasMany(Inscripcion::class, 'id_orquidea', 'id_orquidea');
+    }
+
     /**
      * Get the URL for the orchid photo
      */
