@@ -22,7 +22,7 @@ class OrquideaController extends Controller
             return Orquidea::with(['grupo', 'clase', 'participante'])->get();
         }
 
-        $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])->paginate(10);
+        $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])->get();
         return Inertia::render('registro_orquideas/index', [
             'orquideas' => $orquideas,
         ]);
@@ -171,7 +171,7 @@ class OrquideaController extends Controller
     public function getImageUrl($orquidea)
     {
         if ($orquidea->foto) {
-            return Storage::disk('public')->url($orquidea->foto);
+            return Storage::url($orquidea->foto);
         }
         return null;
     }
