@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             MunicipioSeeder::class,
             // OrganizacionSeeder::class, // Comentado para evitar conflictos con AsoSeeder
             GrupoSeeder::class,
+            ClaseSeeder::class,
             TipoParticipanteSeeder::class,
             AsoSeeder::class,
         ]);
