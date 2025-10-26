@@ -36,4 +36,23 @@ class Orquidea extends Model
         return $this->belongsTo(Participante::class, 'id_participante', 'id');
     }
 
+    /**
+     * Get the URL for the orchid photo
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->foto) {
+            return asset('storage/' . $this->foto);
+        }
+        return null;
+    }
+
+    /**
+     * Get the full photo URL
+     */
+    public function getPhotoUrlAttribute()
+    {
+        return $this->getImageUrlAttribute();
+    }
+
 }
