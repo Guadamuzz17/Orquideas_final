@@ -8,7 +8,6 @@ use App\Models\Inscripcion;
 use App\Models\Orquidea;
 use App\Models\Ganador;
 use App\Models\Participante;
-use App\Models\Trofeo;
 
 class ReporteController extends Controller
 {
@@ -191,17 +190,12 @@ class ReporteController extends Controller
             $participante = optional(optional($g->inscripcion)->participante);
             $aso = optional($participante->aso)->Clase ?? '';
 
-            // Determinar si la orquídea asociada tiene trofeo(s)
-            $idOrq = optional(optional($g->inscripcion)->orquidea)->id_orquidea;
-            $hasTrophy = $idOrq ? Trofeo::where('id_orquidea', $idOrq)->exists() : false;
-
             return [
                 'grupo_clase' => $grupoClase,
                 'correlativo' => optional($g->inscripcion)->correlativo ?? '',
                 'planta' => optional(optional($g->inscripcion)->orquidea)->nombre_planta ?? '',
                 'propietario' => $participante->nombre ?? '',
                 'asociacion' => $aso,
-                'trofeo' => $hasTrophy ? 'X' : '',
                 'p1' => $g->posicion == 1 ? 'X' : '',
                 'p2' => $g->posicion == 2 ? 'X' : '',
                 'p3' => $g->posicion == 3 ? 'X' : '',

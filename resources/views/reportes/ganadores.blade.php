@@ -18,7 +18,6 @@
         .w-planta { width: 30%; }
         .w-prop { width: 20%; }
         .w-aso { width: 14%; }
-        .w-tro { width: 6%; }
         .w-pos { width: 3.33%; }
     </style>
 </head>
@@ -37,7 +36,6 @@
                 <th class="w-pos center">1</th>
                 <th class="w-pos center">2</th>
                 <th class="w-pos center">3</th>
-                <th class="w-tro center">Trofeos</th>
             </tr>
         </thead>
         <tbody>
@@ -51,11 +49,10 @@
                     <td class="center">{{ $row['p1'] ?? '' }}</td>
                     <td class="center">{{ $row['p2'] ?? '' }}</td>
                     <td class="center">{{ $row['p3'] ?? '' }}</td>
-                    <td class="center">{{ $row['trofeo'] ?? '' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" class="muted">Sin datos para el rango seleccionado.</td>
+                    <td colspan="8" class="muted">Sin datos para el rango seleccionado.</td>
                 </tr>
             @endforelse
         </tbody>
