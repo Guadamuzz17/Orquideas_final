@@ -10,7 +10,7 @@ class DepartamentoSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('tb_departamento')->insert([
+        $departamentos = [
             ['id_departamento' => 1, 'nombre_departamento' => 'Guatemala'],
             ['id_departamento' => 2, 'nombre_departamento' => 'El Progreso'],
             ['id_departamento' => 3, 'nombre_departamento' => 'Sacatepéquez'],
@@ -33,6 +33,13 @@ class DepartamentoSeeder extends Seeder
             ['id_departamento' => 20, 'nombre_departamento' => 'Chiquimula'],
             ['id_departamento' => 21, 'nombre_departamento' => 'Jalapa'],
             ['id_departamento' => 22, 'nombre_departamento' => 'Jutiapa'],
-        ]);
+        ];
+
+        foreach ($departamentos as $departamento) {
+            DB::table('tb_departamento')->updateOrInsert(
+                ['id_departamento' => $departamento['id_departamento']],
+                $departamento
+            );
+        }
     }
 }

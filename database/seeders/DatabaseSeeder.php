@@ -13,12 +13,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-       
+
         $this->call([
             DepartamentoSeeder::class,
             MunicipioSeeder::class,
-            OrganizacionSeeder::class,
+            // OrganizacionSeeder::class, // Comentado para evitar conflictos con AsoSeeder
             GrupoSeeder::class,
+            ClaseSeeder::class,
             TipoParticipanteSeeder::class,
             AsoSeeder::class,
             ClaseSeeder::class,

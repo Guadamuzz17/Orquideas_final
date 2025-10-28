@@ -12,30 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tb_ganadores', function (Blueprint $table) {
-            // Eliminar columnas antiguas si existen
+            // Eliminar foreign keys primero, luego las columnas
             if (Schema::hasColumn('tb_ganadores', 'id_proudsa')) {
+                $table->dropForeign(['id_proudsa']);
                 $table->dropColumn('id_proudsa');
             }
             if (Schema::hasColumn('tb_ganadores', 'id_grupo')) {
+                $table->dropForeign(['id_grupo']);
                 $table->dropColumn('id_grupo');
             }
             if (Schema::hasColumn('tb_ganadores', 'id_case')) {
+                $table->dropForeign(['id_case']);
                 $table->dropColumn('id_case');
             }
-            
+
             // Agregar nueva estructura
             if (!Schema::hasColumn('tb_ganadores', 'id_inscripcion')) {
                 $table->foreignId('id_inscripcion')->constrained('tb_inscripcion', 'id_nscr')->onDelete('cascade');
             }
-            if (!Schema::hasColumn('tb_ganadores', 'posicion')) {
-                $table->integer('posicion'); // 1, 2, 3 para 1°, 2°, 3° lugar
-            }
-            if (!Schema::hasColumn('tb_ganadores', 'empate')) {
-                $table->boolean('empate')->default(false);
-            }
-            if (!Schema::hasColumn('tb_ganadores', 'fecha_ganador')) {
-                $table->timestamp('fecha_ganador')->useCurrent();
-            }
+            // No agregar posicion, empate y fecha_ganador si ya existen (según la tabla original ya las tiene)
         });
     }
 
@@ -47,12 +42,12 @@ return new class extends Migration
         Schema::table('tb_ganadores', function (Blueprint $table) {
             // Revertir cambios
             $table->dropForeign(['id_inscripcion']);
-            $table->dropColumn(['id_inscripcion', 'posicion', 'empate', 'fecha_ganador']);
-            
+            $table->dropColumn(['id_inscripcion']);
+
             // Restaurar columnas antiguas
-            $table->bigInteger('id_proudsa')->unsigned();
-            $table->bigInteger('id_grupo')->unsigned();
-            $table->bigInteger('id_case')->unsigned();
+            $table->foreignId('id_proudsa')->constrained('tb_participante');
+            $table->foreignId('id_grupo')->constrained('tb_grupo', 'id_grupo');
+            $table->foreignId('id_case')->constrained('tb_clase', 'id_clase');
         });
     }
 };

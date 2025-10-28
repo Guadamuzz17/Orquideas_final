@@ -5,7 +5,7 @@ import { columns } from "./Columns"
 import { DataTable } from "./data-table"
 import React from 'react';
 import { Button } from "@/components/ui/button"
-import { Slash, Plus } from "lucide-react"
+import { Slash, Plus, Download } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbLink,
@@ -59,14 +59,21 @@ interface OrquideasIndexProps {
 }
 
 export default function OrquideasIndex({ orquideas }: OrquideasIndexProps) {
+  console.log('Datos recibidos:', orquideas);
+  console.log('Tipo de datos:', typeof orquideas);
+  console.log('Es array:', Array.isArray(orquideas));
+
   const tableData = orquideas || []
+
+  console.log('Datos de la tabla:', tableData);
+  console.log('Longitud de datos:', tableData.length);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Registro de Orquídeas" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">  
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
         <h1 className="text-2xl font-bold">Registro de Orquídeas</h1>
-        
+
         <div>
           <Breadcrumb>
             <BreadcrumbList>
@@ -87,13 +94,22 @@ export default function OrquideasIndex({ orquideas }: OrquideasIndexProps) {
           <div className="text-sm text-muted-foreground">
             Total de orquídeas registradas: {tableData.length}
           </div>
-          
-          <Button asChild className="bg-green-600 hover:bg-green-700">
-            <Link href={route('orquideas.create')}>
-              <Plus className="mr-2 h-4 w-4" />
-              Registrar Orquídea
-            </Link>
-          </Button>
+
+          <div className="flex items-center gap-2">
+            <Button asChild className="bg-blue-600 hover:bg-blue-700">
+              <a href="/docsDonwload/ClasesOrquideas.pdf" target="_blank" rel="noopener noreferrer" download>
+                <Download className="mr-2 h-4 w-4" />
+                Descargar Formato Inscripción
+              </a>
+            </Button>
+
+            <Button asChild className="bg-green-600 hover:bg-green-700">
+              <Link href={route('orquideas.create')}>
+                <Plus className="mr-2 h-4 w-4" />
+                Registrar Orquídea
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="container mx-auto">
