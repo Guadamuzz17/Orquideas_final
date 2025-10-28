@@ -8,6 +8,7 @@ use App\Http\Controllers\OrquideaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\GanadorController;
+use App\Http\Controllers\ReporteController;
 
 // Ruta de inicio
 Route::get('/', function () {
@@ -18,6 +19,23 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Reportes
+    Route::get('/reportes', function () {
+        return Inertia::render('Reportes/index');
+    })->name('reportes.index');
+
+    // Reporte PDF: Inscripciones (Página 1)
+    Route::get('/reportes/inscripciones/pdf', [ReporteController::class, 'inscripcionesPdf'])->name('reportes.inscripciones.pdf');
+
+    // Reporte PDF: Listado de Plantas por Clases (Página 2)
+    Route::get('/reportes/plantas-por-clases/pdf', [ReporteController::class, 'plantasPorClasesPdf'])->name('reportes.plantas_por_clases.pdf');
+
+    // Reporte PDF: Listado de Orquídeas Ganadoras (Página 3)
+    Route::get('/reportes/ganadores/pdf', [ReporteController::class, 'ganadoresPdf'])->name('reportes.ganadores.pdf');
+
+    // Reporte PDF: Participantes y Orquídeas Asignadas (Página 4)
+    Route::get('/reportes/participantes-orquideas/pdf', [ReporteController::class, 'participantesOrquideasPdf'])->name('reportes.participantes_orquideas.pdf');
 
     // Rutas específicas de orquídeas (DEBEN IR ANTES del resource)
     Route::get('/orquideas/clases/{grupoId}', [OrquideaController::class, 'getClasesByGrupo'])

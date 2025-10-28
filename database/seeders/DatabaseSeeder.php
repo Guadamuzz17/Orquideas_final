@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             GrupoSeeder::class,
             TipoParticipanteSeeder::class,
             AsoSeeder::class,
+            ClaseSeeder::class,
         ]);
     }
 }

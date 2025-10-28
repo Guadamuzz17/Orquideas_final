@@ -46,4 +46,9 @@ class Participante extends Model
     {
         return $this->belongsTo(Usuario::class, 'id_usuario');
     }
+
+    public function orquideas()
+    {
+        return $this->hasMany(Orquidea::class, 'id_participante', 'id');
+    }
 }
