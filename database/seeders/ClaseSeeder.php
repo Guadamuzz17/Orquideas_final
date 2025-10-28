@@ -13,7 +13,7 @@ class ClaseSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('tb_clase')->insert([
+        $clases = [
             ['id_clase' => 1, 'id_grupp' => 1, 'nombre_clase' => 'Clase 1: Epidendrum especie con racimo'],
             ['id_clase' => 2, 'id_grupp' => 1, 'nombre_clase' => 'Clase 2: Epidendrum especie con panícula'],
             ['id_clase' => 3, 'id_grupp' => 1, 'nombre_clase' => 'Clase 3: Epidendrum tipo Oerstedella'],
@@ -128,6 +128,13 @@ class ClaseSeeder extends Seeder
             ['id_clase' => 112, 'id_grupp' => 13, 'nombre_clase' => 'Clase 112: Tema educacional sobre orquídeas'],
             ['id_clase' => 113, 'id_grupp' => 13, 'nombre_clase' => 'Clase 113: Tema educacional sobre medio ambiente'],
             ['id_clase' => 114, 'id_grupp' => 14, 'nombre_clase' => 'Otros'],
-        ]);
+        ];
+
+        foreach ($clases as $clase) {
+            DB::table('tb_clase')->updateOrInsert(
+                ['id_clase' => $clase['id_clase']],
+                $clase
+            );
+        }
     }
 }

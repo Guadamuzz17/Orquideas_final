@@ -16,8 +16,27 @@ class Trofeo extends Model
         'id_clase',
         'id_grupp',
         'categoria',
-        'fecha_ganador'
+        'fecha_ganador',
+        'tipo_premio',
+        'tipo_liston',
+        'descripcion',
+        'id_inscripcion'
     ];
+
+    protected $casts = [
+        'fecha_ganador' => 'date'
+    ];
+
+    // Scopes para filtrar por tipo
+    public function scopeTrofeos($query)
+    {
+        return $query->where('tipo_premio', 'trofeo');
+    }
+
+    public function scopeListones($query)
+    {
+        return $query->where('tipo_premio', 'liston');
+    }
 
     public function orquidea()
     {
@@ -32,5 +51,26 @@ class Trofeo extends Model
     public function grupo()
     {
         return $this->belongsTo(Grupo::class, 'id_grupp');
+    }
+
+    public function inscripcion()
+    {
+        return $this->belongsTo(Inscripcion::class, 'id_inscripcion', 'id_nscr');
+    }
+
+    // Accessors para datos de inscripción (para listones)
+    public function getParticipanteAttribute()
+    {
+        return $this->inscripcion?->participante;
+    }
+
+    public function getOrquideaInscripcionAttribute()
+    {
+        return $this->inscripcion?->orquidea;
+    }
+
+    public function getCorrelativoAttribute()
+    {
+        return $this->inscripcion?->correlativo;
     }
 }

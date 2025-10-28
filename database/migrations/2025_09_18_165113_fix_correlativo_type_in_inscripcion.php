@@ -22,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('inscripcion', function (Blueprint $table) {
-            //
+        Schema::table('tb_inscripcion', function (Blueprint $table) {
+            $table->string('correlativo', 150)->change();
+            $table->dropUnique(['correlativo']);
         });
     }
 };

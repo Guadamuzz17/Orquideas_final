@@ -41,14 +41,24 @@ class InscripcionController extends Controller
 
     /**
      * Get orquídeas by participante
-     * Por ahora devolvemos todas las orquídeas disponibles
      */
     public function getOrquideasByParticipante($participanteId)
     {
-        // Por ahora devolvemos todas las orquídeas ya que no hay relación directa
-        // con participantes en la tabla tb_orquidea
-        $orquideas = Orquidea::with(['grupo', 'clase'])
-            ->get();
+        // Obtener orquídeas del participante con la cantidad de inscripciones
+        $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
+            ->where('id_participante', $participanteId)
+            ->withCount(['inscripciones'])
+            ->get()
+            ->filter(function ($orquidea) {
+                // Solo incluir orquídeas que aún tengan cupos disponibles
+                return $orquidea->inscripciones_count < $orquidea->cantidad;
+            })
+            ->map(function ($orquidea) {
+                // Agregar información de disponibilidad
+                $orquidea->disponibles = $orquidea->cantidad - $orquidea->inscripciones_count;
+                return $orquidea;
+            })
+            ->values(); // Re-indexar el array
 
         return response()->json($orquideas);
     }
@@ -61,14 +71,28 @@ class InscripcionController extends Controller
         $participanteId = $request->get('participante_id');
         $searchTerm = $request->get('search', '');
 
-        // Por ahora buscamos en todas las orquídeas
-        $query = Orquidea::with(['grupo', 'clase']);
+        // Filtrar orquídeas por participante específico con conteo de inscripciones
+        $query = Orquidea::with(['grupo', 'clase', 'participante'])
+            ->where('id_participante', $participanteId)
+            ->withCount(['inscripciones']);
 
         if ($searchTerm) {
             $query->where('nombre_planta', 'LIKE', '%' . $searchTerm . '%');
         }
 
-        $orquideas = $query->get();
+        // Obtener resultados y filtrar por disponibilidad
+        $orquideas = $query->get()
+            ->filter(function ($orquidea) {
+                // Solo incluir orquídeas que aún tengan cupos disponibles
+                return $orquidea->inscripciones_count < $orquidea->cantidad;
+            })
+            ->map(function ($orquidea) {
+                // Agregar información de disponibilidad
+                $orquidea->disponibles = $orquidea->cantidad - $orquidea->inscripciones_count;
+                return $orquidea;
+            })
+            ->take(10) // Limitar resultados para autocompletado
+            ->values(); // Re-indexar el array
 
         return response()->json($orquideas);
     }
@@ -79,7 +103,7 @@ class InscripcionController extends Controller
     public function checkCorrelativo(Request $request)
     {
         $correlativo = $request->get('correlativo');
-        
+
         $inscripcion = Inscripcion::where('correlativo', $correlativo)
             ->with(['participante', 'orquidea'])
             ->first();
@@ -105,7 +129,7 @@ class InscripcionController extends Controller
     public function getUltimoCorrelativo()
     {
         $ultimoCorrelativo = Inscripcion::max('correlativo') ?? 0;
-        
+
         return response()->json([
             'ultimo_correlativo' => $ultimoCorrelativo
         ]);

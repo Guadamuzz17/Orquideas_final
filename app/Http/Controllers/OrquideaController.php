@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\Orquidea;
-use App\Models\Grupo;
 use App\Models\Clase;
+use App\Models\Grupo;
+use App\Models\Orquidea;
 use App\Models\Participante;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Inertia\Inertia;
 
 class OrquideaController extends Controller
 {
@@ -18,10 +18,13 @@ class OrquideaController extends Controller
      */
     public function index()
     {
+        if (request()->wantsJson()) {
+            return Orquidea::with(['grupo', 'clase', 'participante'])->get();
+        }
+
         $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])->get();
-        
         return Inertia::render('registro_orquideas/index', [
-            'orquideas' => $orquideas
+            'orquideas' => $orquideas,
         ]);
     }
 
@@ -48,12 +51,12 @@ class OrquideaController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nombre_planta' => 'required|string|max:255',
-            'origen' => 'required|in:Especie,Híbrida',
+            'origen' => 'required|string|max:255',
             'id_grupo' => 'required|exists:tb_grupo,id_grupo',
             'id_clase' => 'required|exists:tb_clase,id_clase',
-            'cantidad' => 'required|integer|min:1|max:99',
+            'cantidad' => 'required|integer|min:1',
             'id_participante' => 'required|exists:tb_participante,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -79,48 +82,46 @@ class OrquideaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Orquidea $orquidea)
     {
-        $orquidea = Orquidea::with(['grupo', 'clase', 'participante'])->findOrFail($id);
-        
-        return Inertia::render('registro_orquideas/Show', [
-            'orquidea' => $orquidea
+        $orquidea->load(['grupo', 'clase', 'participante']);
+
+        if (request()->wantsJson()) {
+            return response()->json($orquidea);
+        }
+
+        return Inertia::render('orquideas/show', [
+            'orquidea' => $orquidea,
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Orquidea $orquidea)
     {
-        $orquidea = Orquidea::findOrFail($id);
-        $grupos = Grupo::all();
-        $clases = Clase::all();
-        $participantes = Participante::all();
-
-        return Inertia::render('registro_orquideas/Edit', [
+        $orquidea->load(['grupo', 'clase', 'participante']);
+        return Inertia::render('orquideas/form', [
             'orquidea' => $orquidea,
-            'grupos' => $grupos,
-            'clases' => $clases,
-            'participantes' => $participantes
+            'grupos' => Grupo::select('id_grupo', 'nombre_grupo')->get(),
+            'clases' => Clase::select('id_clase', 'nombre_clase', 'id_grupp')->get(),
+            'participantes' => Participante::select('id', 'nombre')->get(),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Orquidea $orquidea)
     {
-        $orquidea = Orquidea::findOrFail($id);
-
         $validator = Validator::make($request->all(), [
             'nombre_planta' => 'required|string|max:255',
-            'origen' => 'required|in:Especie,Híbrida',
+            'origen' => 'required|string|max:255',
             'id_grupo' => 'required|exists:tb_grupo,id_grupo',
             'id_clase' => 'required|exists:tb_clase,id_clase',
-            'cantidad' => 'required|integer|min:1|max:99',
+            'cantidad' => 'required|integer|min:1',
             'id_participante' => 'required|exists:tb_participante,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -129,10 +130,10 @@ class OrquideaController extends Controller
 
         $data = $request->all();
 
-        // Manejar la actualización de imagen
+        // Manejar la subida de imagen
         if ($request->hasFile('foto')) {
-            // Eliminar la imagen anterior si existe
-            if ($orquidea->foto && Storage::disk('public')->exists($orquidea->foto)) {
+            // Eliminar imagen anterior si existe
+            if ($orquidea->foto) {
                 Storage::disk('public')->delete($orquidea->foto);
             }
 
@@ -151,12 +152,10 @@ class OrquideaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Orquidea $orquidea)
     {
-        $orquidea = Orquidea::findOrFail($id);
-
-        // Eliminar la imagen si existe
-        if ($orquidea->foto && Storage::disk('public')->exists($orquidea->foto)) {
+        // Eliminar imagen si existe
+        if ($orquidea->foto) {
             Storage::disk('public')->delete($orquidea->foto);
         }
 
@@ -167,11 +166,13 @@ class OrquideaController extends Controller
     }
 
     /**
-     * Get clases by grupo for AJAX requests
+     * Get image URL for display
      */
-    public function getClasesByGrupo($grupoId)
+    public function getImageUrl($orquidea)
     {
-        $clases = Clase::where('id_grupp', $grupoId)->get();
-        return response()->json($clases);
+        if ($orquidea->foto) {
+            return Storage::url($orquidea->foto);
+        }
+        return null;
     }
 }

@@ -1,0 +1,12 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#f3f4f6"/>
+  <rect x="150" y="100" width="100" height="80" rx="10" fill="#6b7280"/>
+  <circle cx="170" cy="120" r="8" fill="#9ca3af"/>
+  <polygon points="180,140 190,150 200,140 210,150 220,140 220,160 180,160" fill="#9ca3af"/>
+  <text x="200" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#374151">
+    Fotografía de Evento
+  </text>
+  <text x="200" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">
+    Imagen no disponible
+  </text>
+</svg>

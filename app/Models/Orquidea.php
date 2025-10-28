@@ -16,7 +16,9 @@ class Orquidea extends Model
         'origen',
         'foto',
         'id_grupo',
-        'id_case'
+        'id_clase',
+        'cantidad',
+        'id_participante'
     ];
 
     public function grupo()
@@ -26,7 +28,36 @@ class Orquidea extends Model
 
     public function clase()
     {
-        return $this->belongsTo(Clase::class, 'id_case', 'id_clase');
+        return $this->belongsTo(Clase::class, 'id_clase', 'id_clase');
+    }
+
+    public function participante()
+    {
+        return $this->belongsTo(Participante::class, 'id_participante', 'id');
+    }
+
+    public function inscripciones()
+    {
+        return $this->hasMany(Inscripcion::class, 'id_orquidea', 'id_orquidea');
+    }
+
+    /**
+     * Get the URL for the orchid photo
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->foto) {
+            return asset('storage/' . $this->foto);
+        }
+        return null;
+    }
+
+    /**
+     * Get the full photo URL
+     */
+    public function getPhotoUrlAttribute()
+    {
+        return $this->getImageUrlAttribute();
     }
 
 }
