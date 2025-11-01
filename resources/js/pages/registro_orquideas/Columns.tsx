@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useForm, router } from '@inertiajs/react'
 import { toast, Toaster } from 'sonner'
 import { useState } from 'react'
+import { showDeleteConfirm } from '@/utils/sweetalert'
 import {
   Select,
   SelectContent,
@@ -114,7 +115,7 @@ export const columns: ColumnDef<Orquidea>[] = [
         enableSorting: false,
         enableHiding: false,
       },
-   
+
     {
         accessorKey: "id_orquidea",
         header: ({ column }) => {
@@ -128,7 +129,7 @@ export const columns: ColumnDef<Orquidea>[] = [
             </Button>
           )
         },
-    },  
+    },
     {
         accessorKey: "nombre_planta",
         header: ({ column }) => {
@@ -172,7 +173,7 @@ export const columns: ColumnDef<Orquidea>[] = [
       cell: ({ row }) => {
         const orquidea = row.original;
         const [showImageModal, setShowImageModal] = useState(false);
-        
+
         const ImageModal = () => (
           <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
             <DialogContent className="max-w-2xl">
@@ -183,7 +184,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                 </DialogDescription>
               </DialogHeader>
               <div className="flex justify-center">
-                <img 
+                <img
                   src={orquidea.foto?.startsWith('http') ? orquidea.foto : `/storage/${orquidea.foto}`}
                   alt={orquidea.nombre_planta}
                   className="max-w-full max-h-96 object-contain rounded-lg"
@@ -197,11 +198,11 @@ export const columns: ColumnDef<Orquidea>[] = [
           <div className="flex justify-center">
             {orquidea.foto ? (
               <>
-                <div 
+                <div
                   className="relative cursor-pointer group"
                   onClick={() => setShowImageModal(true)}
                 >
-                  <img 
+                  <img
                     src={orquidea.foto?.startsWith('http') ? orquidea.foto : `/storage/${orquidea.foto}`}
                     alt={orquidea.nombre_planta}
                     className="h-12 w-12 object-cover rounded-md border hover:scale-105 transition-transform"
@@ -249,12 +250,13 @@ export const columns: ColumnDef<Orquidea>[] = [
               id_participante: orquidea.id_participante.toString(),
           });
 
-          const handleDelete = (id: number) => {
-              router.delete(route('orquideas.destroy', id), {
-                onSuccess: () => toast.success('Orquídea eliminada correctamente'),
-                onError: () => toast.error('Error al eliminar la orquídea'),
-                preserveScroll: true
-              });
+          const handleDelete = async (id: number, nombre: string) => {
+              const result = await showDeleteConfirm(nombre);
+              if (result.isConfirmed) {
+                router.delete(route('orquideas.destroy', id), {
+                  preserveScroll: true
+                });
+              }
             }
 
             const handleEditSubmit = (e: React.FormEvent, id: number) => {
@@ -265,7 +267,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                 preserveScroll: true
               });
             };
-     
+
           return (
             <div className="flex justify-end items-center gap-2">
               <Toaster position="top-right" richColors expand visibleToasts={3} />
@@ -281,7 +283,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                     <DrawerDescription>Información sobre "{orquidea.nombre_planta}"</DrawerDescription>
                   </DrawerHeader>
                   <DrawerFooter>
-                  
+
                   {/* Imagen de la orquídea */}
                   {orquidea.foto && (
                     <div className="mb-4 text-center">
@@ -289,7 +291,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                         Foto de la Orquídea
                       </Label>
                       <div className="relative mx-auto w-48 h-48">
-                        <img 
+                        <img
                           src={orquidea.foto?.startsWith('http') ? orquidea.foto : `/storage/${orquidea.foto}`}
                           alt={orquidea.nombre_planta}
                           className="w-full h-full object-cover rounded-lg border shadow-sm"
@@ -316,7 +318,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                     Nombre de la Planta
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="nombre_planta"
                     defaultValue={orquidea.nombre_planta}
                     className="mb-4"
@@ -324,8 +326,8 @@ export const columns: ColumnDef<Orquidea>[] = [
                     <Label htmlFor="origen" className="text-right">
                     Origen
                   </Label>
-                  <Input 
-                    disabled 
+                  <Input
+                    disabled
                     id="origen"
                     defaultValue={orquidea.origen}
                     className="mb-4"
@@ -335,7 +337,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                     Grupo
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="grupo"
                     defaultValue={orquidea.grupo?.nombre_grupo || ""}
                     className="mb-4"
@@ -345,7 +347,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                     Clase
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="clase"
                     defaultValue={orquidea.clase?.nombre_clase || ""}
                     className="mb-4"
@@ -355,7 +357,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                     Cantidad
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="cantidad"
                     defaultValue={orquidea.cantidad.toString()}
                     className="mb-4"
@@ -365,7 +367,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                     Participante
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="participante"
                     defaultValue={orquidea.participante?.nombre || ""}
                     className="mb-4"
@@ -447,7 +449,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                         <Button type="submit" disabled={processing} >
                         {processing ? 'Guardando...' : 'Guardar Cambios'}
                         </Button>
-                      </DialogFooter>  
+                      </DialogFooter>
                     </form>
                 </DialogContent>
               </Dialog>
@@ -467,7 +469,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction className="bg-destructive hover:bg-destructive/90"
-                          onClick={() => handleDelete(orquidea.id_orquidea)}>
+                          onClick={() => handleDelete(orquidea.id_orquidea, orquidea.nombre_planta)}>
                           Confirmar
                         </AlertDialogAction>
                       </AlertDialogFooter>

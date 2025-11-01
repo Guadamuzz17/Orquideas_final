@@ -92,7 +92,7 @@ class TrofeoController extends Controller
             DB::rollBack();
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Error al asignar trofeo: '.$e->getMessage()]);
+                ->with('error', 'Error al asignar trofeo: '.$e->getMessage());
         }
     }
 
@@ -155,25 +155,29 @@ class TrofeoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'categoria' => 'required|string'
-        ]);
+        try {
+            $request->validate([
+                'categoria' => 'required|string'
+            ]);
 
-        $trofeo = Trofeo::find($id);
+            $trofeo = Trofeo::find($id);
 
-        if (!$trofeo) {
+            if (!$trofeo) {
+                return redirect()
+                    ->route('trofeos.index')
+                    ->with('error', 'Trofeo no encontrado');
+            }
+
+            $trofeo->update([
+                'categoria' => $request->categoria
+            ]);
+
             return redirect()
                 ->route('trofeos.index')
-                ->with('error', 'Trofeo no encontrado');
+                ->with('success', 'Trofeo actualizado correctamente');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al actualizar el trofeo: ' . $e->getMessage());
         }
-
-        $trofeo->update([
-            'categoria' => $request->categoria
-        ]);
-
-        return redirect()
-            ->route('trofeos.index')
-            ->with('success', 'Trofeo actualizado correctamente');
     }
 
     /**
@@ -181,18 +185,22 @@ class TrofeoController extends Controller
      */
     public function destroy(string $id)
     {
-        $trofeo = Trofeo::find($id);
+        try {
+            $trofeo = Trofeo::find($id);
 
-        if (!$trofeo) {
+            if (!$trofeo) {
+                return redirect()
+                    ->route('trofeos.index')
+                    ->with('error', 'Trofeo no encontrado');
+            }
+
+            $trofeo->delete();
+
             return redirect()
                 ->route('trofeos.index')
-                ->with('error', 'Trofeo no encontrado');
+                ->with('success', 'Trofeo eliminado correctamente');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al eliminar el trofeo: ' . $e->getMessage());
         }
-
-        $trofeo->delete();
-
-        return redirect()
-            ->route('trofeos.index')
-            ->with('success', 'Trofeo eliminado correctamente');
     }
 }

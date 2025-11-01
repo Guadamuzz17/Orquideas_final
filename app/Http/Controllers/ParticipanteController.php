@@ -52,31 +52,37 @@ class ParticipanteController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:255',
-            'numero_telefonico' => 'required|string|max:20',
-            'direccion' => 'required|string|max:500',
-            'id_tipo' => 'required|exists:tb_tipoparticipante,id_tipo',
-            'id_departamento' => 'required|exists:tb_departamento,id_departamento',
-            'id_municipio' => 'required|exists:tb_municipio,id_municipio',
-            'id_aso' => 'required|exists:tb_aso,id_aso',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'nombre' => 'required|string|max:255',
+                'numero_telefonico' => 'required|string|max:20',
+                'direccion' => 'required|string|max:500',
+                'id_tipo' => 'required|exists:tb_tipoparticipante,id_tipo',
+                'id_departamento' => 'required|exists:tb_departamento,id_departamento',
+                'id_municipio' => 'required|exists:tb_municipio,id_municipio',
+                'id_aso' => 'required|exists:tb_aso,id_aso',
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            $data = $request->all();
+            // Asignar null para id_usuario ya que ahora es nullable
+            $data['id_usuario'] = null;
+            $data['id_evento'] = session('evento_activo'); // Asociar al evento activo
+
+            Participante::create($data);
+
+            return redirect()->route('participantes.index')
+                ->with('success', 'Participante creado exitosamente.');
+        } catch (\Exception $e) {
             return redirect()->back()
-                ->withErrors($validator)
+                ->with('error', 'Error al crear el participante: ' . $e->getMessage())
                 ->withInput();
         }
-
-        $data = $request->all();
-        // Asignar null para id_usuario ya que ahora es nullable
-        $data['id_usuario'] = null;
-        $data['id_evento'] = session('evento_activo'); // Asociar al evento activo
-
-        Participante::create($data);
-
-        return redirect()->route('participantes.index')
-            ->with('success', 'Participante creado exitosamente.');
     }
 
     /**
@@ -114,34 +120,40 @@ class ParticipanteController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $participante = Participante::findOrFail($id);
+        try {
+            $participante = Participante::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:255',
-            'numero_telefonico' => 'required|string|max:20',
-            'direccion' => 'required|string|max:500',
-            'id_tipo' => 'required|exists:tb_tipoparticipante,id_tipo',
-            'id_departamento' => 'required|exists:tb_departamento,id_departamento',
-            'id_municipio' => 'required|exists:tb_municipio,id_municipio',
-            'id_aso' => 'required|exists:tb_aso,id_aso',
-        ]);
+            $validator = Validator::make($request->all(), [
+                'nombre' => 'required|string|max:255',
+                'numero_telefonico' => 'required|string|max:20',
+                'direccion' => 'required|string|max:500',
+                'id_tipo' => 'required|exists:tb_tipoparticipante,id_tipo',
+                'id_departamento' => 'required|exists:tb_departamento,id_departamento',
+                'id_municipio' => 'required|exists:tb_municipio,id_municipio',
+                'id_aso' => 'required|exists:tb_aso,id_aso',
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            $data = $request->all();
+            // Mantener el usuario original o asignar null si no existe
+            if (!isset($data['id_usuario'])) {
+                $data['id_usuario'] = $participante->id_usuario ?? null;
+            }
+
+            $participante->update($data);
+
+            return redirect()->route('participantes.index')
+                ->with('success', 'Participante actualizado exitosamente.');
+        } catch (\Exception $e) {
             return redirect()->back()
-                ->withErrors($validator)
+                ->with('error', 'Error al actualizar el participante: ' . $e->getMessage())
                 ->withInput();
         }
-
-        $data = $request->all();
-        // Mantener el usuario original o asignar null si no existe
-        if (!isset($data['id_usuario'])) {
-            $data['id_usuario'] = $participante->id_usuario ?? null;
-        }
-
-        $participante->update($data);
-
-        return redirect()->route('participantes.index')
-            ->with('success', 'Participante actualizado exitosamente.');
     }
 
     /**
@@ -149,11 +161,16 @@ class ParticipanteController extends Controller
      */
     public function destroy(string $id)
     {
-        $participante = Participante::findOrFail($id);
-        $participante->delete();
+        try {
+            $participante = Participante::findOrFail($id);
+            $participante->delete();
 
-        return redirect()->route('participantes.index')
-            ->with('success', 'Participante eliminado exitosamente.');
+            return redirect()->route('participantes.index')
+                ->with('success', 'Participante eliminado exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al eliminar el participante: ' . $e->getMessage());
+        }
     }
 
     /**

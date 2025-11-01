@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { router, useForm } from '@inertiajs/react'
 import { Toaster, toast } from 'sonner'
 import React, { useState } from 'react'
+import { showDeleteConfirm } from '@/utils/sweetalert'
 
 import {
   Dialog,
@@ -116,7 +117,7 @@ export const columns: ColumnDef<Participante>[] = [
         enableSorting: false,
         enableHiding: false,
       },
-   
+
     {
         accessorKey: "id",
         header: ({ column }) => {
@@ -130,7 +131,7 @@ export const columns: ColumnDef<Participante>[] = [
             </Button>
           )
         },
-    },  
+    },
     {
         accessorKey: "nombre",
         header: ({ column }) => {
@@ -187,12 +188,13 @@ export const columns: ColumnDef<Participante>[] = [
               id_aso: participante.id_aso.toString(),
           });
 
-          const handleDelete = (id: number) => {
-              router.delete(route('participantes.destroy', id), {
-                onSuccess: () => toast.success('Participante eliminado correctamente'),
-                onError: () => toast.error('Error al eliminar el participante'),
-                preserveScroll: true
-              });
+          const handleDelete = async (id: number, nombre: string) => {
+              const result = await showDeleteConfirm(nombre);
+              if (result.isConfirmed) {
+                router.delete(route('participantes.destroy', id), {
+                  preserveScroll: true
+                });
+              }
             }
 
             const handleEditSubmit = (e: React.FormEvent, id: number) => {
@@ -203,7 +205,7 @@ export const columns: ColumnDef<Participante>[] = [
                 preserveScroll: true
               });
             };
-     
+
           return (
             <div className="flex justify-end items-center gap-2">
               <Toaster position="top-right" richColors expand visibleToasts={3} />
@@ -223,7 +225,7 @@ export const columns: ColumnDef<Participante>[] = [
                     Nombre
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="nombre"
                     defaultValue={participante.nombre}
                     className="mb-4"
@@ -231,8 +233,8 @@ export const columns: ColumnDef<Participante>[] = [
                     <Label htmlFor="numero_telefonico" className="text-right">
                     Teléfono
                   </Label>
-                  <Input 
-                    disabled 
+                  <Input
+                    disabled
                     id="numero_telefonico"
                     defaultValue={participante.numero_telefonico ?? ""}
                     className="mb-4"
@@ -242,7 +244,7 @@ export const columns: ColumnDef<Participante>[] = [
                     Dirección
                   </Label>
                   <Textarea
-                    disabled 
+                    disabled
                     id="direccion"
                     defaultValue={participante.direccion}
                     className="mb-4"
@@ -252,7 +254,7 @@ export const columns: ColumnDef<Participante>[] = [
                     Tipo de Participante
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="tipo"
                     defaultValue={participante.tipo?.Clase || ""}
                     className="mb-4"
@@ -262,7 +264,7 @@ export const columns: ColumnDef<Participante>[] = [
                     Departamento
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="departamento"
                     defaultValue={participante.departamento?.nombre_departamento || ""}
                     className="mb-4"
@@ -272,7 +274,7 @@ export const columns: ColumnDef<Participante>[] = [
                     Municipio
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="municipio"
                     defaultValue={participante.municipio?.nombre_municipio || ""}
                     className="mb-4"
@@ -282,7 +284,7 @@ export const columns: ColumnDef<Participante>[] = [
                     Asociación
                   </Label>
                   <Input
-                    disabled 
+                    disabled
                     id="asociacion"
                     defaultValue={participante.aso?.Clase || ""}
                     className="mb-4"
@@ -339,7 +341,7 @@ export const columns: ColumnDef<Participante>[] = [
                         <Label htmlFor="numero_telefonico" className="text-right">
                         Teléfono
                       </Label>
-                      <Input 
+                      <Input
                         id="numero_telefonico"
                         value={data.numero_telefonico ?? ""}
                         onChange={(e) => setData('numero_telefonico', e.target.value)}
@@ -359,7 +361,7 @@ export const columns: ColumnDef<Participante>[] = [
                         <Button type="submit" disabled={processing} >
                         {processing ? 'Guardando...' : 'Guardar Cambios'}
                         </Button>
-                      </DialogFooter>  
+                      </DialogFooter>
                     </form>
                 </DialogContent>
               </Dialog>
@@ -379,7 +381,7 @@ export const columns: ColumnDef<Participante>[] = [
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction className="bg-destructive hover:bg-destructive/90"
-                          onClick={() => handleDelete(participante.id)}>
+                          onClick={() => handleDelete(participante.id, participante.nombre)}>
                           Confirmar
                         </AlertDialogAction>
                       </AlertDialogFooter>

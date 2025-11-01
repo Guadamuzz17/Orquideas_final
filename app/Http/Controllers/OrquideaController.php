@@ -58,35 +58,41 @@ class OrquideaController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nombre_planta' => 'required|string|max:255',
-            'origen' => 'required|string|max:255',
-            'id_grupo' => 'required|exists:tb_grupo,id_grupo',
-            'id_clase' => 'required|exists:tb_clase,id_clase',
-            'cantidad' => 'required|integer|min:1',
-            'id_participante' => 'required|exists:tb_participante,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'nombre_planta' => 'required|string|max:255',
+                'origen' => 'required|string|max:255',
+                'id_grupo' => 'required|exists:tb_grupo,id_grupo',
+                'id_clase' => 'required|exists:tb_clase,id_clase',
+                'cantidad' => 'required|integer|min:1',
+                'id_participante' => 'required|exists:tb_participante,id',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
+            }
+
+            $data = $request->all();
+            $data['id_evento'] = session('evento_activo'); // Asociar al evento activo
+
+            // Manejar la subida de imagen
+            if ($request->hasFile('foto')) {
+                $foto = $request->file('foto');
+                $nombreFoto = time() . '_' . $foto->getClientOriginalName();
+                $rutaFoto = $foto->storeAs('orquideas', $nombreFoto, 'public');
+                $data['foto'] = $rutaFoto;
+            }
+
+            Orquidea::create($data);
+
+            return redirect()->route('orquideas.index')
+                ->with('success', 'Orquídea registrada exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al registrar la orquídea: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $data = $request->all();
-        $data['id_evento'] = session('evento_activo'); // Asociar al evento activo
-
-        // Manejar la subida de imagen
-        if ($request->hasFile('foto')) {
-            $foto = $request->file('foto');
-            $nombreFoto = time() . '_' . $foto->getClientOriginalName();
-            $rutaFoto = $foto->storeAs('orquideas', $nombreFoto, 'public');
-            $data['foto'] = $rutaFoto;
-        }
-
-        Orquidea::create($data);
-
-        return redirect()->route('orquideas.index')
-            ->with('success', 'Orquídea registrada exitosamente.');
     }
 
     /**
@@ -124,39 +130,45 @@ class OrquideaController extends Controller
      */
     public function update(Request $request, Orquidea $orquidea)
     {
-        $validator = Validator::make($request->all(), [
-            'nombre_planta' => 'required|string|max:255',
-            'origen' => 'required|string|max:255',
-            'id_grupo' => 'required|exists:tb_grupo,id_grupo',
-            'id_clase' => 'required|exists:tb_clase,id_clase',
-            'cantidad' => 'required|integer|min:1',
-            'id_participante' => 'required|exists:tb_participante,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'nombre_planta' => 'required|string|max:255',
+                'origen' => 'required|string|max:255',
+                'id_grupo' => 'required|exists:tb_grupo,id_grupo',
+                'id_clase' => 'required|exists:tb_clase,id_clase',
+                'cantidad' => 'required|integer|min:1',
+                'id_participante' => 'required|exists:tb_participante,id',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
-
-        $data = $request->all();
-
-        // Manejar la subida de imagen
-        if ($request->hasFile('foto')) {
-            // Eliminar imagen anterior si existe
-            if ($orquidea->foto) {
-                Storage::disk('public')->delete($orquidea->foto);
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
             }
 
-            $foto = $request->file('foto');
-            $nombreFoto = time() . '_' . $foto->getClientOriginalName();
-            $rutaFoto = $foto->storeAs('orquideas', $nombreFoto, 'public');
-            $data['foto'] = $rutaFoto;
+            $data = $request->all();
+
+            // Manejar la subida de imagen
+            if ($request->hasFile('foto')) {
+                // Eliminar imagen anterior si existe
+                if ($orquidea->foto) {
+                    Storage::disk('public')->delete($orquidea->foto);
+                }
+
+                $foto = $request->file('foto');
+                $nombreFoto = time() . '_' . $foto->getClientOriginalName();
+                $rutaFoto = $foto->storeAs('orquideas', $nombreFoto, 'public');
+                $data['foto'] = $rutaFoto;
+            }
+
+            $orquidea->update($data);
+
+            return redirect()->route('orquideas.index')
+                ->with('success', 'Orquídea actualizada exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al actualizar la orquídea: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $orquidea->update($data);
-
-        return redirect()->route('orquideas.index')
-            ->with('success', 'Orquídea actualizada exitosamente.');
     }
 
     /**
@@ -164,15 +176,20 @@ class OrquideaController extends Controller
      */
     public function destroy(Orquidea $orquidea)
     {
-        // Eliminar imagen si existe
-        if ($orquidea->foto) {
-            Storage::disk('public')->delete($orquidea->foto);
+        try {
+            // Eliminar imagen si existe
+            if ($orquidea->foto) {
+                Storage::disk('public')->delete($orquidea->foto);
+            }
+
+            $orquidea->delete();
+
+            return redirect()->route('orquideas.index')
+                ->with('success', 'Orquídea eliminada exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al eliminar la orquídea: ' . $e->getMessage());
         }
-
-        $orquidea->delete();
-
-        return redirect()->route('orquideas.index')
-            ->with('success', 'Orquídea eliminada exitosamente.');
     }
 
     /**

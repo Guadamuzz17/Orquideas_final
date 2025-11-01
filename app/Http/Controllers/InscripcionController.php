@@ -177,7 +177,7 @@ class InscripcionController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withErrors(['error' => 'Error al procesar las inscripciones: ' . $e->getMessage()]);
+            return back()->with('error', 'Error al procesar las inscripciones: ' . $e->getMessage());
         }
     }
 
@@ -221,7 +221,7 @@ class InscripcionController extends Controller
 
             return back()->with('success', 'Inscripción eliminada exitosamente');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Error al eliminar la inscripción']);
+            return back()->with('error', 'Error al eliminar la inscripción: ' . $e->getMessage());
         }
     }
 }

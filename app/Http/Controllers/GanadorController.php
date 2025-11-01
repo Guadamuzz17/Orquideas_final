@@ -59,28 +59,32 @@ class GanadorController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'id_inscripcion' => 'required|exists:tb_inscripcion,id_nscr',
-            'posicion' => 'required|integer|min:1|max:3',
-            'empate' => 'boolean'
-        ]);
+        try {
+            $request->validate([
+                'id_inscripcion' => 'required|exists:tb_inscripcion,id_nscr',
+                'posicion' => 'required|integer|min:1|max:3',
+                'empate' => 'boolean'
+            ]);
 
-        // Verificar que la inscripción no tenga ya un ganador
-        $existeGanador = Ganador::where('id_inscripcion', $request->id_inscripcion)->first();
-        if ($existeGanador) {
-            return back()->withErrors(['id_inscripcion' => 'Esta inscripción ya tiene un ganador asignado.']);
+            // Verificar que la inscripción no tenga ya un ganador
+            $existeGanador = Ganador::where('id_inscripcion', $request->id_inscripcion)->first();
+            if ($existeGanador) {
+                return back()->with('error', 'Esta inscripción ya tiene un ganador asignado.');
+            }
+
+            Ganador::create([
+                'id_inscripcion' => $request->id_inscripcion,
+                'posicion' => $request->posicion,
+                'empate' => $request->empate ?? false,
+                'fecha_ganador' => now(),
+                'id_evento' => session('evento_activo')
+            ]);
+
+            return redirect()->route('ganadores.index')
+                ->with('success', 'Ganador asignado correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al asignar el ganador: ' . $e->getMessage());
         }
-
-        Ganador::create([
-            'id_inscripcion' => $request->id_inscripcion,
-            'posicion' => $request->posicion,
-            'empate' => $request->empate ?? false,
-            'fecha_ganador' => now(),
-            'id_evento' => session('evento_activo')
-        ]);
-
-        return redirect()->route('ganadores.index')
-            ->with('success', 'Ganador asignado correctamente.');
     }
 
     /**
@@ -120,18 +124,22 @@ class GanadorController extends Controller
      */
     public function update(Request $request, Ganador $ganador)
     {
-        $request->validate([
-            'posicion' => 'required|integer|min:1|max:3',
-            'empate' => 'boolean'
-        ]);
+        try {
+            $request->validate([
+                'posicion' => 'required|integer|min:1|max:3',
+                'empate' => 'boolean'
+            ]);
 
-        $ganador->update([
-            'posicion' => $request->posicion,
-            'empate' => $request->empate ?? false
-        ]);
+            $ganador->update([
+                'posicion' => $request->posicion,
+                'empate' => $request->empate ?? false
+            ]);
 
-        return redirect()->route('ganadores.index')
-            ->with('success', 'Ganador actualizado correctamente.');
+            return redirect()->route('ganadores.index')
+                ->with('success', 'Ganador actualizado correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al actualizar el ganador: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -139,10 +147,14 @@ class GanadorController extends Controller
      */
     public function destroy(Ganador $ganador)
     {
-        $ganador->delete();
+        try {
+            $ganador->delete();
 
-        return redirect()->route('ganadores.index')
-            ->with('success', 'Ganador eliminado correctamente.');
+            return redirect()->route('ganadores.index')
+                ->with('success', 'Ganador eliminado correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al eliminar el ganador: ' . $e->getMessage());
+        }
     }
 
     /**

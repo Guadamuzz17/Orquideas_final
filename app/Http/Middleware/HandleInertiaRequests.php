@@ -56,6 +56,13 @@ class HandleInertiaRequests extends Middleware
                 'id' => session('evento_activo'),
                 'nombre' => session('evento_nombre'),
             ],
+            // Compartir mensajes flash
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+                'warning' => fn () => $request->session()->get('warning'),
+                'info' => fn () => $request->session()->get('info'),
+            ],
         ];
     }
 }
