@@ -15,8 +15,11 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     }
 
     return (
-        <SidebarProvider defaultOpen={true} className="min-h-screen">
-            <div className="flex min-h-screen w-full">
+        <SidebarProvider
+            defaultOpen={true}
+            className="min-h-screen w-full"
+        >
+            <div className="relative flex min-h-screen w-full">
                 {children}
             </div>
         </SidebarProvider>

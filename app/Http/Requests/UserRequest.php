@@ -34,6 +34,7 @@ class UserRequest extends FormRequest
                 'max:255',
                 'unique:users,email' . ($userId ? ",$userId" : '')
             ],
+            'rol_id' => ['nullable', 'exists:roles,id'],
         ];
 
         // Reglas de contraseña solo para creación o cuando se especifica

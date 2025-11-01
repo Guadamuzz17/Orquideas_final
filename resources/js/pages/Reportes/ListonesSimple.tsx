@@ -31,19 +31,27 @@ interface Clase {
     nom_clase: string;
 }
 
+interface TipoPremio {
+    id_tipo_premio: number;
+    nombre_premio: string;
+    color: string;
+    posicion: number;
+}
+
 interface PageProps {
     estadisticas: EstadisticasProps;
     listones_recientes: ListonReciente[];
     grupos: Grupo[];
     clases: Clase[];
+    tiposPremio: TipoPremio[];
     error?: string;
 }
 
-export default function ListonesReportes({ estadisticas, listones_recientes, grupos, clases, error }: PageProps) {
+export default function ListonesReportes({ estadisticas, listones_recientes, grupos, clases, tiposPremio, error }: PageProps) {
     const [filtros, setFiltros] = useState({
         fecha_desde: '',
         fecha_hasta: '',
-        tipo_liston: '',
+        id_tipo_premio: 'all',
         id_grupo: 'all',
         id_clase: 'all'
     });
@@ -112,7 +120,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
         setFiltros({
             fecha_desde: '',
             fecha_hasta: '',
-            tipo_liston: '',
+            id_tipo_premio: 'all',
             id_grupo: 'all',
             id_clase: 'all'
         });
@@ -172,14 +180,26 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="tipo_liston">Tipo de Listón</Label>
-                                        <Input
-                                            type="text"
-                                            id="tipo_liston"
-                                            placeholder="Ej: Primer lugar, Segundo lugar..."
-                                            value={filtros.tipo_liston}
-                                            onChange={(e) => handleFiltroChange('tipo_liston', e.target.value)}
-                                        />
+                                        <Label htmlFor="tipo_premio">Tipo de Premio</Label>
+                                        <Select value={filtros.id_tipo_premio} onValueChange={(value) => handleFiltroChange('id_tipo_premio', value)}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Seleccionar tipo de premio" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">Todos los premios</SelectItem>
+                                                {tiposPremio.map((tipo) => (
+                                                    <SelectItem key={tipo.id_tipo_premio} value={tipo.id_tipo_premio.toString()}>
+                                                        <div className="flex items-center gap-2">
+                                                            <span
+                                                                className="inline-block h-3 w-3 rounded-full"
+                                                                style={{ backgroundColor: tipo.color }}
+                                                            ></span>
+                                                            {tipo.nombre_premio}
+                                                        </div>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div>

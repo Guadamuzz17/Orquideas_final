@@ -236,18 +236,18 @@ export default function Dashboard({ stats, eventoActivo }: DashboardProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Dashboard" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
+      <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">
 
         {/* Banner de Evento Activo */}
         {eventoActivo && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-4 mb-4"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl shadow-lg p-6"
           >
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex items-center gap-3">
-                <Calendar className="h-6 w-6" />
+                <Calendar className="h-6 w-6 flex-shrink-0" />
                 <div>
                   <p className="text-sm font-medium opacity-90">Evento Activo:</p>
                   <h3 className="text-xl font-bold">{eventoActivo.nombre}</h3>
@@ -255,7 +255,7 @@ export default function Dashboard({ stats, eventoActivo }: DashboardProps) {
               </div>
               <button
                 onClick={() => router.visit(route('eventos.index'))}
-                className="bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+                className="bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 whitespace-nowrap"
               >
                 <ChevronRight className="h-4 w-4" />
                 Cambiar Evento
@@ -265,18 +265,18 @@ export default function Dashboard({ stats, eventoActivo }: DashboardProps) {
         )}
 
         {/* Logos superiores */}
-        <div className="flex justify-center items-center gap-8 mb-6">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-8 py-4">
           <motion.img
             whileHover={{ scale: 1.05 }}
             src="/images/Logo-fotor-bg-remover-2024090519443.png"
             alt="AAO"
-            className="h-24 w-auto object-contain"
+            className="h-20 sm:h-24 w-auto object-contain"
           />
           <motion.img
             whileHover={{ scale: 1.05 }}
             src="/images/umg2.png"
             alt="UMG"
-            className="h-24 w-auto object-contain"
+            className="h-20 sm:h-24 w-auto object-contain"
           />
         </div>
 
@@ -285,7 +285,7 @@ export default function Dashboard({ stats, eventoActivo }: DashboardProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6"
         >
           {statsCards.map((stat, index) => (
             <motion.div
@@ -304,7 +304,7 @@ export default function Dashboard({ stats, eventoActivo }: DashboardProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
         >
           {actions.map((action, index) => (
             <motion.div
@@ -325,20 +325,20 @@ export default function Dashboard({ stats, eventoActivo }: DashboardProps) {
           transition={{ delay: 1, duration: 0.6 }}
           className="mt-6 text-center"
         >
-          <div className="inline-flex items-center space-x-2 text-gray-500 text-sm mb-4">
+          <div className="inline-flex items-center space-x-2 text-gray-500 text-sm">
             <Calendar className="w-4 h-4" />
             <span>Sistema de Gestión de Orquídeas - {currentStats.year}</span>
           </div>
         </motion.div>
 
         {/* Footer */}
-        <footer className="bg-light text-dark py-4">
+        <footer className="bg-light text-dark py-6 mt-8 rounded-xl border">
           <div className="container mx-auto px-4">
-            <div className="row flex flex-col md:flex-row">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Información de los creadores */}
-              <div className="col-md-4 col-12 mb-3 mb-md-0">
-                <h5 className="font-bold">Creado y Diseñado por:</h5>
-                <ul className="list-unstyled">
+              <div className="text-center md:text-left">
+                <h5 className="font-bold mb-3">Creado y Diseñado por:</h5>
+                <ul className="list-none space-y-1 text-sm">
                   <li>Pablo Andrés Santos González</li>
                   <li>Isaac Andony Guadamuz Ruiz</li>
                   <li>Selvyn Alberto Contreras Alvarado</li>
@@ -347,23 +347,22 @@ export default function Dashboard({ stats, eventoActivo }: DashboardProps) {
               </div>
 
               {/* Redes sociales y derechos */}
-              <div className="col-md-4 col-12 text-center mb-3 mb-md-0 flex items-center justify-center">
-                <p className="mt-3">© 2024 Ingeniería en Sistemas - Plan Diario <b>UMG Campus Cobán</b></p>
+              <div className="text-center flex items-center justify-center">
+                <p className="text-sm">© 2024 Ingeniería en Sistemas - Plan Diario <b>UMG Campus Cobán</b></p>
               </div>
 
               {/* Información de ubicación y logo */}
-              <div className="col-md-4 col-12 flex justify-end items-center mt-3 md:mt-0">
-                <div className="text-end me-4">
+              <div className="flex flex-col sm:flex-row justify-center md:justify-end items-center gap-4">
+                <div className="text-center md:text-right">
                   <h5 className="font-bold">A.A.O</h5>
-                  <p className="mb-0">Cobán</p>
-                  <p className="mb-0">Alta Verapaz</p>
-                  <p>Guatemala</p>
+                  <p className="mb-0 text-sm">Cobán</p>
+                  <p className="mb-0 text-sm">Alta Verapaz</p>
+                  <p className="text-sm">Guatemala</p>
                 </div>
                 <img
                   src="/images/SISTEMAS_UMG-removebg-preview.png"
                   alt="Logo Universidad"
-                  className="responsive-img w-48 md:w-56 lg:w-64"
-                  style={{ marginRight: '-1rem' }}
+                  className="w-40 sm:w-48 md:w-56 object-contain"
                 />
               </div>
             </div>

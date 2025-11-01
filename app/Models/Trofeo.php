@@ -21,7 +21,8 @@ class Trofeo extends Model
         'tipo_liston',
         'descripcion',
         'id_inscripcion',
-        'id_evento'
+        'id_evento',
+        'id_tipo_premio'
     ];
 
     protected $casts = [
@@ -57,6 +58,11 @@ class Trofeo extends Model
     public function inscripcion()
     {
         return $this->belongsTo(Inscripcion::class, 'id_inscripcion', 'id_nscr');
+    }
+
+    public function tipoPremio()
+    {
+        return $this->belongsTo(TipoPremio::class, 'id_tipo_premio', 'id_tipo_premio');
     }
 
     // Accessors para datos de inscripción (para listones)

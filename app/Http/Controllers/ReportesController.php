@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trofeo;
+use App\Models\TipoPremio;
 use App\Exports\ListonesExport;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -39,6 +40,9 @@ class ReportesController extends Controller
                     ];
                 });
 
+            // Obtener tipos de premios activos
+            $tiposPremio = TipoPremio::activos()->ordenadosPorPosicion()->get();
+
             return Inertia::render('Reportes/ListonesSimple', [
                 'estadisticas' => [
                     'total_listones' => $totalListones,
@@ -47,6 +51,7 @@ class ReportesController extends Controller
                 'listones_recientes' => [],
                 'grupos' => $grupos,
                 'clases' => $clases,
+                'tiposPremio' => $tiposPremio,
             ]);
         } catch (\Exception $e) {
             Log::error('Error en reportes/listones: ' . $e->getMessage());
@@ -59,6 +64,7 @@ class ReportesController extends Controller
                 'listones_recientes' => [],
                 'grupos' => [],
                 'clases' => [],
+                'tiposPremio' => [],
                 'error' => $e->getMessage(),
             ]);
         }

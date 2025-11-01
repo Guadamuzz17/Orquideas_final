@@ -18,6 +18,8 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\ReportesEventoController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\TipoPremioController;
+use App\Http\Controllers\RolController;
 
 // Ruta de inicio
 Route::get('/', function () {
@@ -98,6 +100,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rutas de recursos para trofeos
     Route::resource('trofeos', TrofeoController::class);
 
+    // Rutas de Tipos de Premios
+    Route::patch('/tipo-premios/{tipoPremio}/toggle-activo', [TipoPremioController::class, 'toggleActivo'])
+        ->name('tipo-premios.toggle-activo');
+    Route::resource('tipo-premios', TipoPremioController::class);
+
     // Rutas específicas de listones (DEBEN IR ANTES del resource)
     Route::get('/listones/search-inscripciones', [ListonController::class, 'searchInscripciones'])
         ->name('listones.search-inscripciones');
@@ -164,6 +171,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Rutas de recursos para usuarios
     Route::resource('users', UsersController::class)->middleware('user.management');
+
+    // Rutas de recursos para roles y permisos
+    Route::resource('roles', RolController::class)->middleware('user.management');
 
     }); // Fin del grupo evento.activo
 }); // Fin del grupo auth

@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'rol_id',
     ];
 
     /**
@@ -44,5 +45,54 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relación con el rol
+     */
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'rol_id');
+    }
+
+    /**
+     * Verificar si el usuario tiene un permiso específico
+     */
+    public function tienePermiso($permiso)
+    {
+        if (!$this->rol) {
+            return false;
+        }
+
+        return $this->rol->tienePermiso($permiso);
+    }
+
+    /**
+     * Verificar si el usuario tiene alguno de los permisos
+     */
+    public function tieneAlgunPermiso(array $permisos)
+    {
+        foreach ($permisos as $permiso) {
+            if ($this->tienePermiso($permiso)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Verificar si el usuario es admin general
+     */
+    public function esAdminGeneral()
+    {
+        return $this->rol && $this->rol->nombre === 'Admin General';
+    }
+
+    /**
+     * Verificar si el usuario es digitador
+     */
+    public function esDigitador()
+    {
+        return $this->rol && $this->rol->nombre === 'Digitador';
     }
 }

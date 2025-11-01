@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@/components/ui/select';
+import {
     Card,
     CardContent,
     CardDescription,
@@ -22,12 +29,22 @@ import {
     AlertCircle
 } from 'lucide-react';
 
+interface Rol {
+    id: number;
+    nombre: string;
+}
+
 interface CreateFormData {
     name: string;
     email: string;
     password: string;
     password_confirmation: string;
+    rol_id: number | null;
     [key: string]: any;
+}
+
+interface Props {
+    roles?: Rol[];
 }
 
 const breadcrumbs = [
@@ -45,12 +62,13 @@ const breadcrumbs = [
     },
 ];
 
-export default function Create() {
+export default function Create({ roles = [] }: Props) {
     const { data, setData, post, processing, errors, reset } = useForm<CreateFormData>({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
+        rol_id: null,
     });
 
     const [showPassword, setShowPassword] = useState(false);
@@ -153,6 +171,33 @@ export default function Create() {
                                     {errors.email && (
                                         <p className="text-red-500 text-sm">{errors.email}</p>
                                     )}
+                                </div>
+
+                                {/* Rol */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="rol_id">Rol (opcional)</Label>
+                                    <Select
+                                        value={data.rol_id?.toString() || "sin-rol"}
+                                        onValueChange={(value) => setData('rol_id', value === "sin-rol" ? null : parseInt(value))}
+                                    >
+                                        <SelectTrigger className={errors.rol_id ? 'border-red-500' : ''}>
+                                            <SelectValue placeholder="Sin rol asignado" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="sin-rol">Sin rol</SelectItem>
+                                            {roles.map((rol) => (
+                                                <SelectItem key={rol.id} value={rol.id.toString()}>
+                                                    {rol.nombre}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.rol_id && (
+                                        <p className="text-red-500 text-sm">{errors.rol_id}</p>
+                                    )}
+                                    <p className="text-sm text-muted-foreground">
+                                        Los usuarios registrados públicamente no tendrán rol asignado
+                                    </p>
                                 </div>
 
                                 {/* Contraseña */}

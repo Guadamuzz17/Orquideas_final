@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Trofeo;
 use App\Models\Inscripcion;
+use App\Models\TipoPremio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +19,7 @@ class ListonController extends Controller
     {
         return Inertia::render('Listones/index', [
             'listones' => Trofeo::listones()
-                ->with(['inscripcion.participante', 'inscripcion.orquidea.grupo', 'inscripcion.orquidea.clase'])
+                ->with(['inscripcion.participante', 'inscripcion.orquidea.grupo', 'inscripcion.orquidea.clase', 'tipoPremio'])
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($liston) {
@@ -30,10 +31,12 @@ class ListonController extends Controller
                         'grupo' => $liston->inscripcion->orquidea->grupo->nombre_grupo ?? 'Sin grupo',
                         'clase' => $liston->inscripcion->orquidea->clase->nombre_clase ?? 'Sin clase',
                         'tipo_liston' => $liston->tipo_liston,
+                        'tipo_premio' => $liston->tipoPremio,
                         'descripcion' => $liston->descripcion,
                         'fecha_otorgado' => $liston->fecha_ganador->format('d/m/Y'),
                     ];
-                })
+                }),
+            'tiposPremio' => TipoPremio::activos()->ordenadosPorPosicion()->get()
         ]);
     }
 
@@ -57,7 +60,8 @@ class ListonController extends Controller
                         'grupo_nombre' => $inscripcion->orquidea->grupo->nombre_grupo ?? 'Sin grupo',
                         'clase_nombre' => $inscripcion->orquidea->clase->nombre_clase ?? 'Sin clase',
                     ];
-                })
+                }),
+            'tiposPremio' => TipoPremio::activos()->ordenadosPorPosicion()->get()
         ]);
     }
 
@@ -126,7 +130,7 @@ class ListonController extends Controller
     {
         $request->validate([
             'inscripcion_id' => 'required|exists:tb_inscripcion,id_nscr',
-            'tipo_liston' => 'required|string|max:100',
+            'id_tipo_premio' => 'required|exists:tb_tipo_premio,id_tipo_premio',
             'descripcion' => 'nullable|string|max:500'
         ]);
 
@@ -136,7 +140,7 @@ class ListonController extends Controller
             Trofeo::create([
                 'id_inscripcion' => $request->inscripcion_id,
                 'tipo_premio' => 'liston',
-                'tipo_liston' => $request->tipo_liston,
+                'id_tipo_premio' => $request->id_tipo_premio,
                 'descripcion' => $request->descripcion,
                 'fecha_ganador' => now()
             ]);

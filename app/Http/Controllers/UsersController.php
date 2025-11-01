@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Rol;
 use App\Http\Requests\UserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -33,10 +34,11 @@ class UsersController extends Controller
 
         // Filtro por rol (si el campo existe)
         if ($role && $role !== 'all') {
-            $query->where('role', $role);
+            $query->where('rol_id', $role);
         }
 
-        $users = $query->orderBy('created_at', 'desc')
+        $users = $query->with('rol')
+                      ->orderBy('created_at', 'desc')
                       ->paginate(15)
                       ->withQueryString();
 
@@ -59,7 +61,11 @@ class UsersController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Users/Create');
+        $roles = Rol::activos()->get();
+
+        return Inertia::render('Users/Create', [
+            'roles' => $roles,
+        ]);
     }
 
     /**
@@ -73,6 +79,7 @@ class UsersController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'rol_id' => $validated['rol_id'] ?? null,
         ]);
 
         return redirect()->route('users.index')
@@ -84,13 +91,8 @@ class UsersController extends Controller
      */
     public function show(User $user): Response
     {
-        $user->load(['sessions' => function ($query) {
-            $query->orderBy('last_activity', 'desc')->limit(5);
-        }]);
-
         return Inertia::render('Users/Show', [
             'user' => $user,
-            'last_login' => $user->last_login_at?->diffForHumans(),
             'member_since' => $user->created_at->diffForHumans(),
         ]);
     }
@@ -100,8 +102,12 @@ class UsersController extends Controller
      */
     public function edit(User $user): Response
     {
+        $roles = Rol::activos()->get();
+        $user->load('rol');
+
         return Inertia::render('Users/Edit', [
-            'user' => $user
+            'user' => $user,
+            'roles' => $roles,
         ]);
     }
 
@@ -115,6 +121,7 @@ class UsersController extends Controller
         $updateData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'rol_id' => $validated['rol_id'] ?? null,
         ];
 
         // Solo actualizar contraseña si se proporciona

@@ -13,13 +13,15 @@ import {
   UserPlus,
   LayoutGrid,
   ChevronUp,
+  ChevronDown,
   Settings2,
   Leaf,
   FolderTree,
   Tags,
   Download,
   Camera,
-  CalendarDays
+  CalendarDays,
+  UserCog
 } from "lucide-react"
 import {
   Sidebar,
@@ -38,7 +40,13 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -158,6 +166,10 @@ const data = {
           title: "Otorgar Listones",
           url: "/listones",
         },
+        {
+          title: "Tipos de Premios",
+          url: "/tipo-premios",
+        },
       ],
     },
     {
@@ -213,11 +225,84 @@ const data = {
         },
       ],
     },
+    {
+      title: "Gestión de Usuarios",
+      url: "/users",
+      icon: UserCog,
+      items: [
+        {
+          title: "Ver Todos los Usuarios",
+          url: "/users",
+        },
+        {
+          title: "Crear Nuevo Usuario",
+          url: "/users/create",
+        },
+        {
+          title: "Roles y Permisos",
+          url: "/roles",
+        },
+      ],
+    },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { url } = usePage()
+  const { url, props: pageProps } = usePage()
+  const { auth } = pageProps as any
+  const userPermissions = auth?.permissions || []
+
+  // Mapeo de permisos a rutas del sidebar
+  const permissionMap: Record<string, string> = {
+    'dashboard.ver': '/dashboard',
+    'eventos.ver': '/eventos',
+    'participantes.ver': '/participantes',
+    'orquideas.ver': '/orquideas',
+    'grupos.ver': '/grupos',
+    'clases.ver': '/clases',
+    'inscripciones.ver': '/inscripcion',
+    'ganadores.ver': '/ganadores',
+    'listones.ver': '/listones',
+    'tipos-premios.ver': '/tipo-premios',
+    'fotos.ver': '/fotos',
+    'reportes.ver': '/reportes',
+    'usuarios.ver': '/users',
+  }
+
+  // Función para verificar si el usuario tiene permiso para ver un item
+  const hasPermission = (itemUrl: string): boolean => {
+    // Si no hay permisos definidos, mostrar todo (para mantener compatibilidad)
+    if (!userPermissions || userPermissions.length === 0) {
+      return true
+    }
+
+    // Buscar el permiso correspondiente a la URL
+    for (const [permission, route] of Object.entries(permissionMap)) {
+      if (itemUrl.startsWith(route)) {
+        return userPermissions.includes(permission)
+      }
+    }
+
+    // Por defecto, permitir acceso si no hay mapeo específico
+    return true
+  }
+
+  // Filtrar items del menú basándose en permisos
+  const filteredNavMain = data.navMain.filter(item => {
+    // Verificar si el usuario tiene permiso para el item principal
+    if (!hasPermission(item.url)) {
+      return false
+    }
+
+    // Si tiene subitems, filtrarlos también
+    if (item.items) {
+      item.items = item.items.filter(subItem => hasPermission(subItem.url))
+      // Si no quedan subitems después de filtrar, no mostrar el item principal
+      return item.items.length > 0
+    }
+
+    return true
+  })
 
   // Función para descargar PDF de Clases Orquídeas
   const handleDownloadPDF = () => {
@@ -240,7 +325,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="none" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -288,19 +373,34 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupLabel>Navegación Principal</SidebarGroupLabel>
           <SidebarMenu>
-            {data.navMain.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton
-                  asChild
-                  tooltip={item.title}
-                  isActive={url === item.url || (item.items && item.items.some(subItem => url === subItem.url || url.startsWith(subItem.url + '/')))}
-                >
-                  <Link href={item.url}>
+            {filteredNavMain.map((item) => {
+              const isItemActive = url === item.url || (item.items && item.items.some(subItem => url === subItem.url || url.startsWith(subItem.url + '/')));
+
+              // Si no tiene subitems, mostrar enlace simple
+              if (!item.items?.length) {
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={isItemActive}
+                    >
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              }
+
+              // Si tiene subitems, mostrarlos siempre abiertos
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton tooltip={item.title} isActive={isItemActive}>
                     <item.icon />
                     <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-                {item.items?.length ? (
+                  </SidebarMenuButton>
                   <SidebarMenuSub>
                     {item.items.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
@@ -327,9 +427,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       </SidebarMenuSubItem>
                     ))}
                   </SidebarMenuSub>
-                ) : null}
-              </SidebarMenuItem>
-            ))}
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

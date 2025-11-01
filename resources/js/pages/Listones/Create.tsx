@@ -36,11 +36,20 @@ interface Inscripcion {
   clase_nombre: string;
 }
 
-interface CreateListonProps {
-  // Las props pueden venir del backend si es necesario
+interface TipoPremio {
+  id_tipo_premio: number;
+  nombre_premio: string;
+  descripcion: string | null;
+  posicion: number;
+  color: string;
+  activo: boolean;
 }
 
-export default function CreateListon({}: CreateListonProps) {
+interface CreateListonProps {
+  tiposPremio: TipoPremio[];
+}
+
+export default function CreateListon({ tiposPremio }: CreateListonProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [inscripciones, setInscripciones] = useState<Inscripcion[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,21 +57,9 @@ export default function CreateListon({}: CreateListonProps) {
 
   const { data, setData, post, processing, errors } = useForm({
     inscripcion_id: '',
-    tipo_liston: '',
+    id_tipo_premio: '',
     descripcion: '',
   });
-
-  const tiposListon = [
-    { value: 'Primer Premio', label: 'Primer Premio - Oro' },
-    { value: 'Segundo Premio', label: 'Segundo Premio - Plata' },
-    { value: 'Tercer Premio', label: 'Tercer Premio - Bronce' },
-    { value: 'Mención Honorífica', label: 'Mención Honorífica' },
-    { value: 'Mención Especial', label: 'Mención Especial' },
-    { value: 'Premio a la Excelencia', label: 'Premio a la Excelencia' },
-    { value: 'Mejor de Grupo', label: 'Mejor de Grupo' },
-    { value: 'Mejor de Clase', label: 'Mejor de Clase' },
-    { value: 'Reconocimiento Especial', label: 'Reconocimiento Especial' },
-  ];
 
   // Búsqueda de inscripciones
   useEffect(() => {
@@ -194,24 +191,30 @@ export default function CreateListon({}: CreateListonProps) {
 
               {/* Tipo de Listón */}
               <div className="space-y-2">
-                <Label htmlFor="tipo_liston">Tipo de Listón *</Label>
+                <Label htmlFor="id_tipo_premio">Tipo de Premio *</Label>
                 <Select
-                  value={data.tipo_liston}
-                  onValueChange={(value) => setData('tipo_liston', value)}
+                  value={data.id_tipo_premio}
+                  onValueChange={(value) => setData('id_tipo_premio', value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona el tipo de listón" />
+                    <SelectValue placeholder="Selecciona el tipo de premio" />
                   </SelectTrigger>
                   <SelectContent>
-                    {tiposListon.map((tipo) => (
-                      <SelectItem key={tipo.value} value={tipo.value}>
-                        {tipo.label}
+                    {tiposPremio.map((tipo) => (
+                      <SelectItem key={tipo.id_tipo_premio} value={tipo.id_tipo_premio.toString()}>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="inline-block h-3 w-3 rounded-full"
+                            style={{ backgroundColor: tipo.color }}
+                          ></span>
+                          <span>{tipo.nombre_premio}</span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.tipo_liston && (
-                  <p className="text-sm text-red-600">{errors.tipo_liston}</p>
+                {errors.id_tipo_premio && (
+                  <p className="text-sm text-red-600">{errors.id_tipo_premio}</p>
                 )}
               </div>
 
@@ -241,7 +244,7 @@ export default function CreateListon({}: CreateListonProps) {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={processing || !selectedInscripcion || !data.tipo_liston}
+                  disabled={processing || !selectedInscripcion || !data.id_tipo_premio}
                   className="bg-green-600 hover:bg-green-700"
                 >
                   {processing ? (

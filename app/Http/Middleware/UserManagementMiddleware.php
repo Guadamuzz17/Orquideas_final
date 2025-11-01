@@ -23,26 +23,37 @@ class UserManagementMiddleware
 
         $user = Auth::user();
 
-        // Por ahora, permitir acceso a todos los usuarios autenticados
-        // En el futuro se puede implementar roles/permisos específicos
-        // Ejemplo de implementación con roles:
-        /*
-        if (!$user->hasRole('admin') && !$user->hasPermission('manage_users')) {
-            abort(403, 'No tienes permisos para acceder a la gestión de usuarios.');
-        }
-        */
+        // Verificar si el usuario tiene permisos para gestionar usuarios
+        // Si no tiene rol asignado, permitir acceso (para mantener compatibilidad con usuarios existentes)
+        if ($user->rol_id) {
+            // Si tiene rol pero no tiene el permiso de usuarios, denegar acceso
+            if (!$user->tienePermiso('usuarios.ver')) {
+                abort(403, 'No tienes permisos para acceder a la gestión de usuarios.');
+            }
 
-        // Prevenir que usuarios no administradores modifiquen otros usuarios
-        // (excepto el listado que ya está protegido por el controlador)
-        if ($request->route('user')) {
-            $targetUserId = $request->route('user')->id ?? $request->route('user');
+            // Verificar permisos específicos según la acción
+            $route = $request->route();
+            $routeName = $route ? $route->getName() : '';
 
-            // Si está intentando modificar otro usuario y no es admin
-            // Por ahora permitir todo ya que no hay sistema de roles implementado
-            // En el futuro agregar: && !$user->hasRole('admin')
-            if ($targetUserId != $user->id) {
-                // Permitir por ahora, en futuro implementar control de roles
-                // abort(403, 'No tienes permisos para modificar otros usuarios.');
+            // Verificar permisos de creación
+            if (str_contains($routeName, 'create') || str_contains($routeName, 'store')) {
+                if (!$user->tienePermiso('usuarios.crear')) {
+                    abort(403, 'No tienes permisos para crear usuarios.');
+                }
+            }
+
+            // Verificar permisos de edición
+            if (str_contains($routeName, 'edit') || str_contains($routeName, 'update')) {
+                if (!$user->tienePermiso('usuarios.editar')) {
+                    abort(403, 'No tienes permisos para editar usuarios.');
+                }
+            }
+
+            // Verificar permisos de eliminación
+            if (str_contains($routeName, 'destroy')) {
+                if (!$user->tienePermiso('usuarios.eliminar')) {
+                    abort(403, 'No tienes permisos para eliminar usuarios.');
+                }
             }
         }
 

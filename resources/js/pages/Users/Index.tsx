@@ -54,6 +54,10 @@ interface User {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
+    rol?: {
+        id: number;
+        nombre: string;
+    } | null;
 }
 
 interface Props {
@@ -271,6 +275,11 @@ export default function Index({ users, filters }: Props) {
                                         <div>
                                             <h3 className="font-medium">{user.name}</h3>
                                             <p className="text-sm text-gray-500">{user.email}</p>
+                                            {user.rol && (
+                                                <p className="text-xs text-blue-600 font-medium">
+                                                    Rol: {user.rol.nombre}
+                                                </p>
+                                            )}
                                             <p className="text-xs text-gray-400">
                                                 Registrado: {new Date(user.created_at).toLocaleDateString()}
                                             </p>
