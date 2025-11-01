@@ -17,6 +17,7 @@ use App\Http\Controllers\FotosController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\ReportesEventoController;
+use App\Http\Controllers\PasswordResetController;
 
 // Ruta de inicio
 Route::get('/', function () {
@@ -171,6 +172,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::prefix('api')->group(function () {
     Route::get('/fotos', [FotosController::class, 'indexPublic'])->name('api.fotos');
 });
+
+// Rutas de recuperación de contraseña (públicas)
+Route::get('/recuperar-password', [PasswordResetController::class, 'showRequestForm'])->name('password.request');
+Route::post('/recuperar-password', [PasswordResetController::class, 'sendResetEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
 
 // Archivos adicionales requeridos
 require __DIR__.'/settings.php';

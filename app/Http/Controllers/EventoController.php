@@ -124,6 +124,7 @@ class EventoController extends Controller
 
         session(['evento_activo' => $evento->id_evento]);
         session(['evento_nombre' => $evento->nombre_evento]);
+        session(['evento_seleccionado_notificado' => true]); // Marcar que ya se notificó
 
         return redirect()->route('dashboard')
             ->with('success', "Evento '{$evento->nombre_evento}' seleccionado");
