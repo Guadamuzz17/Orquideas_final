@@ -83,6 +83,19 @@ MAIL_ENCRYPTION=tls
 
 ## 🧪 Probar el Envío de Correos
 
+### Método 1: Comando Artisan (Recomendado)
+
+```bash
+php artisan email:test tu-email@ejemplo.com
+```
+
+Este comando:
+- Muestra la configuración actual
+- Envía un email de prueba
+- Muestra mensajes claros de éxito o error
+
+### Método 2: Laravel Tinker
+
 Ejecuta este comando en la terminal para probar:
 
 ```bash
