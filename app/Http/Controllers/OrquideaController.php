@@ -18,11 +18,18 @@ class OrquideaController extends Controller
      */
     public function index()
     {
+        $eventoActivo = session('evento_activo');
+
         if (request()->wantsJson()) {
-            return Orquidea::with(['grupo', 'clase', 'participante'])->get();
+            return Orquidea::with(['grupo', 'clase', 'participante'])
+                ->where('id_evento', $eventoActivo)
+                ->get();
         }
 
-        $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])->get();
+        $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
+            ->where('id_evento', $eventoActivo)
+            ->get();
+
         return Inertia::render('registro_orquideas/index', [
             'orquideas' => $orquideas,
         ]);
@@ -33,9 +40,11 @@ class OrquideaController extends Controller
      */
     public function create()
     {
+        $eventoActivo = session('evento_activo');
+
         $grupos = Grupo::all();
         $clases = Clase::all();
-        $participantes = Participante::all();
+        $participantes = Participante::where('id_evento', $eventoActivo)->get();
 
         return Inertia::render('registro_orquideas/Create', [
             'grupos' => $grupos,
@@ -64,6 +73,7 @@ class OrquideaController extends Controller
         }
 
         $data = $request->all();
+        $data['id_evento'] = session('evento_activo'); // Asociar al evento activo
 
         // Manejar la subida de imagen
         if ($request->hasFile('foto')) {
@@ -174,5 +184,26 @@ class OrquideaController extends Controller
             return Storage::url($orquidea->foto);
         }
         return null;
+    }
+
+    /**
+     * Buscar sugerencias de nombres de orquídeas
+     */
+    public function buscarSugerencias(Request $request)
+    {
+        $query = $request->input('q', '');
+
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        // Buscar nombres únicos de orquídeas que coincidan con la búsqueda
+        $sugerencias = Orquidea::select('nombre_planta')
+            ->where('nombre_planta', 'LIKE', '%' . $query . '%')
+            ->distinct()
+            ->limit(10)
+            ->pluck('nombre_planta');
+
+        return response()->json($sugerencias);
     }
 }

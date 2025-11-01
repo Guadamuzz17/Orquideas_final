@@ -13,11 +13,12 @@ class Inscripcion extends Model
     protected $primaryKey = 'id_nscr';
     public $incrementing = true;
     protected $keyType = 'int';
-    
+
     protected $fillable = [
         'id_participante',
         'id_orquidea',
-        'correlativo'
+        'correlativo',
+        'id_evento'
     ];
 
     // Accessor para que el modelo también responda a 'id'

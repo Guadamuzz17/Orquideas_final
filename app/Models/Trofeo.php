@@ -20,7 +20,8 @@ class Trofeo extends Model
         'tipo_premio',
         'tipo_liston',
         'descripcion',
-        'id_inscripcion'
+        'id_inscripcion',
+        'id_evento'
     ];
 
     protected $casts = [

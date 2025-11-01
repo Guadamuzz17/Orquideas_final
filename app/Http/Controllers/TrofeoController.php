@@ -16,8 +16,11 @@ class TrofeoController extends Controller
      */
     public function index(): Response
     {
+        $eventoActivo = session('evento_activo');
+
         return Inertia::render('Trofeos/index', [
             'trofeos' => Trofeo::with(['orquidea', 'clase', 'grupo'])
+                ->where('id_evento', $eventoActivo)
                 ->orderBy('fecha_ganador', 'desc')
                 ->get()
                 ->map(function ($trofeo) {
@@ -75,7 +78,8 @@ class TrofeoController extends Controller
                 'id_clase' => $orquidea->id_clase,
                 'id_grupp' => $orquidea->id_grupo,
                 'categoria' => $request->categoria,
-                'fecha_ganador' => now()
+                'fecha_ganador' => now(),
+                'id_evento' => session('evento_activo')
             ]);
 
             DB::commit();

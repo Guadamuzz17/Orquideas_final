@@ -11,7 +11,7 @@ export default function Formato() {
   const handleDownloadFormat = () => {
     // Descargar el archivo PDF desde la ruta especificada
     console.log('Descargando formato de juzgamiento...');
-    
+
     const link = document.createElement('a');
     link.href = '/docsDonwload/FormatoJuzgamiento.pdf'; // Ruta al archivo PDF
     link.download = 'FormatoJuzgamiento.pdf';
@@ -34,7 +34,7 @@ export default function Formato() {
   return (
     <AppLayout>
       <Head title="Formato de Juzgamiento - Participantes" />
-      
+
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Formato de Juzgamiento</h1>
@@ -45,7 +45,7 @@ export default function Formato() {
             </Link>
           </Button>
         </div>
-        
+
         <div>
           <Breadcrumb>
             <BreadcrumbList>
@@ -81,20 +81,7 @@ export default function Formato() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="rounded-lg bg-gray-50 p-6">
-                <h3 className="text-lg font-semibold mb-3 flex items-center">
-                  <Users className="mr-2 h-5 w-5" />
-                  Información del Reporte
-                </h3>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>• Lista completa de participantes registrados</li>
-                  <li>• Orquídeas asignadas a cada participante</li>
-                  <li>• Categorías y clasificaciones</li>
-                  <li>• Criterios de evaluación</li>
-                  <li>• Espacios para puntuación y observaciones</li>
-                  <li>• Formato oficial para jueces</li>
-                </ul>
-              </div>
+
 
               <div className="rounded-lg border-2 border-dashed border-blue-200 p-6 text-center">
                 <Download className="mx-auto h-12 w-12 text-blue-500 mb-4" />
@@ -102,7 +89,7 @@ export default function Formato() {
                 <p className="text-gray-600 mb-4">
                   El formato oficial en PDF se está descargando automáticamente...
                 </p>
-                <Button 
+                <Button
                   onClick={handleDownloadFormat}
                   className="bg-blue-600 hover:bg-blue-700"
                   size="lg"

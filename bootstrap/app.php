@@ -3,6 +3,8 @@
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\CorsMiddleware;
+use App\Http\Middleware\UserManagementMiddleware;
+use App\Http\Middleware\ValidarEventoActivo;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -25,6 +27,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->api(prepend: [
             CorsMiddleware::class,
+        ]);
+
+        // Registrar alias de middleware
+        $middleware->alias([
+            'user.management' => UserManagementMiddleware::class,
+            'evento.activo' => ValidarEventoActivo::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

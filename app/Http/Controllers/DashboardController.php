@@ -13,13 +13,14 @@ class DashboardController extends Controller
     public function index()
     {
         $currentYear = Carbon::now()->year;
-        
-        // Contar participantes registrados en el año actual
-        $participantesCount = Participante::whereYear('created_at', $currentYear)->count();
-        
-        // Contar orquídeas registradas en el año actual
-        $orquideasCount = Orquidea::whereYear('created_at', $currentYear)->count();
-        
+        $eventoActivo = session('evento_activo');
+
+        // Contar participantes del evento activo
+        $participantesCount = Participante::where('id_evento', $eventoActivo)->count();
+
+        // Contar orquídeas del evento activo
+        $orquideasCount = Orquidea::where('id_evento', $eventoActivo)->count();
+
         return Inertia::render('dashboard', [
             'stats' => [
                 'participantes' => $participantesCount,

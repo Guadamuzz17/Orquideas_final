@@ -17,11 +17,15 @@ class FotoEvento extends Model
         'descripcion',
         'fecha_evento',
         'ruta_imagen',
+        'id_evento'
     ];
 
     protected $casts = [
         'fecha_evento' => 'date',
     ];
+
+    // Asegurarnos de que el accessor url_imagen se incluya en la serialización
+    protected $appends = ['url_imagen'];
 
     /**
      * Get the full URL for the image
@@ -30,11 +34,11 @@ class FotoEvento extends Model
     {
         // Verificar si el archivo existe
         $imagePath = 'fotos/' . basename($this->ruta_imagen);
-        
+
         if (Storage::disk('public')->exists($imagePath)) {
             return asset('storage/' . $imagePath);
         }
-        
+
         // Si no existe, devolver imagen placeholder local
         return asset('images/placeholder-image.svg');
     }

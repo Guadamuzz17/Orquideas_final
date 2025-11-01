@@ -44,8 +44,8 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
         fecha_desde: '',
         fecha_hasta: '',
         tipo_liston: '',
-        id_grupo: '',
-        id_clase: ''
+        id_grupo: 'all',
+        id_clase: 'all'
     });
 
     const breadcrumbs = [
@@ -57,7 +57,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
         const params = new URLSearchParams();
 
         Object.entries(filtros).forEach(([key, value]) => {
-            if (value && value !== '') {
+            if (value && value !== '' && value !== 'all') {
                 params.append(key, value);
             }
         });
@@ -113,8 +113,8 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
             fecha_desde: '',
             fecha_hasta: '',
             tipo_liston: '',
-            id_grupo: '',
-            id_clase: ''
+            id_grupo: 'all',
+            id_clase: 'all'
         });
     };
 
@@ -189,7 +189,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
                                                 <SelectValue placeholder="Seleccionar grupo" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="">Todos los grupos</SelectItem>
+                                                <SelectItem value="all">Todos los grupos</SelectItem>
                                                 {grupos.map((grupo) => (
                                                     <SelectItem key={grupo.id_grupo} value={grupo.id_grupo.toString()}>
                                                         {grupo.nom_grupo}
@@ -206,7 +206,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
                                                 <SelectValue placeholder="Seleccionar clase" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="">Todas las clases</SelectItem>
+                                                <SelectItem value="all">Todas las clases</SelectItem>
                                                 {clases.map((clase) => (
                                                     <SelectItem key={clase.id_clase} value={clase.id_clase.toString()}>
                                                         {clase.nom_clase}

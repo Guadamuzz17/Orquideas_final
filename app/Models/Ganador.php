@@ -15,7 +15,8 @@ class Ganador extends Model
         'id_inscripcion',
         'posicion',
         'empate',
-        'fecha_ganador'
+        'fecha_ganador',
+        'id_evento'
     ];
 
     protected $casts = [

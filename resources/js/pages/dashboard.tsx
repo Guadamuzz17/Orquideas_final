@@ -1,7 +1,7 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { motion } from "framer-motion";
 import {
   Users,
@@ -17,6 +17,7 @@ import {
   UserPlus,
   FolderTree,
   Tags,
+  Settings,
 } from "lucide-react";
 //comentario
 const breadcrumbs: BreadcrumbItem[] = [
@@ -117,9 +118,13 @@ interface DashboardProps {
     orquideas: number;
     year: number;
   };
+  eventoActivo?: {
+    id: number;
+    nombre: string;
+  };
 }
 
-export default function Dashboard({ stats }: DashboardProps) {
+export default function Dashboard({ stats, eventoActivo }: DashboardProps) {
   // Valores por defecto en caso de que no se pasen los stats
   const defaultStats = {
     participantes: 0,
@@ -130,14 +135,14 @@ export default function Dashboard({ stats }: DashboardProps) {
   const currentStats = stats || defaultStats;
   const statsCards = [
     {
-      title: `Participantes Registrados (${currentStats.year})`,
+      title: eventoActivo ? `Participantes - ${eventoActivo.nombre}` : `Participantes Registrados (${currentStats.year})`,
       value: currentStats.participantes.toLocaleString(),
       subtitle: currentStats.participantes === 1 ? "Participante" : "Participantes",
       color: "blue" as const,
       icon: <Users className="w-6 h-6" />,
     },
     {
-      title: `Orquídeas Registradas (${currentStats.year})`,
+      title: eventoActivo ? `Orquídeas - ${eventoActivo.nombre}` : `Orquídeas Registradas (${currentStats.year})`,
       value: currentStats.orquideas.toLocaleString(),
       subtitle: currentStats.orquideas === 1 ? "Orquídea" : "Orquídeas",
       color: "green" as const,
@@ -149,56 +154,63 @@ export default function Dashboard({ stats }: DashboardProps) {
     {
       title: "Participantes",
       description:
-        "Gestiona los perfiles de los usuarios y administra la información de los participantes del sistema.",
+        "Gestiona los perfiles y administra la información de los participantes del sistema.",
       icon: <Users className="w-6 h-6" />,
       color: "from-blue-500 to-blue-600",
-      onClick: () => window.location.href = "/participantes",
+      onClick: () => router.visit(route('participantes.index')),
     },
     {
-      title: "Gestionar Orquídeas",
+      title: "Catálogo de Orquídeas",
       description: "Registra, edita y administra el catálogo completo de orquídeas en el sistema.",
-      icon: <Plus className="w-6 h-6" />,
+      icon: <Leaf className="w-6 h-6" />,
       color: "from-green-500 to-green-600",
-      onClick: () => window.location.href = "/orquideas",
+      onClick: () => router.visit(route('orquideas.index')),
     },
     {
-      title: "Grupos de Orquídeas",
+      title: "Grupos de Clasificación",
       description: "Gestiona los grupos y categorías principales de clasificación de orquídeas.",
       icon: <FolderTree className="w-6 h-6" />,
       color: "from-orange-500 to-red-500",
-      onClick: () => window.location.href = "/grupos",
+      onClick: () => router.visit(route('grupos.index')),
     },
     {
       title: "Clases de Orquídeas",
       description: "Administra las clases específicas de orquídeas dentro de cada grupo.",
       icon: <Tags className="w-6 h-6" />,
       color: "from-violet-500 to-purple-600",
-      onClick: () => window.location.href = "/clases",
+      onClick: () => router.visit(route('clases.index')),
+    },
+    {
+      title: "Inscripciones al Concurso",
+      description: "Inscribe las orquídeas al concurso y gestiona el proceso de registro completo.",
+      icon: <UserPlus className="w-6 h-6" />,
+      color: "from-pink-500 to-rose-500",
+      onClick: () => router.visit(route('inscripcion.index')),
     },
     {
       title: "Designar Ganadores",
       description: "Sistema de evaluación y juzgamiento para determinar los ganadores de las competiciones.",
       icon: <Award className="w-6 h-6" />,
       color: "from-purple-500 to-purple-600",
-      onClick: () => console.log("Navegando a Designar Ganadores"),
+      onClick: () => router.visit(route('ganadores.index')),
     },
     {
-      title: "Reporte de Orquídeas",
+      title: "Reportes por Eventos",
+      description: "Genera reportes específicos del evento activo con filtros y análisis detallados.",
+      icon: <FileText className="w-6 h-6" />,
+      color: "from-orange-500 to-orange-600",
+      onClick: () => router.visit(route('reportes.evento.index')),
+    },
+    {
+      title: "Reportes y Estadísticas",
       description: "Consulta reportes detallados, estadísticas y análisis completos del registro de orquídeas.",
       icon: <BarChart3 className="w-6 h-6" />,
       color: "from-indigo-500 to-indigo-600",
-      onClick: () => console.log("Navegando a Reportes"),
+      onClick: () => router.visit(route('reportes.index')),
     },
     {
-      title: "Asignar Trofeos",
-      description: "Gestiona y otorga los premios de las orquídeas en las diferentes categorías de competición.",
-      icon: <Trophy className="w-6 h-6" />,
-      color: "from-yellow-500 to-amber-500",
-      onClick: () => console.log("Navegando a Asignar Trofeos"),
-    },
-    {
-      title: "Formato Inscripción",
-      description: "Descargar los formatos de inscripción para registrarse de forma manuscrita en el sistema.",
+      title: "Formatos y Documentos",
+      description: "Accede y descarga los formatos necesarios para el registro y evaluación.",
       icon: <FileText className="w-6 h-6" />,
       color: "from-teal-500 to-cyan-500",
       onClick: () => {
@@ -213,11 +225,11 @@ export default function Dashboard({ stats }: DashboardProps) {
       },
     },
     {
-      title: "Inscripción",
-      description: "Inscribe las orquídeas al concurso y gestiona el proceso de registro completo.",
-      icon: <UserPlus className="w-6 h-6" />,
-      color: "from-pink-500 to-rose-500",
-      onClick: () => console.log("Navegando a Inscripción"),
+      title: "Gestión de Usuarios",
+      description: "Administra las cuentas de usuario del sistema, permisos y configuraciones de acceso.",
+      icon: <Settings className="w-6 h-6" />,
+      color: "from-gray-500 to-gray-600",
+      onClick: () => router.visit(route('users.index')),
     },
   ]
 
@@ -225,6 +237,33 @@ export default function Dashboard({ stats }: DashboardProps) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Dashboard" />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
+
+        {/* Banner de Evento Activo */}
+        {eventoActivo && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-4 mb-4"
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <Calendar className="h-6 w-6" />
+                <div>
+                  <p className="text-sm font-medium opacity-90">Evento Activo:</p>
+                  <h3 className="text-xl font-bold">{eventoActivo.nombre}</h3>
+                </div>
+              </div>
+              <button
+                onClick={() => router.visit(route('eventos.index'))}
+                className="bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+              >
+                <ChevronRight className="h-4 w-4" />
+                Cambiar Evento
+              </button>
+            </div>
+          </motion.div>
+        )}
+
         {/* Logos superiores */}
         <div className="flex justify-center items-center gap-8 mb-6">
           <motion.img

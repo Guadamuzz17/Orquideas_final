@@ -19,7 +19,8 @@ class Participante extends Model
         'id_municipio',
         'pais',
         'id_aso',
-        'id_usuario'
+        'id_usuario',
+        'id_evento'
     ];
 
     public function tipo()

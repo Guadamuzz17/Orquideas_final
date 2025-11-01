@@ -18,7 +18,8 @@ import {
   FolderTree,
   Tags,
   Download,
-  Camera
+  Camera,
+  CalendarDays
 } from "lucide-react"
 import {
   Sidebar,
@@ -64,98 +65,94 @@ const data = {
   ],
   navMain: [
     {
+      title: "Gestión de Eventos",
+      url: "/eventos",
+      icon: CalendarDays,
+      items: [
+        {
+          title: "Panel de Eventos",
+          url: "/eventos",
+        },
+        {
+          title: "Crear Nuevo Evento",
+          url: "/eventos/create",
+        },
+      ],
+    },
+    {
       title: "Panel Principal",
       url: "/dashboard",
       icon: LayoutGrid,
       isActive: true,
     },
     {
-      title: "Gestión de Participantes",
+      title: "Participantes",
       url: "/participantes",
       icon: Users,
       items: [
         {
-          title: "Lista de Participantes",
+          title: "Ver Todos los Participantes",
           url: "/participantes",
         },
         {
-          title: "Registrar Participante",
+          title: "Agregar Nuevo Participante",
           url: "/participantes/create",
-        },
-        {
-          title: "Formato de Juzgamiento",
-          url: "/participantes/formato",
         },
       ],
     },
     {
-      title: "Registro de Orquídeas",
+      title: "Catálogo de Orquídeas",
       url: "/orquideas",
       icon: Leaf,
       items: [
         {
-          title: "Catálogo de Orquídeas",
+          title: "Ver Todas las Orquídeas",
           url: "/orquideas",
         },
         {
-          title: "Registrar Orquídea",
+          title: "Registrar Nueva Orquídea",
           url: "/orquideas/create",
         },
+      ],
+    },
+    {
+      title: "Clasificación",
+      url: "/grupos",
+      icon: FolderTree,
+      items: [
         {
           title: "Grupos de Orquídeas",
           url: "/grupos",
-          icon: FolderTree,
         },
         {
           title: "Clases de Orquídeas",
           url: "/clases",
-          icon: Tags,
-        },
-        {
-          title: "Descargar Clases PDF",
-          url: "#",
-          action: "download",
-          icon: Download,
         },
       ],
     },
     {
-      title: "Inscripción de Orquídeas",
+      title: "Inscripciones al Concurso",
       url: "/inscripcion",
       icon: UserPlus,
       items: [
         {
-          title: "Nueva Inscripción",
+          title: "Crear Nueva Inscripción",
           url: "/inscripcion/create",
         },
         {
-          title: "Lista de Inscripciones",
+          title: "Ver Todas las Inscripciones",
           url: "/inscripcion",
         },
       ],
     },
     {
-      title: "Competición",
-      url: "/competicion",
+      title: "Resultados del Concurso",
+      url: "/ganadores",
       icon: Trophy,
       items: [
         {
-          title: "Inscripción",
-          url: "/inscripcion",
-        },
-        {
-          title: "Formato Inscripción",
-          url: "#",
-          action: "download-inscripcion",
-          icon: Download,
-        },
-        {
           title: "Designar Ganadores",
           url: "/ganadores",
-        },
-        {
-          title: "Asignar Trofeos",
-          url: "/trofeos",
         },
         {
           title: "Otorgar Listones",
@@ -164,27 +161,54 @@ const data = {
       ],
     },
     {
-      title: "Fotografías",
+      title: "Galería de Fotos",
       url: "/fotos",
       icon: Camera,
       items: [
         {
-          title: "Ver Fotografías",
+          title: "Ver Todas las Fotografías",
           url: "/fotos",
         },
         {
-          title: "Subir Nueva Foto",
+          title: "Subir Nueva Fotografía",
           url: "/fotos/create",
         },
       ],
     },
     {
-      title: "Reportes y Análisis",
+      title: "Formatos y Documentos",
+      url: "/formatos",
+      icon: FileText,
+      items: [
+        {
+          title: "Formato de Inscripción",
+          url: "#",
+          action: "download-inscripcion",
+          icon: Download,
+        },
+        {
+          title: "Formato de Juzgamiento",
+          url: "/participantes/formato",
+        },
+        {
+          title: "Listado de Clases (PDF)",
+          url: "#",
+          action: "download",
+          icon: Download,
+        },
+      ],
+    },
+    {
+      title: "Reportes y Estadísticas",
       url: "/reportes",
       icon: BarChart3,
       items: [
         {
-          title: "Reportes de Listones",
+          title: "Reporte General",
+          url: "/reportes",
+        },
+        {
+          title: "Reporte de Listones",
           url: "/reportes/listones",
         },
       ],

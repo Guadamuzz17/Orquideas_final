@@ -18,8 +18,12 @@ class ParticipanteController extends Controller
      */
     public function index()
     {
-        $participantes = Participante::with(['tipo', 'departamento', 'municipio', 'aso'])->get();
-        
+        $eventoActivo = session('evento_activo');
+
+        $participantes = Participante::with(['tipo', 'departamento', 'municipio', 'aso'])
+            ->where('id_evento', $eventoActivo)
+            ->get();
+
         return Inertia::render('participantes/index', [
             'participantes' => $participantes
         ]);
@@ -67,6 +71,7 @@ class ParticipanteController extends Controller
         $data = $request->all();
         // Asignar null para id_usuario ya que ahora es nullable
         $data['id_usuario'] = null;
+        $data['id_evento'] = session('evento_activo'); // Asociar al evento activo
 
         Participante::create($data);
 
@@ -80,7 +85,7 @@ class ParticipanteController extends Controller
     public function show(string $id)
     {
         $participante = Participante::with(['tipo', 'departamento', 'municipio', 'aso'])->findOrFail($id);
-        
+
         return response()->json($participante);
     }
 

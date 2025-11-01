@@ -8,15 +8,15 @@ use App\Http\Controllers\OrquideaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\GanadorController;
-<<<<<<< HEAD
 use App\Http\Controllers\ReporteController;
-=======
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\ClaseController;
 use App\Http\Controllers\ListonController;
 use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\FotosController;
->>>>>>> ffa8e2b26f7287a7dd579ad1ec8c84fb46b6e3a3
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\EventoController;
+use App\Http\Controllers\ReportesEventoController;
 
 // Ruta de inicio
 Route::get('/', function () {
@@ -25,9 +25,25 @@ Route::get('/', function () {
 
 // Grupo de rutas protegidas por autenticación
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
+    // Rutas de Eventos (SIN middleware de evento activo)
+    Route::resource('eventos', EventoController::class);
+    Route::post('/eventos/{id}/seleccionar', [EventoController::class, 'seleccionar'])->name('eventos.seleccionar');
+    Route::post('/eventos/cerrar', [EventoController::class, 'cerrarEvento'])->name('eventos.cerrar');
+
+    // Todas las demás rutas requieren un evento activo
+    Route::middleware(['evento.activo'])->group(function () {
+
+        // Dashboard
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Reportes por Eventos (nueva interfaz separada)
+        Route::get('/reportes-evento', [ReportesEventoController::class, 'index'])->name('reportes.evento.index');
+        Route::get('/reportes-evento/inscripciones/pdf', [ReportesEventoController::class, 'inscripcionesPdf'])->name('reportes.evento.inscripciones.pdf');
+        Route::get('/reportes-evento/plantas-por-clases/pdf', [ReportesEventoController::class, 'plantasPorClasesPdf'])->name('reportes.evento.plantas_por_clases.pdf');
+        Route::get('/reportes-evento/ganadores/pdf', [ReportesEventoController::class, 'ganadoresPdf'])->name('reportes.evento.ganadores.pdf');
+        Route::get('/reportes-evento/participantes-orquideas/pdf', [ReportesEventoController::class, 'participantesOrquideasPdf'])->name('reportes.evento.participantes_orquideas.pdf');
+
     // Reportes
     Route::get('/reportes', function () {
         return Inertia::render('Reportes/index');
@@ -48,6 +64,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rutas específicas de orquídeas (DEBEN IR ANTES del resource)
     Route::get('/orquideas/clases/{grupoId}', [OrquideaController::class, 'getClasesByGrupo'])
         ->name('orquideas.clases');
+    Route::get('/orquideas/sugerencias', [OrquideaController::class, 'buscarSugerencias'])
+        ->name('orquideas.sugerencias');
 
     // Rutas de recursos para orquídeas
     Route::resource('orquideas', OrquideaController::class);
@@ -131,7 +149,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Rutas de recursos para fotografías
     Route::resource('fotos', FotosController::class);
-});
+
+    // Rutas del módulo de gestión de usuarios
+    Route::prefix('users')->name('users.')->middleware('user.management')->group(function () {
+        // Rutas específicas (DEBEN IR ANTES del resource)
+        Route::patch('/{user}/toggle-verification', [UsersController::class, 'toggleVerification'])
+            ->name('toggle-verification');
+        Route::patch('/{user}/reset-password', [UsersController::class, 'resetPassword'])
+            ->name('reset-password');
+        Route::post('/bulk-action', [UsersController::class, 'bulkAction'])
+            ->name('bulk-action');
+    });
+
+    // Rutas de recursos para usuarios
+    Route::resource('users', UsersController::class)->middleware('user.management');
+
+    }); // Fin del grupo evento.activo
+}); // Fin del grupo auth
 
 // Rutas API públicas (sin autenticación)
 Route::prefix('api')->group(function () {

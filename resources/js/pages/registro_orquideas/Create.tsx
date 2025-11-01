@@ -9,6 +9,7 @@ import { ArrowLeft, Camera, Plus, Minus, Upload, Flower2 } from "lucide-react";
 import { toast } from 'sonner';
 import axios from 'axios';
 import AppLayout from '@/layouts/app-layout';
+import { AutocompleteOrquidea } from '@/components/AutocompleteOrquidea';
 
 interface Grupo {
   id_grupo: number;
@@ -74,7 +75,7 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
     if (file) {
       setSelectedFile(file);
       setData('foto', file);
-      
+
       // Crear preview
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -102,7 +103,7 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Crear FormData para manejar la imagen
     const formData = new FormData();
     formData.append('nombre_planta', data.nombre_planta);
@@ -111,7 +112,7 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
     formData.append('id_clase', data.id_clase);
     formData.append('cantidad', data.cantidad.toString());
     formData.append('id_participante', data.id_participante);
-    
+
     if (data.foto) {
       formData.append('foto', data.foto);
     }
@@ -133,7 +134,7 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
   return (
     <AppLayout>
       <Head title="Registrar Orquídea" />
-      
+
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Registrar Nueva Orquídea</h1>
@@ -158,19 +159,20 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
 
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Nombre de la Planta */}
+              {/* Nombre de la Planta con Autocompletado */}
               <div className="space-y-2">
                 <Label htmlFor="nombre_planta" className="text-sm font-medium">
                   Nombre de la Planta *
                 </Label>
-                <Input 
-                  id="nombre_planta"
-                  placeholder="Ingrese el nombre científico de la planta"
+                <AutocompleteOrquidea
                   value={data.nombre_planta}
-                  onChange={(e) => setData('nombre_planta', e.target.value)}
-                  className="h-11"
-                  required
+                  onChange={(value) => setData('nombre_planta', value)}
+                  placeholder="Ej: Cattleya mossiae, Phalaenopsis amabilis..."
+                  error={!!errors.nombre_planta}
                 />
+                <p className="text-xs text-gray-500">
+                  💡 Empiece a escribir para ver sugerencias de nombres existentes
+                </p>
                 {errors.nombre_planta && (
                   <p className="text-sm text-red-600">{errors.nombre_planta}</p>
                 )}
@@ -222,9 +224,9 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
                   <Label htmlFor="id_clase" className="text-sm font-medium">
                     Clase *
                   </Label>
-                  <Select 
-                    value={data.id_clase} 
-                    onValueChange={(value) => setData('id_clase', value)} 
+                  <Select
+                    value={data.id_clase}
+                    onValueChange={(value) => setData('id_clase', value)}
                     disabled={!data.id_grupo}
                     required
                   >
@@ -322,9 +324,9 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
 
                   {previewUrl ? (
                     <div className="space-y-4">
-                      <img 
-                        src={previewUrl} 
-                        alt="Preview" 
+                      <img
+                        src={previewUrl}
+                        alt="Preview"
                         className="mx-auto h-32 w-32 object-cover rounded-lg"
                       />
                       <div className="text-green-600 font-medium">
@@ -356,9 +358,9 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
                 </div>
 
                 <div className="flex gap-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     className="flex-1"
                     onClick={handleCameraCapture}
                   >
@@ -374,17 +376,17 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
 
               {/* Botones de Acción */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="flex-1 h-12 bg-green-600 hover:bg-green-700"
                   disabled={processing}
                 >
                   <Flower2 className="mr-2 h-4 w-4" />
                   {processing ? 'Registrando...' : 'Registrar Orquídea'}
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   className="h-12"
                   onClick={() => {
                     reset();

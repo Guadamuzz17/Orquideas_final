@@ -18,11 +18,14 @@ class GanadorController extends Controller
      */
     public function index()
     {
+        $eventoActivo = session('evento_activo');
+
         $ganadores = Ganador::with([
             'inscripcion.participante',
             'inscripcion.orquidea.grupo',
             'inscripcion.orquidea.clase'
         ])
+        ->where('id_evento', $eventoActivo)
         ->orderBy('created_at', 'desc')
         ->get();
 
@@ -72,7 +75,8 @@ class GanadorController extends Controller
             'id_inscripcion' => $request->id_inscripcion,
             'posicion' => $request->posicion,
             'empate' => $request->empate ?? false,
-            'fecha_ganador' => now()
+            'fecha_ganador' => now(),
+            'id_evento' => session('evento_activo')
         ]);
 
         return redirect()->route('ganadores.index')

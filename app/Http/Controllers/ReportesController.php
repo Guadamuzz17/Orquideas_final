@@ -22,9 +22,22 @@ class ReportesController extends Controller
         try {
             $totalListones = Trofeo::where('tipo_premio', 'liston')->count();
 
-            // Obtener datos para los filtros
-            $grupos = \App\Models\Grupo::orderBy('nom_grupo')->get(['id_grupo', 'nom_grupo']);
-            $clases = \App\Models\Clase::orderBy('nom_clase')->get(['id_clase', 'nom_clase']);
+            // Obtener datos para los filtros (usar los nombres de columna reales)
+            $grupos = \App\Models\Grupo::orderBy('nombre_grupo')->get(['id_grupo', 'nombre_grupo'])
+                ->map(function($g) {
+                    return [
+                        'id_grupo' => $g->id_grupo,
+                        'nom_grupo' => $g->nombre_grupo,
+                    ];
+                });
+
+            $clases = \App\Models\Clase::orderBy('nombre_clase')->get(['id_clase', 'nombre_clase'])
+                ->map(function($c) {
+                    return [
+                        'id_clase' => $c->id_clase,
+                        'nom_clase' => $c->nombre_clase,
+                    ];
+                });
 
             return Inertia::render('Reportes/ListonesSimple', [
                 'estadisticas' => [

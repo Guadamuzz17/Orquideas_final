@@ -9,15 +9,18 @@ interface Orquidea {
   clase?: { nombre_clase: string };
 }
 
-interface PageProps { orquideas: { data: Orquidea[] } }
+interface PageProps {
+  orquideas: { data: Orquidea[] };
+  [key: string]: any;
+}
 
 export default function Index() {
   const { orquideas } = usePage<PageProps>().props;
   return (
     <div className="p-4">
       <div className="flex justify-between mb-4">
-        <h1 className="text-lg font-semibold">Listado de Orquídeas</h1>
-        <Button asChild><Link href={route('orquideas.create')}>Agregar Nuevo Registro</Link></Button>
+        <h1 className="text-lg font-semibold">Catálogo de Orquídeas</h1>
+        <Button asChild><Link href={route('orquideas.create')}>Registrar Nueva Orquídea</Link></Button>
       </div>
       <table className="min-w-full text-sm">
         <thead>

@@ -51,6 +51,11 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            // Compartir evento activo globalmente
+            'eventoActivo' => [
+                'id' => session('evento_activo'),
+                'nombre' => session('evento_nombre'),
+            ],
         ];
     }
 }

@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             ClaseSeeder::class,
             TipoParticipanteSeeder::class,
             AsoSeeder::class,
-            ClaseSeeder::class,
+            EventoSeeder::class,
         ]);
     }
 }

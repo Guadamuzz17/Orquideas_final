@@ -16,7 +16,10 @@ class InscripcionController extends Controller
      */
     public function index()
     {
+        $eventoActivo = session('evento_activo');
+
         $inscripciones = Inscripcion::with(['participante', 'orquidea'])
+            ->where('id_evento', $eventoActivo)
             ->orderBy('correlativo')
             ->get();
 
@@ -30,7 +33,10 @@ class InscripcionController extends Controller
      */
     public function create()
     {
+        $eventoActivo = session('evento_activo');
+
         $participantes = Participante::select('id', 'nombre')
+            ->where('id_evento', $eventoActivo)
             ->orderBy('nombre')
             ->get();
 
@@ -44,9 +50,12 @@ class InscripcionController extends Controller
      */
     public function getOrquideasByParticipante($participanteId)
     {
+        $eventoActivo = session('evento_activo');
+
         // Obtener orquídeas del participante con la cantidad de inscripciones
         $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
             ->where('id_participante', $participanteId)
+            ->where('id_evento', $eventoActivo)
             ->withCount(['inscripciones'])
             ->get()
             ->filter(function ($orquidea) {
@@ -150,11 +159,14 @@ class InscripcionController extends Controller
         try {
             DB::beginTransaction();
 
+            $eventoActivo = session('evento_activo');
+
             foreach ($request->inscripciones as $inscripcionData) {
                 Inscripcion::create([
                     'id_participante' => $inscripcionData['id_participante'],
                     'id_orquidea' => $inscripcionData['id_orquidea'],
-                    'correlativo' => $inscripcionData['correlativo']
+                    'correlativo' => $inscripcionData['correlativo'],
+                    'id_evento' => $eventoActivo
                 ]);
             }
 
