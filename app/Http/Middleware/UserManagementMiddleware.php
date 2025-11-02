@@ -21,6 +21,7 @@ class UserManagementMiddleware
             return redirect()->route('login');
         }
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         // Verificar si el usuario tiene permisos para gestionar usuarios

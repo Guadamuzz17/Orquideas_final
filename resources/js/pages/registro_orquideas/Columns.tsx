@@ -456,7 +456,7 @@ export const columns: ColumnDef<Orquidea>[] = [
 
 
               <AlertDialog>
-                <AlertDialogTrigger>
+                <AlertDialogTrigger asChild>
                   <Button variant="destructive">Eliminar</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>

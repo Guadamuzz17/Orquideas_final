@@ -14,6 +14,11 @@ use App\Http\Controllers\ClaseController;
 use App\Http\Controllers\ListonController;
 use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\FotosController;
+use App\Http\Controllers\EventoController;
+use App\Http\Controllers\ReportesEventoController;
+use App\Http\Controllers\TipoPremioController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\RolController;
 
 
 // Ruta de inicio
@@ -149,6 +154,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/participantes/municipios/{departamentoId}', [ParticipanteController::class, 'getMunicipiosByDepartamento'])
         ->name('participantes.municipios');
 
+    // Ruta para buscar participantes de eventos anteriores (reciclaje)
+    Route::get('/participantes/search-recycle', [ParticipanteController::class, 'searchForRecycle'])
+        ->name('participantes.search.recycle');
+
     // Rutas de recursos para participantes
     Route::resource('participantes', ParticipanteController::class);
 
@@ -183,12 +192,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::prefix('api')->group(function () {
     Route::get('/fotos', [FotosController::class, 'indexPublic'])->name('api.fotos');
 });
-
-// Rutas de recuperación de contraseña (públicas)
-Route::get('/recuperar-password', [PasswordResetController::class, 'showRequestForm'])->name('password.request');
-Route::post('/recuperar-password', [PasswordResetController::class, 'sendResetEmail'])->name('password.email');
-Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
 
 // Archivos adicionales requeridos
 require __DIR__.'/settings.php';

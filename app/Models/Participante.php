@@ -10,6 +10,8 @@ class Participante extends Model
     use HasFactory;
 
     protected $table = 'tb_participante';
+    protected $primaryKey = 'id'; // Clave primaria
+
     protected $fillable = [
         'nombre',
         'numero_telefonico',
@@ -46,6 +48,11 @@ class Participante extends Model
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'id_usuario');
+    }
+
+    public function evento()
+    {
+        return $this->belongsTo(Evento::class, 'id_evento', 'id_evento');
     }
 
     public function orquideas()

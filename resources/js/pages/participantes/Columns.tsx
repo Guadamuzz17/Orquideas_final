@@ -368,7 +368,7 @@ export const columns: ColumnDef<Participante>[] = [
 
 
               <AlertDialog>
-                <AlertDialogTrigger>
+                <AlertDialogTrigger asChild>
                   <Button variant="destructive">Eliminar</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>

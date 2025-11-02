@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class CheckPermission
 {
@@ -17,11 +18,12 @@ class CheckPermission
     public function handle(Request $request, Closure $next, string $permisos): Response
     {
         // Si el usuario no está autenticado
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return redirect()->route('login');
         }
 
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         // Si el usuario no tiene rol asignado (usuarios registrados públicamente)
         if (!$user->rol_id) {

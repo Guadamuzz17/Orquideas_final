@@ -10,6 +10,7 @@ use App\Models\Departamento;
 use App\Models\Municipio;
 use App\Models\Aso;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class ParticipanteController extends Controller
 {
@@ -45,6 +46,88 @@ class ParticipanteController extends Controller
             'municipios' => $municipios,
             'asociaciones' => $asociaciones
         ]);
+    }
+
+    /**
+     * Buscar participantes de eventos anteriores para reciclaje
+     */
+    public function searchForRecycle(Request $request)
+    {
+        $search = $request->input('query');
+        $eventoActivo = session('evento_activo');
+
+        // Log para debugging
+        Log::info('Búsqueda de reciclaje', [
+            'query' => $search,
+            'evento_activo' => $eventoActivo,
+            'length' => strlen($search)
+        ]);
+
+        // Validar mínimo 2 caracteres (reducido de 3)
+        if (strlen($search) < 2) {
+            return response()->json([]);
+        }
+
+        // Normalizar búsqueda: quitar acentos y convertir a minúsculas
+        $searchNormalized = strtolower($search);
+
+        // Buscar participantes en TODOS los eventos o solo otros eventos si hay evento activo
+        $query = Participante::with(['tipo', 'departamento', 'municipio', 'aso', 'evento']);
+
+        // Si hay evento activo, excluir participantes de ese evento
+        if ($eventoActivo) {
+            $query->where('id_evento', '!=', $eventoActivo);
+        }
+
+        $participantes = $query->where(function($q) use ($search, $searchNormalized) {
+                // Búsqueda flexible: acepta coincidencias parciales
+                $q->where('nombre', 'LIKE', "%{$search}%")
+                  ->orWhere('numero_telefonico', 'LIKE', "%{$search}%")
+                  // Búsqueda insensible a mayúsculas
+                  ->orWhereRaw('LOWER(nombre) LIKE ?', ["%{$searchNormalized}%"])
+                  // Búsqueda por palabras individuales
+                  ->orWhere(function($subQ) use ($search) {
+                      $palabras = explode(' ', $search);
+                      foreach ($palabras as $palabra) {
+                          if (strlen(trim($palabra)) >= 2) {
+                              $subQ->orWhere('nombre', 'LIKE', "%{$palabra}%");
+                          }
+                      }
+                  });
+            })
+            ->select('id', 'nombre', 'numero_telefonico', 'direccion',
+                     'id_tipo', 'id_departamento', 'id_municipio', 'id_aso', 'id_evento')
+            ->distinct()
+            ->limit(15) // Aumentado de 10 a 15
+            ->get();
+
+        Log::info('Resultados encontrados', [
+            'count' => $participantes->count(),
+            'participantes' => $participantes->pluck('nombre')
+        ]);
+
+        // Agrupar por participante único (mismo nombre)
+        $uniqueParticipantes = $participantes->groupBy('nombre')->map(function($group) {
+            $first = $group->first();
+            return [
+                'id_participante' => $first->id, // Usar 'id' en lugar de 'id_participante'
+                'nombre' => $first->nombre,
+                'numero_telefonico' => $first->numero_telefonico,
+                'direccion' => $first->direccion,
+                'id_tipo' => $first->id_tipo,
+                'id_departamento' => $first->id_departamento,
+                'id_municipio' => $first->id_municipio,
+                'id_aso' => $first->id_aso,
+                'tipo' => $first->tipo,
+                'departamento' => $first->departamento,
+                'municipio' => $first->municipio,
+                'aso' => $first->aso,
+                'evento_previo' => $first->evento ? $first->evento->nombre : 'N/A',
+                'eventos_participados' => $group->count()
+            ];
+        })->values();
+
+        return response()->json($uniqueParticipantes);
     }
 
     /**
