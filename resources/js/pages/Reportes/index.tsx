@@ -49,11 +49,21 @@ export default function ReportesIndex() {
           <CardFooter>
             <Button
               onClick={() => {
-                const url = `/reportes/inscripciones/pdf?from=${encodeURIComponent(startDate || "")}\u0026to=${encodeURIComponent(endDate || "")}`
+                const url = `/reportes/inscripciones/pdf?from=${encodeURIComponent(startDate || "")}&to=${encodeURIComponent(endDate || "")}`
                 window.open(url, "_blank")
               }}
             >
               Generar reporte
+            </Button>
+            <Button
+              variant="outline"
+              className="ml-2"
+              onClick={() => {
+                const url = `/reportes/inscripciones/excel?from=${encodeURIComponent(startDate || "")}&to=${encodeURIComponent(endDate || "")}`
+                window.open(url, "_blank")
+              }}
+            >
+              Exportar Excel
             </Button>
           </CardFooter>
         </Card>
@@ -205,11 +215,21 @@ export default function ReportesIndex() {
           <CardFooter>
             <Button
               onClick={() => {
-                const url = `/reportes/plantas-por-clases/pdf?from=${encodeURIComponent(startDate2 || "")}\u0026to=${encodeURIComponent(endDate2 || "")}\u0026clase=${encodeURIComponent(claseFiltro || "todas")}`
+                const url = `/reportes/plantas-por-clases/pdf?from=${encodeURIComponent(startDate2 || "")}&to=${encodeURIComponent(endDate2 || "")}&clase=${encodeURIComponent(claseFiltro || "todas")}`
                 window.open(url, "_blank")
               }}
             >
               Generar reporte
+            </Button>
+            <Button
+              variant="outline"
+              className="ml-2"
+              onClick={() => {
+                const url = `/reportes/plantas-por-clases/excel?from=${encodeURIComponent(startDate2 || "")}&to=${encodeURIComponent(endDate2 || "")}&clase=${encodeURIComponent(claseFiltro || "todas")}`
+                window.open(url, "_blank")
+              }}
+            >
+              Exportar Excel
             </Button>
           </CardFooter>
         </Card>
@@ -236,11 +256,21 @@ export default function ReportesIndex() {
           <CardFooter>
             <Button
               onClick={() => {
-                const url = `/reportes/ganadores/pdf?from=${encodeURIComponent(startDate3 || "")}\u0026to=${encodeURIComponent(endDate3 || "")}`
+                const url = `/reportes/ganadores/pdf?from=${encodeURIComponent(startDate3 || "")}&to=${encodeURIComponent(endDate3 || "")}`
                 window.open(url, "_blank")
               }}
             >
               Generar reporte
+            </Button>
+            <Button
+              variant="outline"
+              className="ml-2"
+              onClick={() => {
+                const url = `/reportes/ganadores/excel?from=${encodeURIComponent(startDate3 || "")}&to=${encodeURIComponent(endDate3 || "")}`
+                window.open(url, "_blank")
+              }}
+            >
+              Exportar Excel
             </Button>
           </CardFooter>
         </Card>
@@ -263,6 +293,16 @@ export default function ReportesIndex() {
               }}
             >
               Descargar formato
+            </Button>
+            <Button
+              variant="outline"
+              className="ml-2"
+              onClick={() => {
+                const url = `/reportes/participantes-orquideas/excel`
+                window.open(url, "_blank")
+              }}
+            >
+              Exportar Excel
             </Button>
           </CardFooter>
         </Card>

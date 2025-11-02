@@ -19,7 +19,9 @@ class Orquidea extends Model
         'id_clase',
         'cantidad',
         'id_participante',
-        'id_evento'
+=======
+        'id_participante'
+>>>>>>> ffa8e2b26f7287a7dd579ad1ec8c84fb46b6e3a3
     ];
 
     public function grupo()
@@ -30,6 +32,14 @@ class Orquidea extends Model
     public function clase()
     {
         return $this->belongsTo(Clase::class, 'id_clase', 'id_clase');
+<<<<<<< HEAD
+    }
+
+    public function participante()
+    {
+        return $this->belongsTo(Participante::class, 'id_participante');
+=======
+>>>>>>> ffa8e2b26f7287a7dd579ad1ec8c84fb46b6e3a3
     }
 
     public function participante()

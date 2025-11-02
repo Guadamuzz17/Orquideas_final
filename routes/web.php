@@ -14,12 +14,7 @@ use App\Http\Controllers\ClaseController;
 use App\Http\Controllers\ListonController;
 use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\FotosController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\EventoController;
-use App\Http\Controllers\ReportesEventoController;
-use App\Http\Controllers\PasswordResetController;
-use App\Http\Controllers\TipoPremioController;
-use App\Http\Controllers\RolController;
+
 
 // Ruta de inicio
 Route::get('/', function () {
@@ -51,6 +46,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reportes', function () {
         return Inertia::render('Reportes/index');
     })->name('reportes.index');
+
+    // Reportes Excel
+    Route::get('/reportes/inscripciones/excel', [ReporteController::class, 'inscripcionesExcel'])->name('reportes.inscripciones.excel');
+    Route::get('/reportes/plantas-por-clases/excel', [ReporteController::class, 'plantasPorClasesExcel'])->name('reportes.plantas_por_clases.excel');
+    Route::get('/reportes/ganadores/excel', [ReporteController::class, 'ganadoresExcel'])->name('reportes.ganadores.excel');
+    Route::get('/reportes/participantes-orquideas/excel', [ReporteController::class, 'participantesOrquideasExcel'])->name('reportes.participantes_orquideas.excel');
 
     // Reporte PDF: Inscripciones (Página 1)
     Route::get('/reportes/inscripciones/pdf', [ReporteController::class, 'inscripcionesPdf'])->name('reportes.inscripciones.pdf');

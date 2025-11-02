@@ -8,6 +8,11 @@ use App\Models\Inscripcion;
 use App\Models\Orquidea;
 use App\Models\Ganador;
 use App\Models\Participante;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\InscripcionesExport;
+use App\Exports\PlantasPorClasesExport;
+use App\Exports\GanadoresExport;
+use App\Exports\ParticipantesOrquideasExport;
 
 class ReporteController extends Controller
 {
@@ -199,6 +204,11 @@ class ReporteController extends Controller
                 'p1' => $g->posicion == 1 ? 'X' : '',
                 'p2' => $g->posicion == 2 ? 'X' : '',
                 'p3' => $g->posicion == 3 ? 'X' : '',
+                // Nuevas columnas solicitadas (por ahora vacías hasta definir reglas de negocio)
+                'mh' => '',
+                'trofeos' => '',
+                'trofeos_especiales' => '',
+                'aos' => '',
             ];
         })->values()->toArray();
 
@@ -262,5 +272,44 @@ class ReporteController extends Controller
         $pdf = Pdf::loadView('reportes.participantes_orquideas', $data)->setPaper('letter', 'portrait');
 
         return $pdf->stream('reporte_participantes_orquideas_asignadas.pdf');
+    }
+
+    // Excel: Inscripciones
+    public function inscripcionesExcel(Request $request)
+    {
+        $from = $request->query('from');
+        $to = $request->query('to');
+        $export = new InscripcionesExport($from, $to);
+        $filename = 'reporte_inscripciones_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download($export, $filename);
+    }
+
+    // Excel: Plantas por Clases
+    public function plantasPorClasesExcel(Request $request)
+    {
+        $from = $request->query('from');
+        $to = $request->query('to');
+        $clase = $request->query('clase');
+        $export = new PlantasPorClasesExport($from, $to, $clase);
+        $filename = 'listado_plantas_por_clases_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download($export, $filename);
+    }
+
+    // Excel: Ganadores
+    public function ganadoresExcel(Request $request)
+    {
+        $from = $request->query('from');
+        $to = $request->query('to');
+        $export = new GanadoresExport($from, $to);
+        $filename = 'listado_ganadores_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download($export, $filename);
+    }
+
+    // Excel: Participantes y Orquídeas Asignadas
+    public function participantesOrquideasExcel(Request $request)
+    {
+        $export = new ParticipantesOrquideasExport();
+        $filename = 'reporte_participantes_orquideas_asignadas_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        return Excel::download($export, $filename);
     }
 }
