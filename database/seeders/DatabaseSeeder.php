@@ -23,6 +23,9 @@ class DatabaseSeeder extends Seeder
             TipoParticipanteSeeder::class,
             AsoSeeder::class,
             EventoSeeder::class,
+            TipoPremioSeeder::class,
+            RolesPermisosSeeder::class,
+            SuperAdminSeeder::class,
         ]);
     }
 }
