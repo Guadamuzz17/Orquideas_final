@@ -96,6 +96,27 @@ export const chatbotConfig: Record<string, ModuleQA> = {
       ] }
     ]
   },
+  estadisticas: {
+    title: "Estadísticas del Evento",
+    qas: [
+      { question: "¿Qué tipo de estadísticas puedo ver?", answer: "Puedes ver estadísticas completas en tiempo real del evento: total de participantes, inscripciones, orquídeas, ganadores, especies diferentes, y promedio de orquídeas por participante. Todas las métricas se calculan automáticamente según el evento seleccionado.", actions: [
+        { label: "Ver estadísticas", href: "/estadisticas" }
+      ] },
+      { question: "¿Cómo se organizan las estadísticas?", answer: "Las estadísticas están divididas en 5 pestañas: Participantes (tipos, ASOs, nuevos vs recurrentes, top 20), Orquídeas (clases comunes, grupos, nativas vs híbridos), Ganadores (por trofeo y clase), Tendencias (comparativa entre eventos), y Geografía (distribución por departamento y municipio)." },
+      { question: "¿Qué muestra el Top 20 de participantes?", answer: "Muestra los 20 participantes que trajeron más orquídeas al evento, con gráfico de barras que incluye su nombre, total de plantas, tipo de participante y ASO a la que pertenecen." },
+      { question: "¿Puedo comparar con eventos anteriores?", answer: "Sí, la pestaña 'Tendencias' muestra gráficos de líneas comparativos de participantes, inscripciones y ganadores a través de todos los eventos registrados en el sistema. Esto te permite ver el crecimiento o cambios en el tiempo." },
+      { question: "¿Cómo exportar las estadísticas?", answer: "Usa el botón 'Exportar' en la parte superior para descargar estadísticas en formato CSV. Puedes elegir entre: Estadísticas Completas, Solo Participantes, Solo Orquídeas, o Solo Ganadores. El archivo se descarga inmediatamente y es compatible con Excel." },
+      { question: "¿Qué información incluye la distribución geográfica?", answer: "Muestra dos gráficos: uno con participantes agrupados por departamento, y otro con el top 15 de municipios con más participantes. Esto ayuda a identificar de dónde provienen la mayoría de los expositores." },
+      { question: "¿Se actualizan las estadísticas en tiempo real?", answer: "Sí, todas las estadísticas se calculan en tiempo real desde la base de datos. Presiona el botón 'Actualizar' (ícono de flechas circulares) para refrescar los datos y ver los cambios más recientes." },
+      { question: "¿Qué clases y grupos son más populares?", answer: "En la pestaña 'Orquídeas' encontrarás gráficos con el top 10 de clases y grupos más comunes según la cantidad de inscripciones. Esto ayuda a planificar espacios para futuros eventos." },
+      { question: "¿Cómo se calcula el promedio de orquídeas por participante?", answer: "El sistema divide el total de inscripciones entre el total de participantes del evento. Este promedio aparece en el resumen general en la parte superior del dashboard." },
+      { question: "¿Puedo ver ganadores agrupados por tipo de premio?", answer: "Sí, en la pestaña 'Ganadores' hay un gráfico circular que muestra la distribución de premios por tipo de trofeo, y un gráfico de barras con ganadores agrupados por clase de orquídea." },
+      { question: "¿Qué es 'Nuevos vs Recurrentes'?", answer: "Es una estadística que diferencia participantes que asisten por primera vez al evento versus aquellos que ya participaron en eventos anteriores. Se muestra como gráfico circular en la pestaña 'Participantes'." },
+      { question: "¿Cuántas especies diferentes hay en el evento?", answer: "El sistema cuenta automáticamente las especies únicas basándose en el nombre científico de las orquídeas. Este total se muestra en el resumen general y en la pestaña 'Orquídeas'." },
+      { question: "¿Cómo interpretar los gráficos de tendencias?", answer: "Los gráficos de líneas en 'Tendencias' muestran la evolución año tras año. Una línea ascendente indica crecimiento, mientras que descendente indica reducción. Útil para evaluar el éxito del evento a lo largo del tiempo." },
+      { question: "¿Las estadísticas se pueden imprimir?", answer: "Sí, puedes usar la función de impresión del navegador (Ctrl+P) para imprimir cualquier vista del dashboard. También puedes exportar los datos a CSV y luego importarlos en Excel o Google Sheets para crear tus propios reportes personalizados." }
+    ]
+  },
   tipo_premios: {
     title: "Tipos de Premios",
     qas: [

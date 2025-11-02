@@ -19,6 +19,7 @@ use App\Http\Controllers\ReportesEventoController;
 use App\Http\Controllers\TipoPremioController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\RolController;
+use App\Http\Controllers\EstadisticasController;
 
 
 // Ruta de inicio
@@ -39,6 +40,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Dashboard
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Estadísticas
+        Route::get('/estadisticas', [EstadisticasController::class, 'index'])->name('estadisticas.index');
+        Route::get('/estadisticas/datos', [EstadisticasController::class, 'getEstadisticas'])->name('estadisticas.datos');
+        Route::get('/estadisticas/exportar', [EstadisticasController::class, 'exportar'])->name('estadisticas.exportar');
+        Route::get('/estadisticas/comparar', [EstadisticasController::class, 'comparar'])->name('estadisticas.comparar');
 
         // Reportes por Eventos (nueva interfaz separada)
         Route::get('/reportes-evento', [ReportesEventoController::class, 'index'])->name('reportes.evento.index');

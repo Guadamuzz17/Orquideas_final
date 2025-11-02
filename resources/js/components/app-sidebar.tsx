@@ -216,6 +216,10 @@ const data = {
       icon: BarChart3,
       items: [
         {
+          title: "Estadísticas del Evento",
+          url: "/estadisticas",
+        },
+        {
           title: "Reporte General",
           url: "/reportes",
         },
