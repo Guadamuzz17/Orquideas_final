@@ -23,7 +23,6 @@
 </head>
 <body>
     <h1>Listado de Orquídeas Ganadoras</h1>
-    <div class="subtitle">Desde: {{ $from ?: 'N/A' }} &nbsp;&nbsp; Hasta: {{ $to ?: 'N/A' }}</div>
 
     <table>
         <thead>
@@ -36,10 +35,12 @@
                 <th class="w-pos center">1</th>
                 <th class="w-pos center">2</th>
                 <th class="w-pos center">3</th>
-                <th class="w-pos center">Mención honorífica</th>
-                <th class="w-pos center">Trofeos</th>
-                <th class="w-pos center">Trofeos Especiales</th>
-                <th class="w-pos center">AOS</th>
+                <th class="w-pos center">T</th>
+                @if(!empty($premios))
+                    @foreach($premios as $premio)
+                        <th class="w-pos center">{{ $premio['nombre'] }}</th>
+                    @endforeach
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -53,14 +54,16 @@
                     <td class="center">{{ $row['p1'] ?? '' }}</td>
                     <td class="center">{{ $row['p2'] ?? '' }}</td>
                     <td class="center">{{ $row['p3'] ?? '' }}</td>
-                    <td class="center">{{ $row['mh'] ?? '' }}</td>
-                    <td class="center">{{ $row['trofeos'] ?? '' }}</td>
-                    <td class="center">{{ $row['trofeos_especiales'] ?? '' }}</td>
-                    <td class="center">{{ $row['aos'] ?? '' }}</td>
+                    <td class="center">{{ $row['t'] ?? '' }}</td>
+                    @if(!empty($premios))
+                        @foreach($premios as $premio)
+                            <td class="center">{{ $row['premio_' . $premio['id']] ?? '' }}</td>
+                        @endforeach
+                    @endif
                 </tr>
             @empty
                 <tr>
-                    <td colspan="12" class="muted">Sin datos para el rango seleccionado.</td>
+                    <td colspan="12" class="muted">Sin datos.</td>
                 </tr>
             @endforelse
         </tbody>
