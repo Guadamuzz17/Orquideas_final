@@ -10,36 +10,34 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class InscripcionesExport implements FromCollection, WithHeadings, WithMapping, WithTitle
 {
-    public function __construct(private ?string $from = null, private ?string $to = null) {}
+    public function __construct(private ?string $from = null, private ?string $to = null, private ?int $eventId = null) {}
 
     public function collection()
     {
-        $q = Inscripcion::with(['participante', 'orquidea.grupo', 'orquidea.clase']);
-        if ($this->from && $this->to) {
-            $q->whereBetween('created_at', ["{$this->from} 00:00:00", "{$this->to} 23:59:59"]);
-        } elseif ($this->from) {
-            $q->where('created_at', '>=', "{$this->from} 00:00:00");
-        } elseif ($this->to) {
-            $q->where('created_at', '<=', "{$this->to} 23:59:59");
-        }
+        $effectiveEventId = $this->eventId ?? session('evento_activo');
+
+        $q = Inscripcion::query()
+            ->with(['participante', 'orquidea.grupo', 'orquidea.clase'])
+            ->when($effectiveEventId, function ($q) use ($effectiveEventId) {
+                $q->where('id_evento', $effectiveEventId);
+            })
+            ->orderBy('correlativo');
+
         return $q->get();
     }
 
     public function headings(): array
     {
         return [
-            'Participante', 'Orquídea', 'Grupo', 'Clase', 'Origen', 'Correlativo', 'Fecha Registro'
+            'Participante', 'Orquídea', 'Grupo', 'Clase', 'Origen', 'Correlativo'
         ];
     }
 
     public function map($ins): array
     {
-        $grupoLetter = '';
+        $grupoCod = '';
         if ($ins->orquidea && $ins->orquidea->grupo) {
-            $grupoLetter = $ins->orquidea->grupo->Cod_Grupo ?? '';
-            if (!$grupoLetter && !empty($ins->orquidea->grupo->nombre_grupo)) {
-                $grupoLetter = strtoupper(substr($ins->orquidea->grupo->nombre_grupo, 0, 1));
-            }
+            $grupoCod = $ins->orquidea->grupo->Cod_Grupo ?? '';
         }
         $claseNumber = '';
         if ($ins->orquidea && $ins->orquidea->clase) {
@@ -50,14 +48,14 @@ class InscripcionesExport implements FromCollection, WithHeadings, WithMapping, 
                 $claseNumber = (string) ($ins->orquidea->clase->id_clase ?? '');
             }
         }
+
         return [
-            $ins->participante->nombre ?? '',
-            $ins->orquidea->nombre_planta ?? '',
-            $grupoLetter,
+            optional($ins->participante)->nombre ?? '',
+            optional($ins->orquidea)->nombre_planta ?? '',
+            $grupoCod,
             $claseNumber,
-            $ins->orquidea->origen ?? '',
+            optional($ins->orquidea)->origen ?? '',
             $ins->correlativo ?? '',
-            optional($ins->created_at)?->format('d/m/Y H:i') ?? '',
         ];
     }
 

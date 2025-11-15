@@ -65,7 +65,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Reportes
     Route::get('/reportes', function () {
-        return Inertia::render('Reportes/index');
+        $eventos = \App\Models\Evento::orderByDesc('fecha_inicio')->get(['id_evento','nombre_evento','fecha_inicio','fecha_fin']);
+        $activo = session('evento_activo');
+        $clases = \App\Models\Clase::orderBy('id_clase')->get(['id_clase','nombre_clase']);
+        return Inertia::render('Reportes/index', [
+            'eventos' => $eventos,
+            'activeEventId' => $activo,
+            'clases' => $clases,
+        ]);
     })->name('reportes.index');
 
     // Reportes Excel
@@ -84,7 +91,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reportes/ganadores/pdf', [ReporteController::class, 'ganadoresPdf'])->name('reportes.ganadores.pdf');
 
     // Reporte PDF: Participantes y Orquídeas Asignadas (Página 4)
-    Route::get('/reportes/participantes-orquideas/pdf', [ReporteController::class, 'participantesOrquideasPdf'])->name('reportes.participantes_orquideas.pdf');
+    Route::get('/reportes/participantes-orquideas/pdf', [ReportesEventoController::class, 'participantesOrquideasPdf'])->name('reportes.participantes_orquideas.pdf');
 
     // Rutas específicas de orquídeas (DEBEN IR ANTES del resource)
     Route::get('/orquideas/clases/{grupoId}', [OrquideaController::class, 'getClasesByGrupo'])

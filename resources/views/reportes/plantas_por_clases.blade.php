@@ -24,7 +24,6 @@
 <body>
     <h1>Asociación Altaverapacense de Orquideología</h1>
     <h2>Listado General de Plantas por Clases</h2>
-    <div class="mb-4 muted">Desde: {{ $from ?: 'N/A' }} &nbsp;&nbsp; Hasta: {{ $to ?: 'N/A' }}</div>
 
     <table>
         <thead>
@@ -47,7 +46,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="muted">Sin datos para el rango seleccionado.</td>
+                    <td colspan="5" class="muted">Sin datos.</td>
                 </tr>
             @endforelse
         </tbody>

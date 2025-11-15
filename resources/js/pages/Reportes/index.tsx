@@ -1,16 +1,18 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import AppLayout from "@/layouts/app-layout"
-import { Head } from "@inertiajs/react"
+import { Head, usePage } from "@inertiajs/react"
 import { type BreadcrumbItem } from "@/types"
+
+type Evento = { id_evento: number; nombre_evento: string; fecha_inicio?: string; fecha_fin?: string }
 
 export default function ReportesIndex() {
   const [page, setPage] = useState<number>(1)
-  const totalPages = 4
+  const totalPages = 3
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Reportes", href: "/reportes" },
   ]
@@ -22,6 +24,8 @@ export default function ReportesIndex() {
   const [startDate3, setStartDate3] = useState<string>("")
   const [endDate3, setEndDate3] = useState<string>("")
 
+  // Los reportes usarán session('evento_activo') en backend
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Reportes" />
@@ -30,36 +34,28 @@ export default function ReportesIndex() {
           <h1 className="text-2xl font-semibold">Reportes</h1>
         </div>
 
+        {/* El evento se toma del backend via session('evento_activo') */}
+
       {page === 1 && (
         <Card className="max-w-xl">
           <CardHeader>
             <CardTitle>Listado General</CardTitle>
-            <CardDescription>Selecciona un rango de fechas para el reporte.</CardDescription>
+            <CardDescription>Genera el reporte para el evento seleccionado.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="startDate">Fecha de inicio</Label>
-              <Input id="startDate" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endDate">Fecha final</Label>
-              <Input id="endDate" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-            </div>
-          </CardContent>
           <CardFooter>
-            <Button
+            {/* //<Button
               onClick={() => {
-                const url = `/reportes/inscripciones/pdf?from=${encodeURIComponent(startDate || "")}&to=${encodeURIComponent(endDate || "")}`
+                const url = `/reportes/inscripciones/pdf`
                 window.open(url, "_blank")
               }}
             >
               Generar reporte
-            </Button>
+            </Button> */}
             <Button
               variant="outline"
               className="ml-2"
               onClick={() => {
-                const url = `/reportes/inscripciones/excel?from=${encodeURIComponent(startDate || "")}&to=${encodeURIComponent(endDate || "")}`
+                const url = `/reportes/inscripciones/excel`
                 window.open(url, "_blank")
               }}
             >
@@ -70,66 +66,25 @@ export default function ReportesIndex() {
       )}
 
       {page === 2 && (
-        <Card className="max-w-3xl">
+        <Card className="max-w-xl">
           <CardHeader>
-            <CardTitle>Listado de Orquídeas por Clases</CardTitle>
-            <CardDescription>
-              Genera un reporte de orquídeas clasificadas por categorías en el período seleccionado.
-            </CardDescription>
+            <CardTitle>Plantas por Clases</CardTitle>
+            <CardDescription>Filtra por clase.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
+          <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="startDate2">Fecha de inicio</Label>
-              <Input id="startDate2" type="date" value={startDate2} onChange={(e) => setStartDate2(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endDate2">Fecha de fin</Label>
-              <Input id="endDate2" type="date" value={endDate2} onChange={(e) => setEndDate2(e.target.value)} />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label>Clase</Label>
+              <Label htmlFor="claseSelect">Clase</Label>
               <Select value={claseFiltro} onValueChange={(v) => setClaseFiltro(v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas las clases" />
+                <SelectTrigger id="claseSelect">
+                  <SelectValue placeholder="Selecciona una clase" />
                 </SelectTrigger>
-                <SelectContent className="max-h-80 overflow-auto">
+                <SelectContent>
                   <SelectItem value="todas">Todas las clases</SelectItem>
-                  <SelectItem value="1">Clase 1: Epidendrum especie con racimo</SelectItem>
-                  <SelectItem value="2">Clase 2: Epidendrum especie con panícula</SelectItem>
-                  <SelectItem value="3">Clase 3: Epidendrum tipo Oerstedella</SelectItem>
-                  <SelectItem value="4">Clase 4: Epidendrum tipo caña</SelectItem>
-                  <SelectItem value="5">Clase 5: Barkeria</SelectItem>
-                  <SelectItem value="6">Clase 6: Encyclia</SelectItem>
-                  <SelectItem value="7">Clase 7: Prosthechea</SelectItem>
-                  <SelectItem value="8">Clase 8: Rhyncholaelia y Brassavola</SelectItem>
-                  <SelectItem value="9">Clase 9: Laelias, Schomburgkia, Caularthron y Myrmecophila</SelectItem>
-                  <SelectItem value="10">Clase 10: Híbridos de Encyclia, Laelia, Broughtonia, etc.</SelectItem>
-                  <SelectItem value="11">Clase 11: Arpophyllum, Isochilus, Coelia, Bletia</SelectItem>
-                  <SelectItem value="12">Clase 12: Elleanthus, Sobralia especies e híbridos</SelectItem>
-                  <SelectItem value="13">Clase 13: Scaphyglottis, Jaquinella, Polystachya, etc.</SelectItem>
-                  <SelectItem value="14">Clase 14: Guarianthe especie</SelectItem>
-                  <SelectItem value="15">Clase 15: Guarianthe híbrido con Cattleyas</SelectItem>
-                  <SelectItem value="16">Clase 16: Cattleya de 1 o 2 hojas especies</SelectItem>
-                  <SelectItem value="17">Clase 17: Cattleya híbridos de todos colores</SelectItem>
-                  <SelectItem value="18">Clase 18: Híbridos de Encyclia, Broughtonia con Cattleya</SelectItem>
-                  <SelectItem value="19">Clase 19: Lycaste virginalis fo. Alba</SelectItem>
-                  <SelectItem value="20">Clase 20: Lycaste virginalis fo. Virginalis</SelectItem>
-                  <SelectItem value="21">Clase 21: Lycaste virginalis fo. Superba</SelectItem>
-                  <SelectItem value="22">Clase 22: Lycaste guatemalensis</SelectItem>
-                  <SelectItem value="23">Clase 23: Lycaste cruenta = Selbyana cruenta</SelectItem>
-                  <SelectItem value="24">Clase 24: Lycaste cochleata = Selbyana cochleata</SelectItem>
-                  <SelectItem value="25">Clase 25: Lycaste deppei</SelectItem>
-                  <SelectItem value="26">Clase 26: Lycaste dowiana</SelectItem>
-                  <SelectItem value="27">Clase 27: Lycaste lasioglossa</SelectItem>
-                  <SelectItem value="28">Clase 28: Otras especies de Lycaste</SelectItem>
-                  <SelectItem value="29">Clase 29: Sudamerlycaste</SelectItem>
-                  <SelectItem value="30">Clase 30: Anguloa especies e híbridos</SelectItem>
-                  <SelectItem value="31">Clase 31: Lycaste híbrido natural o artificial primario</SelectItem>
-                  <SelectItem value="32">Clase 32: Lycaste híbridos complejos</SelectItem>
-                  <SelectItem value="33">Clase 33: Camaridium</SelectItem>
-                  <SelectItem value="34">Clase 34: Heterotaxis</SelectItem>
-                  <SelectItem value="35">Clase 35: Rhetinantha aciantha y similares</SelectItem>
-                  <SelectItem value="36">Clase 36: Maxillariella</SelectItem>
+                  {(usePage().props as any).clases?.map((c: any) => (
+                    <SelectItem key={c.id_clase} value={String(c.id_clase)}>
+                      {`Clase ${c.id_clase}: ${c.nombre_clase}`}
+                    </SelectItem>
+                  ))}
                   <SelectItem value="37">Clase 37: Maxillarias sudamericanas especie e híbrido</SelectItem>
                   <SelectItem value="38">Clase 38: Maxillaria tipo sudamericana especie e híbrido</SelectItem>
                   <SelectItem value="39">Clase 39: Xilobium y géneros aliados</SelectItem>
@@ -240,19 +195,9 @@ export default function ReportesIndex() {
           <CardHeader>
             <CardTitle>Listado de Ganadores</CardTitle>
             <CardDescription>
-              Genera un reporte de los ganadores en diferentes categorías en el período seleccionado.
+              Genera un reporte de los ganadores del evento
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="startDate3">Fecha de inicio</Label>
-              <Input id="startDate3" type="date" value={startDate3} onChange={(e) => setStartDate3(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endDate3">Fecha de fin</Label>
-              <Input id="endDate3" type="date" value={endDate3} onChange={(e) => setEndDate3(e.target.value)} />
-            </div>
-          </CardContent>
           <CardFooter>
             <Button
               onClick={() => {
@@ -276,7 +221,7 @@ export default function ReportesIndex() {
         </Card>
       )}
 
-      {page === 4 && (
+      {/* {page === 4 && (
         <Card className="max-w-xl">
           <CardHeader>
             <CardTitle>Reporte Orquídeas Asignadas y Registradas a cada participante</CardTitle>
@@ -306,7 +251,7 @@ export default function ReportesIndex() {
             </Button>
           </CardFooter>
         </Card>
-      )}
+      )} */}
 
       <div className="flex items-center justify-center gap-2">
         <Button variant="outline" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>

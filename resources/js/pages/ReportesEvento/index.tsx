@@ -59,14 +59,6 @@ export default function ReportesEventoIndex({ evento }: Props) {
       route: 'reportes.evento.ganadores.pdf',
       useFechas: false,
     },
-    {
-      title: "Participantes y Orquídeas",
-      description: "Relación de participantes con sus orquídeas registradas",
-      icon: <Users className="h-8 w-8" />,
-      color: "from-purple-500 to-purple-600",
-      route: 'reportes.evento.participantes_orquideas.pdf',
-      useFechas: false,
-    },
   ];
 
   const handleDescargar = (routeName: string, useFechas: boolean) => {
