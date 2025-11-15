@@ -1,0 +1,245 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║              CHECKLIST DE DESPLIEGUE A HOSTINGER                      ║
+║                     aaocoban.com                                      ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+CREDENCIALES:
+- Base de datos: u245906636_aaogt
+- Usuario: u245906636_aaogt
+- Password: 2905Andres@
+- Dominio: https://aaocoban.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 1: EXPORTAR BASE DE DATOS LOCAL
+
+    1. [ ] Abrir phpMyAdmin: http://localhost/phpmyadmin
+    2. [ ] Seleccionar base de datos "orquidea1"
+    3. [ ] Click en pestaña "Exportar"
+    4. [ ] Método: Rápido
+    5. [ ] Formato: SQL
+    6. [ ] Click "Continuar"
+    7. [ ] Guardar como: orquideas_database.sql
+    8. [ ] Verificar que el archivo se descargó
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 2: PREPARAR ARCHIVOS PARA SUBIR
+
+    Carpeta "laravel" (subir a public_html/laravel/):
+    1. [ ] app/
+    2. [ ] bootstrap/
+    3. [ ] config/
+    4. [ ] database/
+    5. [ ] resources/
+    6. [ ] routes/
+    7. [ ] storage/
+    8. [ ] vendor/
+    9. [ ] artisan
+   10. [ ] composer.json
+   11. [ ] composer.lock
+   12. [ ] .env.production → RENOMBRAR A .env
+
+    Carpeta "public_html" (subir a public_html/):
+   13. [ ] index.php
+   14. [ ] .htaccess
+   15. [ ] robots.txt
+   16. [ ] build/ (toda la carpeta)
+   17. [ ] storage (si existe como enlace simbólico)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 3: ACCEDER A HOSTINGER
+
+    1. [ ] Ir a: https://hpanel.hostinger.com
+    2. [ ] Iniciar sesión con tus credenciales
+    3. [ ] Seleccionar tu plan de hosting
+    4. [ ] Click en "File Manager"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 4: CREAR ESTRUCTURA DE CARPETAS
+
+    1. [ ] Entrar a carpeta "public_html"
+    2. [ ] Click derecho → New Folder
+    3. [ ] Nombre: laravel
+    4. [ ] Click "Create"
+    5. [ ] Verificar que la carpeta "laravel" existe
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 5: SUBIR ARCHIVOS DEL PROYECTO LARAVEL
+
+    1. [ ] Entrar a public_html/laravel/
+    2. [ ] Click en "Upload Files"
+    3. [ ] Seleccionar y subir:
+           [ ] Carpeta app/
+           [ ] Carpeta bootstrap/
+           [ ] Carpeta config/
+           [ ] Carpeta database/
+           [ ] Carpeta resources/
+           [ ] Carpeta routes/
+           [ ] Carpeta storage/
+           [ ] Carpeta vendor/ (puede tardar, es grande)
+           [ ] Archivo artisan
+           [ ] Archivo composer.json
+           [ ] Archivo composer.lock
+    4. [ ] Subir archivo .env.production
+    5. [ ] Renombrar .env.production a .env
+    6. [ ] Esperar a que todos los archivos se suban
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 6: SUBIR ARCHIVOS PÚBLICOS
+
+    1. [ ] Regresar a public_html/ (no laravel/)
+    2. [ ] Subir desde carpeta "public" de tu proyecto:
+           [ ] index.php
+           [ ] .htaccess
+           [ ] robots.txt
+           [ ] Carpeta build/ completa
+    3. [ ] Verificar que build/ contiene archivos .js y .css
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 7: MODIFICAR index.php
+
+    1. [ ] En public_html/, buscar archivo index.php
+    2. [ ] Click derecho → Edit
+    3. [ ] Buscar líneas (alrededor línea 17):
+
+        require __DIR__.'/../vendor/autoload.php';
+        $app = require_once __DIR__.'/../bootstrap/app.php';
+
+    4. [ ] Cambiar por:
+
+        require __DIR__.'/laravel/vendor/autoload.php';
+        $app = require_once __DIR__.'/laravel/bootstrap/app.php';
+
+    5. [ ] Click "Save Changes"
+    6. [ ] Verificar que se guardó correctamente
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 8: CONFIGURAR PERMISOS
+
+    Storage:
+    1. [ ] Ir a public_html/laravel/storage/
+    2. [ ] Click derecho → Permissions
+    3. [ ] Establecer: 755
+    4. [ ] Marcar "Recurse into subdirectories"
+    5. [ ] Click "Change Permissions"
+
+    Bootstrap Cache:
+    6. [ ] Ir a public_html/laravel/bootstrap/cache/
+    7. [ ] Click derecho → Permissions
+    8. [ ] Establecer: 755
+    9. [ ] Click "Change Permissions"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 9: VERIFICAR/CREAR BASE DE DATOS
+
+    1. [ ] Regresar a hPanel principal
+    2. [ ] Click en "MySQL Databases"
+    3. [ ] Verificar que existe: u245906636_aaogt
+    4. [ ] Si no existe:
+           [ ] Click "Create Database"
+           [ ] Nombre: u245906636_aaogt
+           [ ] Click "Create"
+    5. [ ] Verificar usuario: u245906636_aaogt
+    6. [ ] Verificar que usuario tiene todos los permisos
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 10: IMPORTAR BASE DE DATOS
+
+    1. [ ] En hPanel, click en "phpMyAdmin"
+    2. [ ] Iniciar sesión (usa credenciales de BD)
+    3. [ ] En panel izquierdo, click en: u245906636_aaogt
+    4. [ ] Click en pestaña "Importar"
+    5. [ ] Click "Choose File"
+    6. [ ] Seleccionar: orquideas_database.sql
+    7. [ ] Scroll hasta abajo
+    8. [ ] Click "Continuar"
+    9. [ ] Esperar mensaje de éxito
+   10. [ ] Verificar que aparecen tablas en el panel izquierdo
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 11: PROBAR LA APLICACIÓN
+
+    1. [ ] Abrir navegador
+    2. [ ] Visitar: https://aaocoban.com
+    3. [ ] Verificar que carga la página (puede tardar la primera vez)
+    4. [ ] Verificar que los estilos se ven correctamente
+    5. [ ] Intentar iniciar sesión
+    6. [ ] Verificar que no hay errores
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ ] PASO 12: VERIFICACIÓN FINAL
+
+    [ ] La página principal carga sin errores
+    [ ] Los estilos (CSS) se muestran correctamente
+    [ ] Las imágenes cargan (si hay)
+    [ ] El login funciona
+    [ ] La base de datos está conectada
+    [ ] No hay errores 500
+    [ ] No hay errores de "file not found"
+    [ ] Las rutas funcionan correctamente
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUCIÓN DE PROBLEMAS:
+
+[ ] Error 500:
+    1. Verificar permisos storage/ (755)
+    2. Verificar que .env existe
+    3. Verificar index.php tiene rutas correctas
+    4. Revisar logs en: laravel/storage/logs/laravel.log
+
+[ ] Assets no cargan (CSS/JS):
+    1. Verificar que build/ está en public_html/
+    2. Verificar APP_URL en .env
+    3. Limpiar caché del navegador
+    4. Verificar en inspector que rutas de assets son correctas
+
+[ ] Error de base de datos:
+    1. Verificar credenciales en .env
+    2. Verificar que BD fue importada completa
+    3. DB_HOST debe ser "localhost"
+    4. Verificar permisos de usuario en MySQL
+
+[ ] Sesiones no funcionan:
+    1. SESSION_DRIVER=file en .env
+    2. Permisos 755 en storage/framework/sessions/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CONTACTOS DE SOPORTE:
+
+Hostinger:
+- Chat 24/7 en hPanel
+- Tickets: https://support.hostinger.com
+- Teléfono: Disponible en hPanel
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOTAS:
+
+- APP_DEBUG debe estar en "false" en producción
+- Hacer backup antes de cualquier actualización
+- Guardar este checklist para futuras referencias
+- Tiempo estimado: 30-60 minutos
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fecha de despliegue: ___/___/______
+Completado por: _________________
+Hora inicio: __:__    Hora fin: __:__
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                    ¡DESPLIEGUE COMPLETADO!                            ║
+║              https://aaocoban.com está en línea                       ║
+╚═══════════════════════════════════════════════════════════════════════╝

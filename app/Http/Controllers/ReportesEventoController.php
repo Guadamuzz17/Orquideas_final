@@ -10,6 +10,8 @@ use App\Models\Orquidea;
 use App\Models\Ganador;
 use App\Models\Participante;
 use App\Models\Evento;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ReportesEventoController extends Controller
 {
@@ -57,24 +59,6 @@ class ReportesEventoController extends Controller
             $from = $request->query('from');
             $to = $request->query('to');
 
-            // Depuración: Verificar el ID del evento activo
-            \Log::info('=== INICIO DE GENERACIÓN DE REPORTE ===');
-            \Log::info('Evento activo:', [
-                'id' => $eventoActivo,
-                'nombre' => $evento->nombre_evento,
-                'fechas' => $evento->fecha_inicio . ' - ' . ($evento->fecha_fin ?? 'Sin fecha fin')
-            ]);
-
-            // Consulta directa a la base de datos para verificar datos
-            $inscripcionesDirectas = \DB::table('tb_inscripciones')
-                ->where('id_evento', $eventoActivo)
-                ->get();
-
-            \Log::info('Datos directos de tb_inscripciones:', [
-                'total' => $inscripcionesDirectas->count(),
-                'ejemplo' => $inscripcionesDirectas->first()
-            ]);
-
             // Iniciar la consulta con Eloquent
             $query = Inscripcion::with([
                     'participante',
@@ -98,124 +82,40 @@ class ReportesEventoController extends Controller
             // Obtener las inscripciones ordenadas por correlativo
             $inscripciones = $query->orderBy('correlativo')->get();
 
-            // Depuración: Verificar las inscripciones encontradas
-            \Log::info('Inscripciones encontradas con Eloquent:', [
-                'total' => $inscripciones->count(),
-                'ejemplo' => $inscripciones->first()
-            ]);
-
             if ($inscripciones->isEmpty()) {
                 throw new \Exception('No se encontraron inscripciones para el evento ' . $evento->nombre_evento);
             }
 
-        // Aplicar filtros de fecha si existen
-        if ($from && $to) {
-            $query->whereBetween('created_at', [
-                \Carbon\Carbon::parse($from)->startOfDay(),
-                \Carbon\Carbon::parse($to)->endOfDay()
-            ]);
-        } elseif ($from) {
-            $query->where('created_at', '>=', \Carbon\Carbon::parse($from)->startOfDay());
-        } elseif ($to) {
-            $query->where('created_at', '<=', \Carbon\Carbon::parse($to)->endOfDay());
-        }
-
-        // Obtener las inscripciones ordenadas por correlativo
-        $inscripciones = $query->orderBy('correlativo')->get();
-        
-        // Depuración: Verificar las inscripciones encontradas
-        \Log::info('Inscripciones encontradas:', [
-            'total' => $inscripciones->count(),
-            'ids_inscripciones' => $inscripciones->pluck('id_inscripcion')->toArray()
-        ]);
-
-        // Depuración: Verificar si hay inscripciones
-        if ($inscripciones->isEmpty()) {
-            // Si no hay inscripciones, verificar la consulta SQL
-            $sql = $query->toSql();
-            $bindings = $query->getBindings();
-            \Log::info('No se encontraron inscripciones para el evento', [
-                'evento_id' => $eventoActivo,
-                'sql' => $sql,
-                'bindings' => $bindings,
-                'fecha_inicio' => $from,
-                'fecha_fin' => $to
-            ]);
-        }
-
             // Procesar los datos para el reporte
             $datosReporte = $inscripciones->map(function($inscripcion) {
-                try {
-                    $orquidea = $inscripcion->orquidea;
-                    $participante = $inscripcion->participante;
-                    
-                    if (!$orquidea) {
-                        \Log::warning('Inscripción sin orquídea asociada', ['inscripcion_id' => $inscripcion->id_inscripcion]);
-                    }
-                    if (!$participante) {
-                        \Log::warning('Inscripción sin participante asociado', ['inscripcion_id' => $inscripcion->id_inscripcion]);
-                    }
+                $orquidea = $inscripcion->orquidea;
+                $participante = $inscripcion->participante;
 
-                    $grupo = $orquidea ? ($orquidea->grupo ?? null) : null;
-                    $clase = $orquidea ? ($orquidea->clase ?? null) : null;
+                $grupo = $orquidea ? ($orquidea->grupo ?? null) : null;
+                $clase = $orquidea ? ($orquidea->clase ?? null) : null;
 
-                    // Obtener el código del grupo
-                    $codigoGrupo = $grupo ? ($grupo->Cod_Grupo ?? '') : '';
+                // Obtener el código del grupo
+                $codigoGrupo = $grupo ? ($grupo->Cod_Grupo ?? '') : '';
 
-                    // Obtener el número de clase
-                    $numeroClase = '';
-                    if ($clase && !empty($clase->nombre_clase) && preg_match('/Clase\s+(\d+)/', $clase->nombre_clase, $matches)) {
-                        $numeroClase = $matches[1];
-                    }
-
-                    $data = [
-                        'participante' => $participante ? ($participante->nombre ?? 'Sin nombre') : 'Participante no encontrado',
-                        'orquidea' => $orquidea ? ($orquidea->nombre_planta ?? 'Sin nombre') : 'Orquídea no encontrada',
-                        'grupo' => $codigoGrupo,
-                        'clase' => $numeroClase,
-                        'origen' => $orquidea ? ($orquidea->origen ?? 'No especificado') : 'N/A',
-                        'correlativo' => $inscripcion->correlativo ?? 'N/A'
-                    ];
-
-                    return $data;
-                } catch (\Exception $e) {
-                    \Log::error('Error procesando inscripción ' . ($inscripcion->id_inscripcion ?? 'desconocida') . ': ' . $e->getMessage());
-                    return null;
+                // Obtener el número de clase
+                $numeroClase = '';
+                if ($clase && !empty($clase->nombre_clase) && preg_match('/Clase\s+(\d+)/', $clase->nombre_clase, $matches)) {
+                    $numeroClase = $matches[1];
                 }
-            })->filter(); // Eliminar elementos nulos
 
-        // Convertir a array y asegurarse de que los índices sean numéricos
-        $datosReporte = $datosReporte->toArray();
-        
-        // Verificar si hay datos para mostrar
-        if ($datosReporte->isEmpty()) {
-            throw new \Exception('No hay datos válidos para generar el reporte');
-        }
-
-        // Depuración: Verificar los datos que se enviarán a la vista
-        \Log::info('Datos del reporte', [
-            'total_inscripciones' => count($datosReporte),
-            'tiene_datos' => !$datosReporte->isEmpty()
-        ]);
-
-            // Depuración: Mostrar ejemplo de datos procesados
-            \Log::info('Datos procesados para el reporte:', [
-                'total_registros' => $datosReporte->count(),
-                'ejemplo' => $datosReporte->first()
-            ]);
-
-            // Convertir a array y asegurarse de que los índices sean numéricos
-            $datosArray = $datosReporte->values()->toArray();
-            
-            // Depuración: Verificar datos antes de generar el PDF
-            \Log::info('Datos que se enviarán a la vista:', [
-                'total' => count($datosArray),
-                'ejemplo' => $datosArray[0] ?? 'No hay datos'
-            ]);
+                return [
+                    'participante' => $participante ? ($participante->nombre ?? 'Sin nombre') : 'Participante no encontrado',
+                    'orquidea' => $orquidea ? ($orquidea->nombre_planta ?? 'Sin nombre') : 'Orquídea no encontrada',
+                    'grupo' => $codigoGrupo,
+                    'clase' => $numeroClase,
+                    'origen' => $orquidea ? ($orquidea->origen ?? 'No especificado') : 'N/A',
+                    'correlativo' => $inscripcion->correlativo ?? 'N/A'
+                ];
+            });
 
             // Cargar la vista con los datos
             $pdf = Pdf::loadView('reportes.inscripciones', [
-                'inscripciones' => $datosArray,
+                'inscripciones' => $datosReporte,
                 'evento' => $evento,
                 'fechaInicio' => $from,
                 'fechaFin' => $to,
@@ -223,19 +123,16 @@ class ReportesEventoController extends Controller
             ]);
 
             $pdf->setPaper('letter', 'portrait');
-            \Log::info('=== FIN DE GENERACIÓN DE REPORTE ===');
             return $pdf->stream('Inscripciones_' . $evento->nombre_evento . '.pdf');
 
         } catch (\Exception $e) {
-            \Log::error('Error al generar el reporte: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
-            
-            // Crear un PDF de error para diagnóstico
+            Log::error('Error al generar el reporte: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());            // Crear un PDF de error para diagnóstico
             $pdf = Pdf::loadView('reportes.error', [
                 'error' => $e->getMessage(),
                 'detalles' => 'Revise los logs para más información.'
             ]);
-            
+
             return $pdf->stream('Error_Reporte.pdf');
         }
     }

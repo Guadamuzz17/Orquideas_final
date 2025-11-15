@@ -165,11 +165,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reportes/pdf', [ReportesController::class, 'exportPdf'])
         ->name('reportes.pdf');
 
-    // Ruta para la vista de creación de trofeos
-    Route::get('/trofeos/crear', function () {
-        return view('trofeos.create');
-    })->name('trofeos.create');
-
     // Rutas específicas de participantes (DEBEN IR ANTES del resource)
     Route::get('/participantes/formato', [ParticipanteController::class, 'formato'])
         ->name('participantes.formato');
