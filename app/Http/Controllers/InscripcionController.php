@@ -46,17 +46,19 @@ class InscripcionController extends Controller
     }
 
     /**
-     * Get orquídeas by participante
+     * Get orquídeas disponibles de un participante EN EL EVENTO ACTIVO
      */
     public function getOrquideasByParticipante($participanteId)
     {
         $eventoActivo = session('evento_activo');
 
-        // Obtener orquídeas del participante con la cantidad de inscripciones
+        // Obtener orquídeas del participante con la cantidad de inscripciones DEL EVENTO ACTIVO
         $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
             ->where('id_participante', $participanteId)
             ->where('id_evento', $eventoActivo)
-            ->withCount(['inscripciones'])
+            ->withCount(['inscripciones' => function ($query) use ($eventoActivo) {
+                $query->where('id_evento', $eventoActivo);
+            }])
             ->get()
             ->filter(function ($orquidea) {
                 // Solo incluir orquídeas que aún tengan cupos disponibles
@@ -73,17 +75,21 @@ class InscripcionController extends Controller
     }
 
     /**
-     * Search orquídeas by participante and name
+     * Search orquídeas by participante and name EN EL EVENTO ACTIVO
      */
     public function searchOrquideas(Request $request)
     {
         $participanteId = $request->get('participante_id');
         $searchTerm = $request->get('search', '');
+        $eventoActivo = session('evento_activo');
 
-        // Filtrar orquídeas por participante específico con conteo de inscripciones
+        // Filtrar orquídeas por participante específico Y evento activo con conteo de inscripciones
         $query = Orquidea::with(['grupo', 'clase', 'participante'])
             ->where('id_participante', $participanteId)
-            ->withCount(['inscripciones']);
+            ->where('id_evento', $eventoActivo)
+            ->withCount(['inscripciones' => function ($query) use ($eventoActivo) {
+                $query->where('id_evento', $eventoActivo);
+            }]);
 
         if ($searchTerm) {
             $query->where('nombre_planta', 'LIKE', '%' . $searchTerm . '%');
@@ -107,13 +113,17 @@ class InscripcionController extends Controller
     }
 
     /**
-     * Check if correlativo is available
+     * Check if correlativo is available EN EL EVENTO ACTIVO
+     * Permite duplicados entre eventos diferentes
      */
     public function checkCorrelativo(Request $request)
     {
         $correlativo = $request->get('correlativo');
+        $eventoActivo = session('evento_activo');
 
+        // Buscar solo en el evento activo
         $inscripcion = Inscripcion::where('correlativo', $correlativo)
+            ->where('id_evento', $eventoActivo)
             ->with(['participante', 'orquidea'])
             ->first();
 
@@ -133,14 +143,20 @@ class InscripcionController extends Controller
     }
 
     /**
-     * Get último correlativo usado
+     * Get último correlativo usado POR EVENTO
+     * Cada evento empieza desde 1
      */
     public function getUltimoCorrelativo()
     {
-        $ultimoCorrelativo = Inscripcion::max('correlativo') ?? 0;
+        $eventoActivo = session('evento_activo');
+
+        // Obtener el último correlativo solo del evento activo
+        $ultimoCorrelativo = Inscripcion::where('id_evento', $eventoActivo)
+            ->max('correlativo') ?? 0;
 
         return response()->json([
-            'ultimo_correlativo' => $ultimoCorrelativo
+            'ultimo_correlativo' => $ultimoCorrelativo,
+            'evento_id' => $eventoActivo
         ]);
     }
 
@@ -149,17 +165,30 @@ class InscripcionController extends Controller
      */
     public function store(Request $request)
     {
+        $eventoActivo = session('evento_activo');
+
+        // Validar con regla unique que considera el evento
         $request->validate([
             'inscripciones' => 'required|array|min:1',
             'inscripciones.*.id_participante' => 'required|exists:tb_participante,id',
             'inscripciones.*.id_orquidea' => 'required|exists:tb_orquidea,id_orquidea',
-            'inscripciones.*.correlativo' => 'required|integer|unique:tb_inscripcion,correlativo'
+            'inscripciones.*.correlativo' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) use ($eventoActivo) {
+                    $existe = Inscripcion::where('correlativo', $value)
+                        ->where('id_evento', $eventoActivo)
+                        ->exists();
+
+                    if ($existe) {
+                        $fail("El correlativo $value ya está en uso en este evento.");
+                    }
+                }
+            ]
         ]);
 
         try {
             DB::beginTransaction();
-
-            $eventoActivo = session('evento_activo');
 
             foreach ($request->inscripciones as $inscripcionData) {
                 Inscripcion::create([

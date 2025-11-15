@@ -258,7 +258,7 @@ export default function Dashboard({ stats, eventoActivo }: DashboardProps) {
                 className="bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 whitespace-nowrap"
               >
                 <ChevronRight className="h-4 w-4" />
-                Cambiar Evento
+                Salir de Evento
               </button>
             </div>
           </motion.div>

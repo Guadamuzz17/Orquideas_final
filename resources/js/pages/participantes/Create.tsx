@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Slash, ArrowLeft, Search, User, Recycle, AlertCircle } from "lucide-react";
+import { Slash, ArrowLeft, Search, User, Recycle, AlertCircle, Lock } from "lucide-react";
 import { Breadcrumb, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from 'sonner';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -64,11 +65,14 @@ export default function CreateParticipante({
   municipios: initialMunicipios,
   asociaciones
 }: CreateParticipanteProps) {
+  const { eventoActivo } = usePage().props as any;
   const [municipios, setMunicipios] = useState<Municipio[]>(initialMunicipios);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<ParticipantePrevio[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
+
+  const isEventoFinalizado = eventoActivo?.bloqueado || eventoActivo?.estado === 'finalizado';
 
   const { data, setData, post, processing, errors, reset } = useForm({
     nombre: '',
@@ -240,9 +244,24 @@ export default function CreateParticipante({
           </Breadcrumb>
         </div>
 
-        <Card className="max-w-2xl mx-auto">
+        {/* Alerta de evento bloqueado */}
+        {isEventoFinalizado && (
+          <Alert variant="destructive" className="bg-red-50 border-red-200">
+            <Lock className="h-5 w-5" />
+            <AlertTitle className="text-red-800 font-bold">🔒 Evento Finalizado - Formulario Bloqueado</AlertTitle>
+            <AlertDescription className="text-red-700">
+              El evento "{eventoActivo?.nombre}" ha finalizado y no se pueden registrar nuevos participantes.
+              Por favor, seleccione un evento activo desde el menú de eventos.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <Card className={`max-w-2xl mx-auto ${isEventoFinalizado ? 'opacity-60 pointer-events-none' : ''}`}>
           <CardHeader>
-            <CardTitle>Formulario de Registro</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              Formulario de Registro
+              {isEventoFinalizado && <Lock className="h-4 w-4 text-red-600 ml-auto" />}
+            </CardTitle>
             <CardDescription>
               Complete todos los campos para registrar un nuevo participante
             </CardDescription>

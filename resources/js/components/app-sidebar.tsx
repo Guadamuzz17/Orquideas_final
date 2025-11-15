@@ -21,7 +21,8 @@ import {
   Download,
   Camera,
   CalendarDays,
-  UserCog
+  UserCog,
+  LogOut
 } from "lucide-react"
 import {
   Sidebar,
@@ -253,8 +254,11 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { url, props: pageProps } = usePage()
-  const { auth } = pageProps as any
+  const { auth, eventoActivo } = pageProps as any
   const userPermissions = auth?.permissions || []
+
+  // Detectar si hay un evento activo
+  const hayEventoActivo = eventoActivo && eventoActivo.id
 
   // Mapeo de permisos a rutas del sidebar
   const permissionMap: Record<string, string> = {
@@ -293,6 +297,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   // Filtrar items del menú basándose en permisos
   const filteredNavMain = data.navMain.filter(item => {
+    // Si hay evento activo, ocultar la opción de Gestión de Eventos
+    if (hayEventoActivo && item.title === "Gestión de Eventos") {
+      return false
+    }
+
     // Verificar si el usuario tiene permiso para el item principal
     if (!hasPermission(item.url)) {
       return false
@@ -344,10 +353,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {data.teams[0].name}
+                      {hayEventoActivo ? eventoActivo.nombre : data.teams[0].name}
                     </span>
                     <span className="truncate text-xs">
-                      {data.teams[0].plan}
+                      {hayEventoActivo ? `Evento ${eventoActivo.estado}` : data.teams[0].plan}
                     </span>
                   </div>
                   <ChevronUp className="ml-auto" />
@@ -359,6 +368,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 side="bottom"
                 sideOffset={4}
               >
+                {hayEventoActivo && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href={route('eventos.salir')} method="post" as="button" className="w-full">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Salir del Evento</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem>
                   <Settings2 className="mr-2 h-4 w-4" />
                   <span>Configuración</span>

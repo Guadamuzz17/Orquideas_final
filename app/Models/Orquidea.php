@@ -18,7 +18,8 @@ class Orquidea extends Model
         'id_grupo',
         'id_clase',
         'cantidad',
-        'id_participante'
+        'id_participante',
+        'id_evento'
     ];
 
     public function grupo()

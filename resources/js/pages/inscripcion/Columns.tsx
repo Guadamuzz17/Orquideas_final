@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, FileText } from "lucide-react"
 import { ArrowUpDown } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
@@ -73,7 +73,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  
+
   {
     accessorKey: "correlativo",
     header: ({ column }) => {
@@ -95,7 +95,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
       )
     },
   },
-  
+
   {
     accessorKey: "orquidea.nombre_planta",
     header: ({ column }) => {
@@ -121,7 +121,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
       )
     },
   },
-  
+
   {
     accessorKey: "participante.nombre",
     header: ({ column }) => {
@@ -136,7 +136,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
       )
     },
   },
-  
+
   {
     accessorKey: "created_at",
     header: ({ column }) => {
@@ -156,9 +156,9 @@ export const columns: ColumnDef<Inscripcion>[] = [
         <div className="text-sm">
           <div>{fecha.toLocaleDateString('es-ES')}</div>
           <div className="text-muted-foreground">
-            {fecha.toLocaleTimeString('es-ES', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
+            {fecha.toLocaleTimeString('es-ES', {
+              hour: '2-digit',
+              minute: '2-digit'
             })}
           </div>
         </div>
@@ -178,6 +178,13 @@ export const columns: ColumnDef<Inscripcion>[] = [
           onError: () => toast.error('Error al eliminar la inscripción'),
           preserveScroll: true
         });
+      }
+
+      const handleReporteParticipante = (participanteId: number) => {
+        window.open(
+          route('reportes.evento.inscripciones_participante.pdf', { participante_id: participanteId }),
+          '_blank'
+        );
       }
 
       return (
@@ -202,6 +209,12 @@ export const columns: ColumnDef<Inscripcion>[] = [
               >
                 Ver detalles
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleReporteParticipante(inscripcion.participante.id)}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Reporte del Participante
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -213,14 +226,14 @@ export const columns: ColumnDef<Inscripcion>[] = [
                   <AlertDialogHeader>
                     <AlertDialogTitle>¿Eliminar inscripción?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Esta acción eliminará la inscripción del correlativo #{inscripcion.correlativo} 
+                      Esta acción eliminará la inscripción del correlativo #{inscripcion.correlativo}
                       de la orquídea "{inscripcion.orquidea.nombre_planta}" del participante {inscripcion.participante.nombre}.
                       Esta acción no se puede deshacer.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction 
+                    <AlertDialogAction
                       className="bg-destructive hover:bg-destructive/90"
                       onClick={() => handleDelete(inscripcion.id_nscr)}
                     >

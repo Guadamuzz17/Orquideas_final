@@ -1,11 +1,13 @@
 import SimpleLayout from '@/layouts/simple-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Slash, Plus, Calendar, Eye, Edit, Trash2, Play } from "lucide-react";
+import { Slash, Plus, Calendar, Eye, Edit, Trash2, Play, EyeOff, Lock, AlertTriangle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Breadcrumb,
   BreadcrumbLink,
@@ -53,12 +55,28 @@ interface EventosIndexProps {
 }
 
 export default function EventosIndex({ eventos }: EventosIndexProps) {
+  const [mostrarFinalizados, setMostrarFinalizados] = useState(false);
+
+  // Filtrar eventos según el toggle
+  const eventosFiltrados = mostrarFinalizados
+    ? eventos.data
+    : eventos.data.filter(evento => evento.estado !== 'finalizado');
+
+  const eventosFinalizadosCount = eventos.data.filter(e => e.estado === 'finalizado').length;
+
   const handleDelete = (id: number) => {
     router.delete(route('eventos.destroy', id));
   };
 
-  const handleSeleccionar = (id: number) => {
-    router.post(route('eventos.seleccionar', id));
+  const handleSeleccionar = (id: number, estado: string) => {
+    if (estado === 'finalizado') {
+      // Advertencia pero permitir selección
+      if (confirm('⚠️ Este evento está finalizado. No podrás registrar nuevas orquídeas ni participantes. ¿Deseas continuar?')) {
+        router.post(route('eventos.seleccionar', id));
+      }
+    } else {
+      router.post(route('eventos.seleccionar', id));
+    }
   };
 
   const getEstadoBadge = (estado: string) => {
@@ -98,30 +116,58 @@ export default function EventosIndex({ eventos }: EventosIndexProps) {
       </div>
 
       <div className="container mx-auto px-6 py-10">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold">Seleccione un Evento</h2>
-            <p className="text-gray-500 mt-2">Elija el evento con el que desea trabajar</p>
-          </div>
-          <Button asChild className="bg-green-600 hover:bg-green-700">
+        <div className="flex flex-col gap-4 mb-8">
+          {/* Botón crear primero */}
+          <Button asChild className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
             <Link href={route('eventos.create')}>
               <Plus className="mr-2 h-4 w-4" />
               Crear Nuevo Evento
             </Link>
           </Button>
-        </div>
 
-        <div className="text-sm text-muted-foreground mb-4">
-          Total de eventos: {eventos.total}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-bold">Gestión de Eventos</h2>
+              <p className="text-gray-500 mt-2">Seleccione el evento con el que desea trabajar</p>
+            </div>
+
+            {/* Toggle para mostrar/ocultar finalizados */}
+            <div className="flex items-center space-x-3 bg-white p-4 rounded-lg border shadow-sm">
+              <Switch
+                id="mostrar-finalizados"
+                checked={mostrarFinalizados}
+                onCheckedChange={setMostrarFinalizados}
+              />
+              <Label htmlFor="mostrar-finalizados" className="cursor-pointer flex items-center gap-2">
+                {mostrarFinalizados ? (
+                  <><Eye className="h-4 w-4" /> Mostrar finalizados ({eventosFinalizadosCount})</>
+                ) : (
+                  <><EyeOff className="h-4 w-4" /> Ocultar finalizados ({eventosFinalizadosCount})</>
+                )}
+              </Label>
+            </div>
+          </div>
+        </div>        <div className="text-sm text-muted-foreground mb-4">
+          Mostrando {eventosFiltrados.length} de {eventos.total} eventos
+          {!mostrarFinalizados && eventosFinalizadosCount > 0 && (
+            <span className="text-amber-600 ml-2">
+              ({eventosFinalizadosCount} finalizado{eventosFinalizadosCount !== 1 ? 's' : ''} oculto{eventosFinalizadosCount !== 1 ? 's' : ''})
+            </span>
+          )}
         </div>
 
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {eventos.data.map((evento) => (
-            <Card key={evento.id_evento} className="hover:shadow-lg transition-shadow">
+          {eventosFiltrados.map((evento) => (
+            <Card key={evento.id_evento} className={`hover:shadow-lg transition-shadow ${
+              evento.estado === 'finalizado' ? 'border-amber-300 bg-amber-50/30' : ''
+            }`}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-xl mb-2">{evento.nombre_evento}</CardTitle>
+                    <CardTitle className="text-xl mb-2 flex items-center gap-2">
+                      {evento.nombre_evento}
+                      {evento.estado === 'finalizado' && <Lock className="h-4 w-4 text-amber-600" />}
+                    </CardTitle>
                     <Badge className={getEstadoBadge(evento.estado).variant === 'default' ? 'bg-green-500' : ''} variant={getEstadoBadge(evento.estado).variant}>
                       {evento.estado}
                     </Badge>
@@ -148,46 +194,87 @@ export default function EventosIndex({ eventos }: EventosIndexProps) {
                   </div>
 
                   <div className="pt-4 border-t space-y-2">
+                    {/* Advertencia para eventos finalizados */}
+                    {evento.estado === 'finalizado' && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-md p-2 text-xs">
+                        <p className="text-amber-800 font-medium flex items-center gap-1">
+                          <AlertTriangle className="h-3 w-3" />
+                          Evento finalizado - Solo lectura
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Botón seleccionar - siempre habilitado pero con advertencia */}
                     <Button
-                      onClick={() => handleSeleccionar(evento.id_evento)}
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      onClick={() => handleSeleccionar(evento.id_evento, evento.estado)}
+                      className={`w-full ${
+                        evento.estado === 'finalizado'
+                          ? 'bg-amber-600 hover:bg-amber-700'
+                          : 'bg-blue-600 hover:bg-blue-700'
+                      }`}
                       size="sm"
                     >
                       <Play className="mr-2 h-4 w-4" />
-                      Seleccionar Evento
+                      {evento.estado === 'finalizado' ? 'Seleccionar (Solo lectura)' : 'Seleccionar Evento'}
                     </Button>
 
+                    {/* Botones editar/eliminar - BLOQUEADOS para finalizados */}
                     <div className="flex gap-2">
-                      <Button asChild size="sm" variant="outline" className="flex-1">
-                        <Link href={route('eventos.edit', evento.id_evento)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Editar
-                        </Link>
+                      <Button
+                        asChild={evento.estado !== 'finalizado'}
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        disabled={evento.estado === 'finalizado'}
+                      >
+                        {evento.estado === 'finalizado' ? (
+                          <div className="flex items-center justify-center gap-2 text-gray-400 cursor-not-allowed">
+                            <Lock className="h-4 w-4" />
+                            <span>Editar</span>
+                          </div>
+                        ) : (
+                          <Link href={route('eventos.edit', evento.id_evento)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </Link>
+                        )}
                       </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>¿Eliminar evento?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Esta acción no se puede deshacer. Se eliminará permanentemente el evento "{evento.nombre_evento}".
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDelete(evento.id_evento)}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Eliminar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+
+                      {evento.estado === 'finalizado' ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-gray-400 cursor-not-allowed"
+                          disabled
+                        >
+                          <Lock className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>¿Eliminar evento?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta acción no se puede deshacer. Se eliminará permanentemente el evento "{evento.nombre_evento}".
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(evento.id_evento)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Eliminar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -195,6 +282,18 @@ export default function EventosIndex({ eventos }: EventosIndexProps) {
             </Card>
           ))}
         </div>
+
+        {eventosFiltrados.length === 0 && eventos.data.length > 0 && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <div className="text-gray-500 text-center">
+                <EyeOff className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-lg font-semibold mb-2">Todos los eventos activos están ocultos</h3>
+                <p className="text-sm mb-4">Activa el interruptor "Mostrar finalizados" para ver los eventos completados</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {eventos.data.length === 0 && (
           <Card>

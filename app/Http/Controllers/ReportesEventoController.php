@@ -21,8 +21,20 @@ class ReportesEventoController extends Controller
         $eventoActivo = session('evento_activo');
         $evento = Evento::find($eventoActivo);
 
+        // Obtener estadísticas del evento
+        $totalInscripciones = Inscripcion::where('id_evento', $eventoActivo)->count();
+        $totalParticipantes = Participante::where('id_evento', $eventoActivo)->count();
+        $totalOrquideas = Orquidea::where('id_evento', $eventoActivo)->count();
+        $totalGanadores = Ganador::where('id_evento', $eventoActivo)->count();
+
         return Inertia::render('ReportesEvento/index', [
-            'evento' => $evento
+            'evento' => $evento,
+            'estadisticas' => [
+                'total_inscripciones' => $totalInscripciones,
+                'total_participantes' => $totalParticipantes,
+                'total_orquideas' => $totalOrquideas,
+                'total_ganadores' => $totalGanadores,
+            ]
         ]);
     }
 
@@ -247,5 +259,143 @@ class ReportesEventoController extends Controller
 
         $pdf->setPaper('letter', 'portrait');
         return $pdf->stream('Participantes_Orquideas_' . $evento->nombre_evento . '.pdf');
+    }
+
+    /**
+     * Vista previa de inscripciones (primeros 10 registros)
+     */
+    public function previewInscripciones(Request $request)
+    {
+        $eventoActivo = session('evento_activo');
+
+        $inscripciones = Inscripcion::with(['participante', 'orquidea.grupo', 'orquidea.clase'])
+            ->where('id_evento', $eventoActivo)
+            ->orderBy('correlativo')
+            ->take(10)
+            ->get()
+            ->map(function ($ins) {
+                return [
+                    'correlativo' => $ins->correlativo,
+                    'grupo' => $ins->orquidea?->grupo?->Cod_Grupo ?? '',
+                    'clase' => $ins->orquidea?->clase?->nombre_clase ?? '',
+                    'nombre_planta' => $ins->orquidea?->nombre_planta ?? '',
+                    'participante' => $ins->participante?->nombre ?? '',
+                ];
+            });
+
+        return response()->json($inscripciones);
+    }
+
+    /**
+     * Vista previa de ganadores (primeros 10 registros)
+     */
+    public function previewGanadores(Request $request)
+    {
+        $eventoActivo = session('evento_activo');
+
+        $ganadores = Ganador::with(['inscripcion.participante', 'inscripcion.orquidea.grupo', 'inscripcion.orquidea.clase'])
+            ->where('id_evento', $eventoActivo)
+            ->orderBy('posicion')
+            ->take(10)
+            ->get()
+            ->map(function ($g) {
+                return [
+                    'posicion' => $g->posicion,
+                    'correlativo' => $g->inscripcion?->correlativo ?? '',
+                    'nombre_planta' => $g->inscripcion?->orquidea?->nombre_planta ?? '',
+                    'participante' => $g->inscripcion?->participante?->nombre ?? '',
+                    'empate' => $g->empate ? 'Sí' : 'No',
+                ];
+            });
+
+        return response()->json($ganadores);
+    }
+
+    /**
+     * Vista previa de plantas por clases (primeros 10 registros)
+     */
+    public function previewPlantasPorClases(Request $request)
+    {
+        $eventoActivo = session('evento_activo');
+
+        $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
+            ->where('id_evento', $eventoActivo)
+            ->orderBy('id_grupo')
+            ->take(10)
+            ->get()
+            ->map(function ($orq) {
+                return [
+                    'grupo' => $orq->grupo?->Cod_Grupo ?? '',
+                    'clase' => $orq->clase?->nombre_clase ?? '',
+                    'nombre_planta' => $orq->nombre_planta ?? '',
+                    'participante' => $orq->participante?->nombre ?? '',
+                ];
+            });
+
+        return response()->json($orquideas);
+    }
+
+    /**
+     * Vista previa de participantes y orquídeas (primeros 5 participantes)
+     */
+    public function previewParticipantesOrquideas(Request $request)
+    {
+        $eventoActivo = session('evento_activo');
+
+        $participantes = Participante::with(['orquideas.grupo', 'orquideas.clase'])
+            ->where('id_evento', $eventoActivo)
+            ->take(5)
+            ->get()
+            ->map(function ($p) {
+                return [
+                    'participante' => $p->nombre,
+                    'total_orquideas' => $p->orquideas->count(),
+                    'orquideas' => $p->orquideas->take(3)->map(function ($orq) {
+                        return [
+                            'nombre_planta' => $orq->nombre_planta,
+                            'grupo' => $orq->grupo?->nombre_grupo ?? '',
+                            'clase' => $orq->clase?->nombre_clase ?? '',
+                        ];
+                    })
+                ];
+            });
+
+        return response()->json($participantes);
+    }
+
+    /**
+     * PDF: Inscripciones por participante específico
+     */
+    public function inscripcionesPorParticipantePdf(Request $request)
+    {
+        $eventoActivo = session('evento_activo');
+        $evento = Evento::find($eventoActivo);
+        $participanteId = $request->query('participante_id');
+
+        $participante = Participante::find($participanteId);
+
+        $inscripciones = Inscripcion::with(['orquidea.grupo', 'orquidea.clase'])
+            ->where('id_evento', $eventoActivo)
+            ->where('id_participante', $participanteId)
+            ->orderBy('correlativo')
+            ->get()
+            ->map(function ($ins) {
+                return [
+                    'correlativo' => $ins->correlativo,
+                    'grupo' => $ins->orquidea?->grupo?->Cod_Grupo ?? '',
+                    'clase' => $ins->orquidea?->clase?->nombre_clase ?? '',
+                    'nombre_planta' => $ins->orquidea?->nombre_planta ?? '',
+                    'origen' => $ins->orquidea?->origen ?? '',
+                ];
+            });
+
+        $pdf = Pdf::loadView('reportes.inscripciones_participante', [
+            'inscripciones' => $inscripciones,
+            'evento' => $evento,
+            'participante' => $participante,
+        ]);
+
+        $pdf->setPaper('letter', 'portrait');
+        return $pdf->stream('Inscripciones_' . $participante->nombre . '_' . $evento->nombre_evento . '.pdf');
     }
 }

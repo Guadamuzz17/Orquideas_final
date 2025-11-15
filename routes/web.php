@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rutas de Eventos (SIN middleware de evento activo)
     Route::resource('eventos', EventoController::class);
     Route::post('/eventos/{id}/seleccionar', [EventoController::class, 'seleccionar'])->name('eventos.seleccionar');
+    Route::post('/eventos/salir', [EventoController::class, 'salir'])->name('eventos.salir');
     Route::post('/eventos/cerrar', [EventoController::class, 'cerrarEvento'])->name('eventos.cerrar');
 
     // Todas las demás rutas requieren un evento activo
@@ -53,6 +54,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/reportes-evento/plantas-por-clases/pdf', [ReportesEventoController::class, 'plantasPorClasesPdf'])->name('reportes.evento.plantas_por_clases.pdf');
         Route::get('/reportes-evento/ganadores/pdf', [ReportesEventoController::class, 'ganadoresPdf'])->name('reportes.evento.ganadores.pdf');
         Route::get('/reportes-evento/participantes-orquideas/pdf', [ReportesEventoController::class, 'participantesOrquideasPdf'])->name('reportes.evento.participantes_orquideas.pdf');
+        Route::get('/reportes-evento/inscripciones-participante/pdf', [ReportesEventoController::class, 'inscripcionesPorParticipantePdf'])->name('reportes.evento.inscripciones_participante.pdf');
+
+        // Vistas previas de reportes
+        Route::get('/reportes-evento/preview/inscripciones', [ReportesEventoController::class, 'previewInscripciones'])->name('reportes.evento.preview.inscripciones');
+        Route::get('/reportes-evento/preview/ganadores', [ReportesEventoController::class, 'previewGanadores'])->name('reportes.evento.preview.ganadores');
+        Route::get('/reportes-evento/preview/plantas-clases', [ReportesEventoController::class, 'previewPlantasPorClases'])->name('reportes.evento.preview.plantas_clases');
+        Route::get('/reportes-evento/preview/participantes-orquideas', [ReportesEventoController::class, 'previewParticipantesOrquideas'])->name('reportes.evento.preview.participantes_orquideas');
+
 
     // Reportes
     Route::get('/reportes', function () {

@@ -93,9 +93,15 @@ class GanadorController extends Controller
     public function show(Ganador $ganador)
     {
         $ganador->load([
-            'inscripcion.participante',
+            'inscripcion.participante.tipoParticipante',
+            'inscripcion.participante.departamento',
+            'inscripcion.participante.municipio',
+            'inscripcion.participante.aso',
             'inscripcion.orquidea.grupo',
-            'inscripcion.orquidea.clase'
+            'inscripcion.orquidea.clase',
+            'inscripcion.orquidea.participante',
+            'inscripcion.listones.trofeo',
+            'evento'
         ]);
 
         return Inertia::render('Ganadores/Show', [

@@ -13,7 +13,10 @@ class EventoController extends Controller
      */
     public function index()
     {
-        $eventos = Evento::orderBy('fecha_inicio', 'desc')->paginate(10);
+        // Mostrar TODOS los eventos (incluidos finalizados)
+        $eventos = Evento::orderBy('estado', 'asc') // 'en curso' primero, luego programados, finalizados al final
+            ->orderBy('fecha_inicio', 'desc')
+            ->paginate(50);
 
         return Inertia::render('eventos/index', [
             'eventos' => $eventos,
@@ -128,6 +131,18 @@ class EventoController extends Controller
 
         return redirect()->route('dashboard')
             ->with('success', "Evento '{$evento->nombre_evento}' seleccionado");
+    }
+
+    /**
+     * Salir del evento actual (lo mismo que cerrar)
+     */
+    public function salir()
+    {
+        $eventoNombre = session('evento_nombre', 'el evento');
+        session()->forget(['evento_activo', 'evento_nombre', 'evento_seleccionado_notificado']);
+
+        return redirect()->route('eventos.index')
+            ->with('info', "Has salido de '{$eventoNombre}'. Selecciona otro evento para continuar.");
     }
 
     /**

@@ -72,7 +72,7 @@ export default function OrquideasIndex({ orquideas }: OrquideasIndexProps) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Registro de Orquídeas" />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <h1 className="text-2xl font-bold">Registro de Orquídeas</h1>
+        <h1 className="text-2xl font-bold">Orquideas Registradas</h1>
 
         <div>
           <Breadcrumb>

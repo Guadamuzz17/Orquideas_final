@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Camera, Plus, Minus, Upload, Flower2 } from "lucide-react";
+import { ArrowLeft, Camera, Plus, Minus, Upload, Flower2, Lock, AlertTriangle } from "lucide-react";
 import { toast } from 'sonner';
 import axios from 'axios';
 import AppLayout from '@/layouts/app-layout';
 import { AutocompleteOrquidea } from '@/components/AutocompleteOrquidea';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface Grupo {
   id_grupo: number;
@@ -35,9 +36,14 @@ interface CreateOrquideaProps {
 }
 
 export default function CreateOrquidea({ grupos, clases, participantes }: CreateOrquideaProps) {
+  const { eventoActivo } = usePage().props as any;
   const [clasesDisponibles, setClasesDisponibles] = useState<Clase[]>(clases);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [searchParticipante, setSearchParticipante] = useState('');
+  const [participantesFiltrados, setParticipantesFiltrados] = useState<Participante[]>(participantes);
+
+  const isEventoFinalizado = eventoActivo?.bloqueado || eventoActivo?.estado === 'finalizado';
 
   const { data, setData, post, processing, errors, reset } = useForm({
     nombre_planta: '',
@@ -57,6 +63,19 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
       setData('id_clase', ''); // Resetear clase cuando cambia grupo
     }
   }, [data.id_grupo]);
+
+  // Filtrar participantes cuando cambia la búsqueda
+  useEffect(() => {
+    if (searchParticipante.trim() === '') {
+      setParticipantesFiltrados(participantes);
+    } else {
+      const filtered = participantes.filter(p =>
+        p.nombre.toLowerCase().includes(searchParticipante.toLowerCase()) ||
+        p.id.toString().includes(searchParticipante)
+      );
+      setParticipantesFiltrados(filtered);
+    }
+  }, [searchParticipante, participantes]);
 
   const incrementQuantity = () => {
     if (data.cantidad < 99) {
@@ -146,11 +165,24 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
           </Button>
         </div>
 
-        <Card className="shadow-lg">
+        {/* Alerta de evento bloqueado */}
+        {isEventoFinalizado && (
+          <Alert variant="destructive" className="bg-red-50 border-red-200">
+            <Lock className="h-5 w-5" />
+            <AlertTitle className="text-red-800 font-bold">🔒 Evento Finalizado - Formulario Bloqueado</AlertTitle>
+            <AlertDescription className="text-red-700">
+              El evento "{eventoActivo?.nombre}" ha finalizado y no se pueden registrar nuevas orquídeas.
+              Por favor, seleccione un evento activo desde el menú de eventos.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <Card className={`shadow-lg ${isEventoFinalizado ? 'opacity-60 pointer-events-none' : ''}`}>
           <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
             <CardTitle className="flex items-center gap-2 text-green-800">
               <Flower2 className="h-5 w-5" />
               Información de la Orquídea
+              {isEventoFinalizado && <Lock className="h-4 w-4 text-red-600 ml-auto" />}
             </CardTitle>
             <CardDescription>
               Complete todos los campos para registrar una nueva orquídea en el sistema
@@ -291,18 +323,34 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
                   <Label htmlFor="id_participante" className="text-sm font-medium">
                     Participante *
                   </Label>
+                  <Input
+                    type="text"
+                    placeholder="🔍 Buscar por nombre o ID..."
+                    value={searchParticipante}
+                    onChange={(e) => setSearchParticipante(e.target.value)}
+                    className="h-11 mb-2"
+                  />
                   <Select value={data.id_participante} onValueChange={(value) => setData('id_participante', value)} required>
                     <SelectTrigger className="h-11">
                       <SelectValue placeholder="Selecciona un participante" />
                     </SelectTrigger>
                     <SelectContent>
-                      {participantes.map((participante) => (
-                        <SelectItem key={participante.id} value={participante.id.toString()}>
-                          {participante.nombre}
+                      {participantesFiltrados.length > 0 ? (
+                        participantesFiltrados.map((participante) => (
+                          <SelectItem key={participante.id} value={participante.id.toString()}>
+                            #{participante.id} - {participante.nombre}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-results" disabled>
+                          No se encontraron participantes
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-gray-500">
+                    💡 {participantesFiltrados.length} participante(s) del evento activo
+                  </p>
                   {errors.id_participante && (
                     <p className="text-sm text-red-600">{errors.id_participante}</p>
                   )}
