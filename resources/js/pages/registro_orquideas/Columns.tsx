@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal, Trash2, Edit, Eye, ZoomIn } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal, Trash2, Eye, ZoomIn, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -61,18 +61,17 @@ import {
 interface Grupo {
   id_grupo: number;
   nombre_grupo: string;
-  Cod_Grupo: string;
 }
 
 interface Clase {
   id_clase: number;
   nombre_clase: string;
-  id_grupp: number;
+  id_grupo: number;
 }
 
 interface Participante {
-  id: number;
-  nombre: string;
+  id_participante: number;
+  nombre_participante: string;
 }
 
 export type Orquidea = {
@@ -86,12 +85,17 @@ export type Orquidea = {
   id_participante: number
   grupo?: Grupo
   clase?: Clase
-  participante?: Participante
+  participante?: { id_participante: number; nombre_participante: string }
   created_at?: string
   updated_at?: string
 }
 
-export const columns: ColumnDef<Orquidea>[] = [
+// Factory para permitir pasar datasets necesarios para edición
+export const columns = (
+  participantes: Participante[],
+  grupos: Grupo[],
+  clases: Clase[]
+): ColumnDef<Orquidea>[] => [
 
     {
         id: "select",
@@ -164,7 +168,7 @@ export const columns: ColumnDef<Orquidea>[] = [
       },
     },
     {
-      accessorKey: "participante.nombre",
+      accessorKey: "participante.nombre_participante",
       header: "Participante",
     },
     {
@@ -238,35 +242,55 @@ export const columns: ColumnDef<Orquidea>[] = [
         id: "actions",
         header: () => <div className="text-right pr-15">Acciones</div>,
         cell: ({ row }) => {
-
           const orquidea = row.original
 
+          // Estados locales para edición avanzada
+          const [searchParticipante, setSearchParticipante] = useState("")
+          const [clasesFiltradas, setClasesFiltradas] = useState<Clase[]>(
+            clases.filter(c => c.id_grupo === orquidea.id_grupo)
+          )
+
           const { data, setData, put, processing, reset } = useForm({
-              nombre_planta: orquidea.nombre_planta,
-              origen: orquidea.origen,
-              id_grupo: orquidea.id_grupo.toString(),
-              id_clase: orquidea.id_clase.toString(),
-              cantidad: orquidea.cantidad.toString(),
-              id_participante: orquidea.id_participante.toString(),
-          });
+            nombre_planta: orquidea.nombre_planta,
+            origen: orquidea.origen,
+            id_grupo: orquidea.id_grupo.toString(),
+            id_clase: orquidea.id_clase.toString(),
+            cantidad: orquidea.cantidad.toString(),
+            id_participante: orquidea.id_participante.toString(),
+            descripcion: '',
+          })
 
           const handleDelete = async (id: number, nombre: string) => {
-              const result = await showDeleteConfirm(nombre);
-              if (result.isConfirmed) {
-                router.delete(route('orquideas.destroy', id), {
-                  preserveScroll: true
-                });
-              }
+            const result = await showDeleteConfirm(nombre)
+            if (result.isConfirmed) {
+              router.delete(route('orquideas.destroy', id), {
+                preserveScroll: true,
+                onSuccess: () => toast.success('Orquídea eliminada'),
+                onError: () => toast.error('Error al eliminar')
+              })
             }
+          }
 
-            const handleEditSubmit = (e: React.FormEvent, id: number) => {
-              e.preventDefault();
-              put(route('orquideas.update', id), {
-                onSuccess: () => toast.success('Orquídea actualizada correctamente'),
-                onError: () => toast.error('Error al actualizar la orquídea'),
-                preserveScroll: true
-              });
-            };
+          const handleEditSubmit = (e: React.FormEvent, id: number) => {
+            e.preventDefault()
+            put(route('orquideas.update', id), {
+              onSuccess: () => toast.success('Orquídea actualizada correctamente'),
+              onError: () => toast.error('Error al actualizar la orquídea'),
+              preserveScroll: true,
+            })
+          }
+
+          const handleGrupoChange = (grupoId: string) => {
+            setData('id_grupo', grupoId)
+            const filtered = clases.filter(c => c.id_grupo === parseInt(grupoId))
+            setClasesFiltradas(filtered)
+            setData('id_clase', '')
+          }
+
+          const participantesFiltrados = participantes.filter((p) =>
+            p.nombre_participante.toLowerCase().includes(searchParticipante.toLowerCase()) ||
+            p.id_participante.toString().includes(searchParticipante)
+          )
 
           return (
             <div className="flex justify-end items-center gap-2">
@@ -369,7 +393,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                   <Input
                     disabled
                     id="participante"
-                    defaultValue={orquidea.participante?.nombre || ""}
+                    defaultValue={orquidea.participante?.nombre_participante || ""}
                     className="mb-4"
                     />
 
@@ -385,72 +409,128 @@ export const columns: ColumnDef<Orquidea>[] = [
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline"
-                  onClick={() => {
-                    reset();
-                    setData({
-                      nombre_planta: orquidea.nombre_planta,
-                      origen: orquidea.origen,
-                      id_grupo: orquidea.id_grupo.toString(),
-                      id_clase: orquidea.id_clase.toString(),
-                      cantidad: orquidea.cantidad.toString(),
-                      id_participante: orquidea.id_participante.toString(),
-                    });
-                  }}>
-                    Editar
+                    onClick={() => {
+                      reset()
+                      setData({
+                        nombre_planta: orquidea.nombre_planta,
+                        origen: orquidea.origen,
+                        id_grupo: orquidea.id_grupo.toString(),
+                        id_clase: orquidea.id_clase.toString(),
+                        cantidad: orquidea.cantidad.toString(),
+                        id_participante: orquidea.id_participante.toString(),
+                        descripcion: '',
+                      })
+                      setClasesFiltradas(clases.filter(c => c.id_grupo === orquidea.id_grupo))
+                      setSearchParticipante('')
+                    }}>
+                    <Pencil className="h-4 w-4 mr-1" /> Editar
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>Edición de Orquídea</DialogTitle>
-                    <DialogDescription>
-                    Modifica los campos necesarios.
-                    </DialogDescription>
+                    <DialogTitle>Editar Orquídea</DialogTitle>
+                    <DialogDescription>Modifica los campos necesarios. Puedes cambiar participante, grupo y clase.</DialogDescription>
                   </DialogHeader>
-                        <form onSubmit={(e) => {
-                          e.preventDefault();
-                          handleEditSubmit(e, orquidea.id_orquidea);
-                        }}>
-                      <div className="space-y-4 m-4">
-                      <Label htmlFor="nombre_planta" className="text-right">
-                        Nombre de la Planta
-                      </Label>
-                      <Input
-                        id="nombre_planta"
-                        value={data.nombre_planta}
-                        onChange={(e) => setData('nombre_planta', e.target.value)}
-                        className="mb-4"
-                        />
-                        <Label htmlFor="origen" className="text-right">
-                        Origen
-                      </Label>
-                      <Select value={data.origen} onValueChange={(value) => setData('origen', value)}>
-                        <SelectTrigger className="mb-4">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Especie">Especie</SelectItem>
-                          <SelectItem value="Híbrida">Híbrida</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Label htmlFor="cantidad" className="text-right">
-                        Cantidad
-                      </Label>
-                      <Input
-                        id="cantidad"
-                        type="number"
-                        min="1"
-                        max="99"
-                        value={data.cantidad}
-                        onChange={(e) => setData('cantidad', e.target.value)}
-                        className="mb-4"
+                  <form onSubmit={(e) => { e.preventDefault(); handleEditSubmit(e, orquidea.id_orquidea) }}>
+                    <div className="space-y-4 m-4">
+                      {/* Nombre */}
+                      <div>
+                        <Label htmlFor="nombre_planta">Nombre de la Planta *</Label>
+                        <Input
+                          id="nombre_planta"
+                          value={data.nombre_planta}
+                          onChange={(e) => setData('nombre_planta', e.target.value)}
+                          placeholder="Ej: Cattleya mossiae"
+                          required
                         />
                       </div>
-                      <DialogFooter>
-                        <Button type="submit" disabled={processing} >
-                        {processing ? 'Guardando...' : 'Guardar Cambios'}
-                        </Button>
-                      </DialogFooter>
-                    </form>
+                      {/* Origen */}
+                      <div>
+                        <Label htmlFor="origen">Origen *</Label>
+                        <Select value={data.origen} onValueChange={(value) => setData('origen', value)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="nativa">Nativa</SelectItem>
+                            <SelectItem value="hibrido">Híbrido</SelectItem>
+                            <SelectItem value="importada">Importada</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {/* Participante */}
+                      <div>
+                        <Label>Buscar Participante *</Label>
+                        <Input
+                          type="text"
+                          placeholder="🔍 Buscar por nombre o ID..."
+                          value={searchParticipante}
+                          onChange={(e) => setSearchParticipante(e.target.value)}
+                          className="mb-2"
+                        />
+                        <Select value={data.id_participante} onValueChange={(value) => setData('id_participante', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar participante" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {participantesFiltrados.map(p => (
+                              <SelectItem key={p.id_participante} value={p.id_participante.toString()}>
+                                #{p.id_participante} - {p.nombre_participante}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {/* Grupo */}
+                      <div>
+                        <Label>Grupo *</Label>
+                        <Select value={data.id_grupo} onValueChange={handleGrupoChange}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {grupos.map(g => (
+                              <SelectItem key={g.id_grupo} value={g.id_grupo.toString()}>{g.nombre_grupo}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {/* Clase */}
+                      <div>
+                        <Label>Clase *</Label>
+                        <Select
+                          value={data.id_clase}
+                          onValueChange={(value) => setData('id_clase', value)}
+                          disabled={!data.id_grupo}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={data.id_grupo ? 'Seleccionar clase' : 'Primero selecciona un grupo'} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {clasesFiltradas.map(c => (
+                              <SelectItem key={c.id_clase} value={c.id_clase.toString()}>{c.nombre_clase}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {/* Cantidad */}
+                      <div>
+                        <Label htmlFor="cantidad">Cantidad *</Label>
+                        <Input
+                          id="cantidad"
+                          type="number"
+                          min="1"
+                          max="999"
+                          value={data.cantidad}
+                          onChange={(e) => setData('cantidad', e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit" disabled={processing}>{processing ? 'Guardando...' : 'Guardar Cambios'}</Button>
+                    </DialogFooter>
+                  </form>
                 </DialogContent>
               </Dialog>
 
@@ -476,8 +556,7 @@ export const columns: ColumnDef<Orquidea>[] = [
                   </AlertDialogContent>
               </AlertDialog>
             </div>
-
-          )
-        },
-      },
+      )
+    },
+  },
 ]

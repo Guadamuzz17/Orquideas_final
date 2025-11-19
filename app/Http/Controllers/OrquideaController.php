@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\OrquideasExport;
 
 class OrquideaController extends Controller
 {
@@ -28,10 +31,28 @@ class OrquideaController extends Controller
 
         $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
             ->where('id_evento', $eventoActivo)
+            ->get()
+            ->map(function ($o) {
+                if ($o->participante) {
+                    // Alias para frontend esperado
+                    $o->participante->id_participante = $o->participante->id;
+                    $o->participante->nombre_participante = $o->participante->nombre;
+                }
+                return $o;
+            });
+
+        $participantes = Participante::where('id_evento', $eventoActivo)
+            ->select('id as id_participante', 'nombre as nombre_participante')
             ->get();
+
+        $grupos = Grupo::select('id_grupo', 'nombre_grupo')->get();
+        $clases = Clase::select('id_clase', 'nombre_clase', 'id_grupp as id_grupo')->get();
 
         return Inertia::render('registro_orquideas/index', [
             'orquideas' => $orquideas,
+            'participantes' => $participantes,
+            'grupos' => $grupos,
+            'clases' => $clases,
         ]);
     }
 
@@ -120,8 +141,8 @@ class OrquideaController extends Controller
         return Inertia::render('orquideas/form', [
             'orquidea' => $orquidea,
             'grupos' => Grupo::select('id_grupo', 'nombre_grupo')->get(),
-            'clases' => Clase::select('id_clase', 'nombre_clase', 'id_grupp')->get(),
-            'participantes' => Participante::select('id', 'nombre')->get(),
+            'clases' => Clase::select('id_clase', 'nombre_clase', 'id_grupp as id_grupo')->get(),
+            'participantes' => Participante::select('id as id_participante', 'nombre as nombre_participante')->get(),
         ]);
     }
 
@@ -222,5 +243,102 @@ class OrquideaController extends Controller
             ->pluck('nombre_planta');
 
         return response()->json($sugerencias);
+    }
+
+    /**
+     * Generar reporte PDF de todas las orquídeas inscritas
+     */
+    public function reportePDF()
+    {
+        $eventoActivo = session('evento_activo');
+
+        $orquideas = Orquidea::with(['grupo', 'clase', 'participante', 'inscripcion'])
+            ->where('id_evento', $eventoActivo)
+            ->orderBy('id_grupo')
+            ->orderBy('id_clase')
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.orquideas-inscritas', [
+            'orquideas' => $orquideas,
+            'fecha' => now()->format('d/m/Y H:i'),
+        ]);
+
+        return $pdf->download('orquideas-inscritas-' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Generar reporte Excel de todas las orquídeas inscritas
+     */
+    public function reporteExcel()
+    {
+        $eventoActivo = session('evento_activo');
+
+        return Excel::download(
+            new OrquideasExport($eventoActivo),
+            'orquideas-inscritas-' . now()->format('Y-m-d') . '.xlsx'
+        );
+    }
+
+    /**
+     * Generar reporte CSV de todas las orquídeas inscritas
+     */
+    public function reporteCSV()
+    {
+        $eventoActivo = session('evento_activo');
+
+        $orquideas = Orquidea::with(['grupo', 'clase', 'participante', 'inscripcion'])
+            ->where('id_evento', $eventoActivo)
+            ->orderBy('id_grupo')
+            ->orderBy('id_clase')
+            ->get();
+
+        $filename = 'orquideas-inscritas-' . now()->format('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
+        ];
+
+        $callback = function() use ($orquideas) {
+            $file = fopen('php://output', 'w');
+
+            // BOM para UTF-8
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Encabezados
+            fputcsv($file, [
+                'ID',
+                'Correlativo',
+                'Nombre Planta',
+                'Origen',
+                'Grupo',
+                'Clase',
+                'Cantidad',
+                'Participante',
+                'Fecha Registro'
+            ]);
+
+            // Datos
+            foreach ($orquideas as $orq) {
+                fputcsv($file, [
+                    $orq->id_orquidea,
+                    $orq->inscripcion->correlativo ?? 'N/A',
+                    $orq->nombre_planta,
+                    $orq->origen,
+                    $orq->grupo->nombre_grupo ?? 'N/A',
+                    $orq->clase->nombre_clase ?? 'N/A',
+                    $orq->cantidad,
+                    $orq->participante->nombre ?? 'N/A',
+                    $orq->created_at->format('d/m/Y H:i')
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

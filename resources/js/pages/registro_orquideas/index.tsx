@@ -5,7 +5,7 @@ import { columns } from "./Columns"
 import { DataTable } from "./data-table"
 import React from 'react';
 import { Button } from "@/components/ui/button"
-import { Slash, Plus, Download } from "lucide-react"
+import { Slash, Plus, Download, FileSpreadsheet, FileText } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbLink,
@@ -24,18 +24,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface Grupo {
   id_grupo: number;
   nombre_grupo: string;
-  Cod_Grupo: string;
 }
 
 interface Clase {
   id_clase: number;
   nombre_clase: string;
-  id_grupp: number;
+  id_grupo: number;
 }
 
 interface Participante {
-  id: number;
-  nombre: string;
+  id_participante: number;
+  nombre_participante: string;
 }
 
 interface Orquidea {
@@ -56,9 +55,12 @@ interface Orquidea {
 
 interface OrquideasIndexProps {
   orquideas: Orquidea[];
+  participantes: Participante[];
+  grupos: Grupo[];
+  clases: Clase[];
 }
 
-export default function OrquideasIndex({ orquideas }: OrquideasIndexProps) {
+export default function OrquideasIndex({ orquideas, participantes, grupos, clases }: OrquideasIndexProps) {
   console.log('Datos recibidos:', orquideas);
   console.log('Tipo de datos:', typeof orquideas);
   console.log('Es array:', Array.isArray(orquideas));
@@ -96,6 +98,36 @@ export default function OrquideasIndex({ orquideas }: OrquideasIndexProps) {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Botones de descarga de reportes */}
+            <Button
+              onClick={() => window.open(route('orquideas.reporte.pdf'), '_blank')}
+              variant="outline"
+              className="bg-red-50 hover:bg-red-100 text-red-700 border-red-300"
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              PDF
+            </Button>
+
+            <Button
+              onClick={() => window.open(route('orquideas.reporte.excel'), '_blank')}
+              variant="outline"
+              className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
+            >
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              Excel
+            </Button>
+
+            <Button
+              onClick={() => window.open(route('orquideas.reporte.csv'), '_blank')}
+              variant="outline"
+              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              CSV
+            </Button>
+
+            <div className="h-6 w-px bg-gray-300 mx-2"></div>
+
             <Button asChild className="bg-blue-600 hover:bg-blue-700">
               <a href="/docsDonwload/ClasesOrquideas.pdf" target="_blank" rel="noopener noreferrer" download>
                 <Download className="mr-2 h-4 w-4" />
@@ -113,7 +145,7 @@ export default function OrquideasIndex({ orquideas }: OrquideasIndexProps) {
         </div>
 
         <div className="container mx-auto">
-          <DataTable columns={columns} data={tableData} />
+          <DataTable columns={columns(participantes, grupos, clases)} data={tableData} />
         </div>
       </div>
     </AppLayout>

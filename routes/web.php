@@ -99,6 +99,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orquideas/sugerencias', [OrquideaController::class, 'buscarSugerencias'])
         ->name('orquideas.sugerencias');
 
+    // Rutas de reportes de orquídeas
+    Route::get('/orquideas/reporte-pdf', [OrquideaController::class, 'reportePDF'])
+        ->name('orquideas.reporte.pdf');
+    Route::get('/orquideas/reporte-excel', [OrquideaController::class, 'reporteExcel'])
+        ->name('orquideas.reporte.excel');
+    Route::get('/orquideas/reporte-csv', [OrquideaController::class, 'reporteCSV'])
+        ->name('orquideas.reporte.csv');
+
     // Rutas de recursos para orquídeas
     Route::resource('orquideas', OrquideaController::class);
 

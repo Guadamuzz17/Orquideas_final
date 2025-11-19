@@ -43,6 +43,14 @@ class Orquidea extends Model
     }
 
     /**
+     * Relación singular para obtener la última inscripción
+     */
+    public function inscripcion()
+    {
+        return $this->hasOne(Inscripcion::class, 'id_orquidea', 'id_orquidea')->latest();
+    }
+
+    /**
      * Get the URL for the orchid photo
      */
     public function getImageUrlAttribute()
