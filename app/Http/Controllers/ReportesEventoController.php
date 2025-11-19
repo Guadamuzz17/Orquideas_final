@@ -142,75 +142,43 @@ class ReportesEventoController extends Controller
      */
     public function plantasPorClasesPdf(Request $request)
     {
-        $eventoActivo = session('evento_activo');
-        $evento = Evento::find($eventoActivo);
+        try {
+            $eventoActivo = session('evento_activo');
 
-        $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
-            ->where('id_evento', $eventoActivo)
-            ->take(30)
-            ->get();
-
-        $data = $orquideas->map(function ($orq) {
-            $grupoLetter = '';
-            if ($orq->grupo) {
-                $grupoLetter = $orq->grupo->Cod_Grupo ?? '';
-                if (!$grupoLetter && !empty($orq->grupo->nombre_grupo)) {
-                    $grupoLetter = strtoupper(substr($orq->grupo->nombre_grupo, 0, 1));
-                }
+            if (!$eventoActivo) {
+                Log::warning('Intento de generar reporte sin evento activo');
+                return redirect()->route('eventos.index')
+                    ->with('error', 'Debe seleccionar un evento activo primero.');
             }
 
-            $claseNumber = '';
-            if ($orq->clase) {
-                $nombre = $orq->clase->nombre_clase ?? '';
-                if ($nombre && preg_match('/Clase\s+(\d+)/u', $nombre, $m)) {
-                    $claseNumber = $m[1];
-                }
+            $evento = Evento::find($eventoActivo);
+
+            if (!$evento) {
+                Log::error('Evento no encontrado: ' . $eventoActivo);
+                return redirect()->route('eventos.index')
+                    ->with('error', 'El evento seleccionado no existe.');
             }
 
-            return [
-                'grupo' => $grupoLetter,
-                'clase' => $claseNumber,
-                'nombre_planta' => $orq->nombre_planta ?? '',
-                'nombre_participante' => $orq->participante->nombre ?? '',
-            ];
-        })->sortBy(function ($item) {
-            return [$item['grupo'], $item['clase']];
-        })->values();
+            $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
+                ->where('id_evento', $eventoActivo)
+                ->get();
 
-        $pdf = Pdf::loadView('reportes.plantas_por_clases', [
-            'orquideas' => $data,
-            'evento' => $evento,
-        ]);
+            if ($orquideas->isEmpty()) {
+                Log::info('No hay orquídeas para el evento: ' . $eventoActivo);
 
-        $pdf->setPaper('letter', 'portrait');
-        return $pdf->stream('Plantas_Por_Clases_' . $evento->nombre_evento . '.pdf');
-    }
+                // Generar PDF vacío con mensaje
+                $pdf = Pdf::loadView('reportes.plantas_por_clases', [
+                    'orquideas' => collect([]),
+                    'evento' => $evento,
+                    'mensaje' => 'No hay orquídeas registradas para este evento.'
+                ]);
 
-    /**
-     * PDF: Ganadores del evento activo
-     */
-    public function ganadoresPdf(Request $request)
-    {
-        $eventoActivo = session('evento_activo');
-        $evento = Evento::find($eventoActivo);
+                $pdf->setPaper('letter', 'portrait');
+                return $pdf->stream('Plantas_Por_Clases_' . ($evento->nombre_evento ?? 'Sin_Nombre') . '.pdf');
+            }
 
-        $ganadores = Ganador::with([
-            'inscripcion.participante',
-            'inscripcion.orquidea.grupo',
-            'inscripcion.orquidea.clase'
-        ])
-        ->where('id_evento', $eventoActivo)
-        ->orderBy('posicion')
-        ->take(30)
-        ->get();
-
-        $data = $ganadores->map(function ($ganador) {
-            $grupoLetter = '';
-            $claseNumber = '';
-
-            if ($ganador->inscripcion && $ganador->inscripcion->orquidea) {
-                $orq = $ganador->inscripcion->orquidea;
-
+            $data = $orquideas->map(function ($orq) {
+                $grupoLetter = '';
                 if ($orq->grupo) {
                     $grupoLetter = $orq->grupo->Cod_Grupo ?? '';
                     if (!$grupoLetter && !empty($orq->grupo->nombre_grupo)) {
@@ -218,32 +186,138 @@ class ReportesEventoController extends Controller
                     }
                 }
 
+                $claseNumber = '';
                 if ($orq->clase) {
                     $nombre = $orq->clase->nombre_clase ?? '';
                     if ($nombre && preg_match('/Clase\s+(\d+)/u', $nombre, $m)) {
                         $claseNumber = $m[1];
                     }
                 }
+
+                return [
+                    'grupo' => $grupoLetter ?: 'N/A',
+                    'clase' => $claseNumber ?: 'N/A',
+                    'nombre_planta' => $orq->nombre_planta ?? 'Sin nombre',
+                    'nombre_participante' => optional($orq->participante)->nombre ?? 'Sin participante',
+                ];
+            })->sortBy(function ($item) {
+                return [$item['grupo'], $item['clase']];
+            })->values();
+
+            $pdf = Pdf::loadView('reportes.plantas_por_clases', [
+                'orquideas' => $data,
+                'evento' => $evento,
+            ]);
+
+            $pdf->setPaper('letter', 'portrait');
+            return $pdf->stream('Plantas_Por_Clases_' . ($evento->nombre_evento ?? 'Sin_Nombre') . '.pdf');
+
+        } catch (\Exception $e) {
+            Log::error('Error en plantasPorClasesPdf: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'evento_activo' => session('evento_activo')
+            ]);
+
+            return redirect()->route('reportes.evento.index')
+                ->with('error', 'Error al generar el reporte: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * PDF: Ganadores del evento activo
+     */
+    public function ganadoresPdf(Request $request)
+    {
+        try {
+            $eventoActivo = session('evento_activo');
+
+            if (!$eventoActivo) {
+                Log::warning('Intento de generar reporte de ganadores sin evento activo');
+                return redirect()->route('eventos.index')
+                    ->with('error', 'Debe seleccionar un evento activo primero.');
             }
 
-            return [
-                'posicion' => $ganador->posicion,
-                'correlativo' => $ganador->inscripcion->correlativo ?? '',
-                'grupo' => $grupoLetter,
-                'clase' => $claseNumber,
-                'nombre_planta' => $ganador->inscripcion->orquidea->nombre_planta ?? '',
-                'nombre_participante' => $ganador->inscripcion->participante->nombre ?? '',
-                'empate' => $ganador->empate,
-            ];
-        });
+            $evento = Evento::find($eventoActivo);
 
-        $pdf = Pdf::loadView('reportes.ganadores', [
-            'ganadores' => $data,
-            'evento' => $evento,
-        ]);
+            if (!$evento) {
+                Log::error('Evento no encontrado para ganadores: ' . $eventoActivo);
+                return redirect()->route('eventos.index')
+                    ->with('error', 'El evento seleccionado no existe.');
+            }
 
-        $pdf->setPaper('letter', 'landscape');
-        return $pdf->stream('Ganadores_' . $evento->nombre_evento . '.pdf');
+            $ganadores = Ganador::with([
+                'inscripcion.participante',
+                'inscripcion.orquidea.grupo',
+                'inscripcion.orquidea.clase'
+            ])
+            ->where('id_evento', $eventoActivo)
+            ->orderBy('posicion')
+            ->get();
+
+            if ($ganadores->isEmpty()) {
+                Log::info('No hay ganadores para el evento: ' . $eventoActivo);
+
+                // Generar PDF vacío con mensaje
+                $pdf = Pdf::loadView('reportes.ganadores', [
+                    'ganadores' => collect([]),
+                    'evento' => $evento,
+                    'mensaje' => 'No hay ganadores registrados para este evento.'
+                ]);
+
+                $pdf->setPaper('letter', 'landscape');
+                return $pdf->stream('Ganadores_' . ($evento->nombre_evento ?? 'Sin_Nombre') . '.pdf');
+            }
+
+            $data = $ganadores->map(function ($ganador) {
+                $grupoLetter = '';
+                $claseNumber = '';
+
+                if ($ganador->inscripcion && $ganador->inscripcion->orquidea) {
+                    $orq = $ganador->inscripcion->orquidea;
+
+                    if ($orq->grupo) {
+                        $grupoLetter = $orq->grupo->Cod_Grupo ?? '';
+                        if (!$grupoLetter && !empty($orq->grupo->nombre_grupo)) {
+                            $grupoLetter = strtoupper(substr($orq->grupo->nombre_grupo, 0, 1));
+                        }
+                    }
+
+                    if ($orq->clase) {
+                        $nombre = $orq->clase->nombre_clase ?? '';
+                        if ($nombre && preg_match('/Clase\s+(\d+)/u', $nombre, $m)) {
+                            $claseNumber = $m[1];
+                        }
+                    }
+                }
+
+                return [
+                    'posicion' => $ganador->posicion ?? 'N/A',
+                    'correlativo' => optional($ganador->inscripcion)->correlativo ?? 'N/A',
+                    'grupo' => $grupoLetter ?: 'N/A',
+                    'clase' => $claseNumber ?: 'N/A',
+                    'nombre_planta' => optional(optional($ganador->inscripcion)->orquidea)->nombre_planta ?? 'Sin nombre',
+                    'nombre_participante' => optional(optional($ganador->inscripcion)->participante)->nombre ?? 'Sin participante',
+                    'empate' => $ganador->empate ?? 0,
+                ];
+            });
+
+            $pdf = Pdf::loadView('reportes.ganadores', [
+                'ganadores' => $data,
+                'evento' => $evento,
+            ]);
+
+            $pdf->setPaper('letter', 'landscape');
+            return $pdf->stream('Ganadores_' . ($evento->nombre_evento ?? 'Sin_Nombre') . '.pdf');
+
+        } catch (\Exception $e) {
+            Log::error('Error en ganadoresPdf: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'evento_activo' => session('evento_activo')
+            ]);
+
+            return redirect()->route('reportes.evento.index')
+                ->with('error', 'Error al generar el reporte de ganadores: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -251,25 +325,58 @@ class ReportesEventoController extends Controller
      */
     public function participantesOrquideasPdf(Request $request)
     {
-        $eventoActivo = session('evento_activo');
-        $evento = Evento::find($eventoActivo);
+        try {
+            $eventoActivo = session('evento_activo');
 
-        if (!$evento) {
-            return back()->with('error', 'No se encontró el evento especificado');
+            if (!$eventoActivo) {
+                Log::warning('Intento de generar reporte de participantes-orquídeas sin evento activo');
+                return redirect()->route('eventos.index')
+                    ->with('error', 'Debe seleccionar un evento activo primero.');
+            }
+
+            $evento = Evento::find($eventoActivo);
+
+            if (!$evento) {
+                Log::error('Evento no encontrado para participantes-orquídeas: ' . $eventoActivo);
+                return redirect()->route('eventos.index')
+                    ->with('error', 'El evento seleccionado no existe.');
+            }
+
+            $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
+                ->where('id_evento', $eventoActivo)
+                ->whereNotNull('id_participante')
+                ->orderBy('nombre_planta')
+                ->get();
+
+            if ($orquideas->isEmpty()) {
+                Log::info('No hay orquídeas asignadas para el evento: ' . $eventoActivo);
+
+                // Generar PDF vacío con mensaje
+                $pdf = Pdf::loadView('reportes.participantes_orquideas', [
+                    'orquideas' => collect([]),
+                    'evento' => $evento,
+                    'mensaje' => 'No hay orquídeas asignadas a participantes en este evento.'
+                ]);
+
+                return $pdf->stream('Orquideas_Asignadas_' . ($evento->nombre_evento ?? 'Sin_Nombre') . '.pdf');
+            }
+
+            $pdf = Pdf::loadView('reportes.participantes_orquideas', [
+                'orquideas' => $orquideas,
+                'evento' => $evento
+            ]);
+
+            return $pdf->stream('Orquideas_Asignadas_' . ($evento->nombre_evento ?? 'Sin_Nombre') . '.pdf');
+
+        } catch (\Exception $e) {
+            Log::error('Error en participantesOrquideasPdf: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'evento_activo' => session('evento_activo')
+            ]);
+
+            return redirect()->route('reportes.evento.index')
+                ->with('error', 'Error al generar el reporte: ' . $e->getMessage());
         }
-
-        $orquideas = Orquidea::with(['grupo', 'clase', 'participante'])
-            ->where('id_evento', $eventoActivo)
-            ->whereNotNull('id_participante')
-            ->orderBy('nombre_planta')
-            ->get();
-
-        $pdf = Pdf::loadView('reportes.participantes_orquideas', [
-            'orquideas' => $orquideas,
-            'evento' => $evento
-        ]);
-
-        return $pdf->stream('Orquideas_Asignadas_' . $evento->nombre_evento . '.pdf');
     }
 
     /**
