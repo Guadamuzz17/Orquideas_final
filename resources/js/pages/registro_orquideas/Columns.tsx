@@ -452,9 +452,8 @@ export const columns = (
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="nativa">Nativa</SelectItem>
+                            <SelectItem value="especie">Especie</SelectItem>
                             <SelectItem value="hibrido">Híbrido</SelectItem>
-                            <SelectItem value="importada">Importada</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
