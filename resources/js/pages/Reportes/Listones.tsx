@@ -114,7 +114,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes }: P
     };
 
     const estadisticasVisuales = estadisticasActualizadas || estadisticas;
-    const tiposListones = Object.keys(estadisticasVisuales.listones_por_tipo || {});
+    const tiposListones = Object.keys(estadisticasVisuales.listones_por_tipo || {}).filter(tipo => tipo && tipo !== 'null' && tipo !== 'undefined');
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -293,7 +293,9 @@ export default function ListonesReportes({ estadisticas, listones_recientes }: P
                             </CardHeader>
                             <CardContent>
                                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    {Object.entries(estadisticasVisuales.listones_por_tipo).map(([tipo, cantidad]) => (
+                                    {Object.entries(estadisticasVisuales.listones_por_tipo || {})
+                                        .filter(([tipo]) => tipo && tipo !== 'null' && tipo !== 'undefined')
+                                        .map(([tipo, cantidad]) => (
                                         <div
                                             key={tipo}
                                             className="bg-green-50 border border-green-200 rounded-lg p-4 text-center"
@@ -341,16 +343,16 @@ export default function ListonesReportes({ estadisticas, listones_recientes }: P
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200">
-                                            {listones_recientes.map((liston) => (
+                                            {(listones_recientes || []).filter(liston => liston && liston.id).map((liston) => (
                                                 <tr key={liston.id} className="hover:bg-gray-50">
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                        {liston.correlativo}
+                                                        {liston.correlativo || 'N/A'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {liston.participante}
+                                                        {liston.participante || 'N/A'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {liston.orquidea}
+                                                        {liston.orquidea || 'N/A'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -358,7 +360,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes }: P
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {formatDate(liston.fecha_ganador)}
+                                                        {liston.fecha_ganador ? formatDate(liston.fecha_ganador) : 'N/A'}
                                                     </td>
                                                 </tr>
                                             ))}
