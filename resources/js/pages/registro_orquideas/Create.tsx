@@ -240,7 +240,7 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
                       <SelectValue placeholder="Selecciona un grupo" />
                     </SelectTrigger>
                     <SelectContent>
-                      {grupos.map((grupo) => (
+                      {(grupos || []).filter(g => g && g.id_grupo && g.nombre_grupo).map((grupo) => (
                         <SelectItem key={grupo.id_grupo} value={grupo.id_grupo.toString()}>
                           {grupo.Cod_Grupo} - {grupo.nombre_grupo}
                         </SelectItem>
@@ -266,7 +266,7 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
                       <SelectValue placeholder="Selecciona una clase" />
                     </SelectTrigger>
                     <SelectContent>
-                      {clasesDisponibles.map((clase) => (
+                      {(clasesDisponibles || []).filter(c => c && c.id_clase && c.nombre_clase).map((clase) => (
                         <SelectItem key={clase.id_clase} value={clase.id_clase.toString()}>
                           {clase.nombre_clase}
                         </SelectItem>
@@ -336,7 +336,7 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
                     </SelectTrigger>
                     <SelectContent>
                       {participantesFiltrados.length > 0 ? (
-                        participantesFiltrados.map((participante) => (
+                        (participantesFiltrados || []).filter(p => p && p.id && p.nombre).map((participante) => (
                           <SelectItem key={participante.id} value={participante.id.toString()}>
                             #{participante.id} - {participante.nombre}
                           </SelectItem>

@@ -200,12 +200,12 @@ export default function CreateListon({ tiposPremio }: CreateListonProps) {
                     <SelectValue placeholder="Selecciona el tipo de premio" />
                   </SelectTrigger>
                   <SelectContent>
-                    {tiposPremio.map((tipo) => (
+                    {(tiposPremio || []).filter(t => t && t.id_tipo_premio && t.nombre_premio).map((tipo) => (
                       <SelectItem key={tipo.id_tipo_premio} value={tipo.id_tipo_premio.toString()}>
                         <div className="flex items-center gap-2">
                           <span
                             className="inline-block h-3 w-3 rounded-full"
-                            style={{ backgroundColor: tipo.color }}
+                            style={{ backgroundColor: tipo.color || '#cccccc' }}
                           ></span>
                           <span>{tipo.nombre_premio}</span>
                         </div>

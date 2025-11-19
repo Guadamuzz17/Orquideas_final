@@ -9,6 +9,7 @@ use App\Models\Inscripcion;
 use App\Models\TipoPremio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ListonController extends Controller
 {
@@ -17,27 +18,52 @@ class ListonController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Listones/index', [
-            'listones' => Trofeo::listones()
+        try {
+            $listones = Trofeo::listones()
                 ->with(['inscripcion.participante', 'inscripcion.orquidea.grupo', 'inscripcion.orquidea.clase', 'tipoPremio'])
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($liston) {
                     return [
-                        'id_liston' => $liston->id_trofeo,
-                        'correlativo' => $liston->inscripcion->correlativo ?? 'N/A',
-                        'participante' => $liston->inscripcion->participante->nombre ?? 'Sin participante',
-                        'orquidea' => $liston->inscripcion->orquidea->nombre_planta ?? 'Sin orquídea',
-                        'grupo' => $liston->inscripcion->orquidea->grupo->nombre_grupo ?? 'Sin grupo',
-                        'clase' => $liston->inscripcion->orquidea->clase->nombre_clase ?? 'Sin clase',
-                        'tipo_liston' => $liston->tipo_liston,
-                        'tipo_premio' => $liston->tipoPremio,
-                        'descripcion' => $liston->descripcion,
-                        'fecha_otorgado' => $liston->fecha_ganador->format('d/m/Y'),
+                        'id_liston' => $liston->id_trofeo ?? null,
+                        'correlativo' => optional($liston->inscripcion)->correlativo ?? 'N/A',
+                        'participante' => optional(optional($liston->inscripcion)->participante)->nombre ?? 'Sin participante',
+                        'orquidea' => optional(optional(optional($liston->inscripcion)->orquidea))->nombre_planta ?? 'Sin orquídea',
+                        'grupo' => optional(optional(optional(optional($liston->inscripcion)->orquidea)->grupo))->nombre_grupo ?? 'Sin grupo',
+                        'clase' => optional(optional(optional(optional($liston->inscripcion)->orquidea)->clase))->nombre_clase ?? 'Sin clase',
+                        'tipo_liston' => $liston->tipo_liston ?? null,
+                        'tipo_premio' => $liston->tipoPremio ?? null,
+                        'descripcion' => $liston->descripcion ?? null,
+                        'fecha_otorgado' => $liston->fecha_ganador ? $liston->fecha_ganador->format('d/m/Y') : 'N/A',
                     ];
-                }),
-            'tiposPremio' => TipoPremio::activos()->ordenadosPorPosicion()->get()
-        ]);
+                })
+                ->filter(function ($item) {
+                    return $item['id_liston'] !== null;
+                })
+                ->values();
+
+            $tiposPremio = TipoPremio::activos()->ordenadosPorPosicion()->get();
+
+            Log::info('Listones index cargado correctamente', [
+                'total_listones' => $listones->count(),
+                'total_tipos_premio' => $tiposPremio->count()
+            ]);
+
+            return Inertia::render('Listones/index', [
+                'listones' => $listones,
+                'tiposPremio' => $tiposPremio
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error en ListonController@index: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return Inertia::render('Listones/index', [
+                'listones' => collect([]),
+                'tiposPremio' => collect([]),
+                'error' => 'Error al cargar los listones: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**

@@ -133,7 +133,7 @@ export default function EditClase({ clase, grupos }: EditClaseProps) {
                       <SelectValue placeholder="Selecciona un grupo" />
                     </SelectTrigger>
                     <SelectContent>
-                      {grupos.map((grupo) => (
+                      {(grupos || []).filter(g => g && g.id_grupo && g.nombre_grupo).map((grupo) => (
                         <SelectItem key={grupo.id_grupo} value={grupo.id_grupo.toString()}>
                           {grupo.Cod_Grupo} - {grupo.nombre_grupo}
                         </SelectItem>

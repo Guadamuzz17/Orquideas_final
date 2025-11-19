@@ -135,7 +135,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!data.id_inscripcion || !data.posicion) {
       toast.error('Por favor completa todos los campos requeridos');
       return;
@@ -158,7 +158,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Asignar Ganador" />
-      
+
       <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-10">
         <div className="flex items-center justify-between">
           <div>
@@ -168,7 +168,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
             </h1>
             <p className="text-gray-600 mt-2">Designa ganadores para las orquídeas inscritas</p>
           </div>
-          
+
           <Button asChild variant="outline">
             <Link href={route('ganadores.index')}>
               <Users className="mr-2 h-4 w-4" />
@@ -188,7 +188,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
               onChange={(e) => setFiltroParticipante(e.target.value)}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="filtro-grupo">Buscar Grupo</Label>
             <Input
@@ -198,7 +198,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
               onChange={(e) => setFiltroGrupo(e.target.value)}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="filtro-correlativo">Buscar Correlativo</Label>
             <Input
@@ -208,7 +208,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
               onChange={(e) => setFiltroCorrelativo(e.target.value)}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="filtro-orquidea">Buscar Orquídea</Label>
             <Input
@@ -254,13 +254,13 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
                         No hay inscripciones disponibles con los filtros actuales
                       </div>
                     ) : (
-                      inscripcionesFiltradas.map((inscripcion) => (
+                      (inscripcionesFiltradas || []).filter(i => i && i.id_nscr && i.correlativo && i.orquidea).map((inscripcion) => (
                         <SelectItem key={inscripcion.id_nscr} value={inscripcion.id_nscr.toString()}>
                           <div className="flex items-center gap-2">
                             <Badge variant="secondary">#{inscripcion.correlativo}</Badge>
-                            <span>{inscripcion.orquidea.nombre_planta}</span>
+                            <span>{inscripcion.orquidea?.nombre_planta || 'Sin nombre'}</span>
                             <span className="text-sm text-gray-500">
-                              - {inscripcion.participante.nombre}
+                              - {inscripcion.participante?.nombre || 'Sin participante'}
                             </span>
                           </div>
                         </SelectItem>
@@ -343,8 +343,8 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
 
               {/* Botón de envío */}
               {selectedInscripcion && data.posicion && (
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={processing}
                   className="w-full bg-yellow-600 hover:bg-yellow-700"
                 >

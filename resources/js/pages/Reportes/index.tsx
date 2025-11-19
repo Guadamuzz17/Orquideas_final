@@ -80,7 +80,7 @@ export default function ReportesIndex() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todas">Todas las clases</SelectItem>
-                  {(usePage().props as any).clases?.map((c: any) => (
+                  {(usePage().props as any).clases?.filter((c: any) => c && c.id_clase && c.nombre_clase).map((c: any) => (
                     <SelectItem key={c.id_clase} value={String(c.id_clase)}>
                       {`Clase ${c.id_clase}: ${c.nombre_clase}`}
                     </SelectItem>

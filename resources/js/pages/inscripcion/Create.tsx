@@ -434,7 +434,7 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
                       <SelectValue placeholder="Selecciona un participante" />
                     </SelectTrigger>
                     <SelectContent>
-                      {participantes.map((participante) => (
+                      {(participantes || []).filter(p => p && p.id && p.nombre).map((participante) => (
                         <SelectItem key={participante.id} value={participante.id.toString()}>
                           {participante.nombre}
                         </SelectItem>

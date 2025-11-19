@@ -46,23 +46,34 @@ interface Liston {
 
 interface ListonesIndexProps {
   listones: Liston[];
+  error?: string;
 }
 
-export default function ListonesIndex({ listones }: ListonesIndexProps) {
+export default function ListonesIndex({ listones = [], error }: ListonesIndexProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedListon, setSelectedListon] = useState<Liston | null>(null);
 
   const filteredListones = useMemo(() => {
-    if (!searchTerm) return listones;
+    if (!searchTerm || !listones || listones.length === 0) return listones || [];
 
-    return listones.filter(liston =>
-      liston.correlativo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      liston.participante.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      liston.orquidea.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      liston.tipo_liston.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      liston.grupo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      liston.clase.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return listones.filter(liston => {
+      if (!liston) return false;
+
+      const correlativo = (liston.correlativo || '').toLowerCase();
+      const participante = (liston.participante || '').toLowerCase();
+      const orquidea = (liston.orquidea || '').toLowerCase();
+      const tipo_liston = (liston.tipo_liston || '').toLowerCase();
+      const grupo = (liston.grupo || '').toLowerCase();
+      const clase = (liston.clase || '').toLowerCase();
+      const search = searchTerm.toLowerCase();
+
+      return correlativo.includes(search) ||
+        participante.includes(search) ||
+        orquidea.includes(search) ||
+        tipo_liston.includes(search) ||
+        grupo.includes(search) ||
+        clase.includes(search);
+    });
   }, [listones, searchTerm]);
 
   const handleDelete = (liston: Liston) => {
@@ -77,6 +88,8 @@ export default function ListonesIndex({ listones }: ListonesIndexProps) {
   };
 
   const getTipoListonColor = (tipo: string) => {
+    if (!tipo) return 'bg-green-100 text-green-800 border-green-200';
+
     const tipoLower = tipo.toLowerCase();
     if (tipoLower.includes('oro') || tipoLower.includes('primero')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     if (tipoLower.includes('plata') || tipoLower.includes('segundo')) return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -90,6 +103,13 @@ export default function ListonesIndex({ listones }: ListonesIndexProps) {
       <Head title="Listones - Menciones Honoríficas" />
 
       <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-10">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-4">
+            <p className="font-medium">Error al cargar listones:</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Listones y Menciones Honoríficas</h1>

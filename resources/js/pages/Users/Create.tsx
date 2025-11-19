@@ -185,7 +185,7 @@ export default function Create({ roles = [] }: Props) {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="sin-rol">Sin rol</SelectItem>
-                                            {roles.map((rol) => (
+                                            {(roles || []).filter(r => r && r.id && r.nombre).map((rol) => (
                                                 <SelectItem key={rol.id} value={rol.id.toString()}>
                                                     {rol.nombre}
                                                 </SelectItem>

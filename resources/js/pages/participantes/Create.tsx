@@ -406,7 +406,7 @@ export default function CreateParticipante({
                     <SelectValue placeholder="Selecciona un Tipo de Participante" />
                   </SelectTrigger>
                   <SelectContent>
-                    {tiposParticipante.map((tipo) => (
+                    {(tiposParticipante || []).filter(tipo => tipo && tipo.id_tipo && tipo.Clase).map((tipo) => (
                       <SelectItem key={tipo.id_tipo} value={tipo.id_tipo.toString()}>
                         {tipo.Clase}
                       </SelectItem>
@@ -429,7 +429,7 @@ export default function CreateParticipante({
                     <SelectValue placeholder="Selecciona un Departamento" />
                   </SelectTrigger>
                   <SelectContent>
-                    {departamentos.map((departamento) => (
+                    {(departamentos || []).filter(dept => dept && dept.id_departamento && dept.nombre_departamento).map((departamento) => (
                       <SelectItem key={departamento.id_departamento} value={departamento.id_departamento.toString()}>
                         {departamento.nombre_departamento}
                       </SelectItem>
@@ -453,7 +453,7 @@ export default function CreateParticipante({
                     <SelectValue placeholder="Selecciona un Municipio" />
                   </SelectTrigger>
                   <SelectContent>
-                    {municipios.map((municipio) => (
+                    {(municipios || []).filter(mun => mun && mun.id_municipio && mun.nombre_municipio).map((municipio) => (
                       <SelectItem key={municipio.id_municipio} value={municipio.id_municipio.toString()}>
                         {municipio.nombre_municipio}
                       </SelectItem>
@@ -473,7 +473,7 @@ export default function CreateParticipante({
                     <SelectValue placeholder="Selecciona una Asociación" />
                   </SelectTrigger>
                   <SelectContent>
-                    {asociaciones.map((asociacion) => (
+                    {(asociaciones || []).filter(aso => aso && aso.id_aso && aso.Clase).map((asociacion) => (
                       <SelectItem key={asociacion.id_aso} value={asociacion.id_aso.toString()}>
                         {asociacion.Clase}
                       </SelectItem>
