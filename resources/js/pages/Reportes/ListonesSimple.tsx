@@ -187,12 +187,12 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="all">Todos los premios</SelectItem>
-                                                {tiposPremio.map((tipo) => (
+                                                {tiposPremio && tiposPremio.filter(t => t && t.nombre_premio).map((tipo) => (
                                                     <SelectItem key={tipo.id_tipo_premio} value={tipo.id_tipo_premio.toString()}>
                                                         <div className="flex items-center gap-2">
                                                             <span
                                                                 className="inline-block h-3 w-3 rounded-full"
-                                                                style={{ backgroundColor: tipo.color }}
+                                                                style={{ backgroundColor: tipo.color || '#cccccc' }}
                                                             ></span>
                                                             {tipo.nombre_premio}
                                                         </div>
@@ -210,7 +210,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="all">Todos los grupos</SelectItem>
-                                                {grupos.map((grupo) => (
+                                                {grupos && grupos.filter(g => g && g.nom_grupo).map((grupo) => (
                                                     <SelectItem key={grupo.id_grupo} value={grupo.id_grupo.toString()}>
                                                         {grupo.nom_grupo}
                                                     </SelectItem>
@@ -227,7 +227,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="all">Todas las clases</SelectItem>
-                                                {clases.map((clase) => (
+                                                {clases && clases.filter(c => c && c.nom_clase).map((clase) => (
                                                     <SelectItem key={clase.id_clase} value={clase.id_clase.toString()}>
                                                         {clase.nom_clase}
                                                     </SelectItem>
