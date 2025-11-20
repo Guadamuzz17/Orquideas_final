@@ -247,45 +247,33 @@
     @endif
 
     <div class="table-container">
-        @if($listones->count() > 0)
+        @if(isset($rows) && $rows->count() > 0)
         <table>
             <thead>
                 <tr>
-                    <th style="width: 8%;">Correlativo</th>
+                    <th style="width: 6%;">Correlativo</th>
                     <th style="width: 20%;">Participante</th>
                     <th style="width: 25%;">Nombre de Orquídea</th>
-                    <th style="width: 12%;">Grupo</th>
-                    <th style="width: 12%;">Clase</th>
-                    <th style="width: 15%;">Tipo de Listón</th>
-                    <th style="width: 8%;">Fecha</th>
+                    <th style="width: 12%;">Clase / Grupo</th>
+                    <th style="width: 12%;">Asociación</th>
+                    @foreach($tiposPremio as $tipo)
+                        <th style="width: 6%;">{{ $tipo->nombre_premio }}</th>
+                    @endforeach
+                    <th style="width: 6%;">Listón</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($listones as $liston)
+                @foreach($rows as $row)
                 <tr>
-                    <td style="text-align: center; font-weight: bold;">
-                        {{ $liston->inscripcion->correlativo ?? 'N/A' }}
-                    </td>
-                    <td>
-                        {{ $liston->inscripcion->participante->nombre ?? 'Sin participante' }}
-                    </td>
-                    <td>
-                        {{ $liston->inscripcion->orquidea->nombre_planta ?? 'Sin nombre' }}
-                    </td>
-                    <td style="text-align: center;">
-                        {{ $liston->inscripcion->orquidea->grupo->nombre ?? 'N/A' }}
-                    </td>
-                    <td style="text-align: center;">
-                        {{ $liston->inscripcion->orquidea->clase->nombre ?? 'N/A' }}
-                    </td>
-                    <td style="text-align: center;">
-                        <span class="tipo-liston">
-                            {{ $liston->tipo_liston ?: 'Sin especificar' }}
-                        </span>
-                    </td>
-                    <td class="fecha" style="text-align: center;">
-                        {{ $liston->fecha_ganador ? $liston->fecha_ganador->format('d/m/Y') : 'N/A' }}
-                    </td>
+                    <td style="text-align: center; font-weight: bold;">{{ $row['correlativo'] ?? 'N/A' }}</td>
+                    <td>{{ $row['participante'] }}</td>
+                    <td>{{ $row['orquidea'] }}</td>
+                    <td style="text-align: center;">{{ $row['clase_grupo'] }}</td>
+                    <td style="text-align: center;">{{ $row['aso'] }}</td>
+                    @foreach($row['flags'] as $flag)
+                        <td style="text-align: center;">{{ $flag }}</td>
+                    @endforeach
+                    <td style="text-align: center;">{{ $row['liston'] }}</td>
                 </tr>
                 @endforeach
             </tbody>

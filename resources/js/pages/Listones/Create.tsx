@@ -59,7 +59,10 @@ export default function CreateListon({ tiposPremio }: CreateListonProps) {
     inscripcion_id: '',
     id_tipo_premio: '',
     descripcion: '',
+    add_trofeo: '0',
   });
+
+  const [addTrofeo, setAddTrofeo] = useState(false);
 
   // Búsqueda de inscripciones
   useEffect(() => {
@@ -110,6 +113,26 @@ export default function CreateListon({ tiposPremio }: CreateListonProps) {
     setData('inscripcion_id', inscripcion.id_inscripcion.toString());
     setSearchTerm(`${inscripcion.correlativo} - ${inscripcion.participante_nombre} - ${inscripcion.orquidea_nombre}`);
   };
+
+  // When id_tipo_premio changes, enable addTrofeo automatically if posicion == 1
+  useEffect(() => {
+    const tipoId = parseInt(data.id_tipo_premio || '0');
+    if (!tipoId) {
+      setAddTrofeo(false);
+      setData('add_trofeo', '0');
+      return;
+    }
+
+    const tipo = (tiposPremio || []).find(t => t.id_tipo_premio === tipoId);
+    if (tipo && tipo.posicion === 1) {
+      // default to true for first place
+      setAddTrofeo(true);
+      setData('add_trofeo', '1');
+    } else {
+      // keep whatever user selected previously
+      setData('add_trofeo', addTrofeo ? '1' : '0');
+    }
+  }, [data.id_tipo_premio]);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -231,6 +254,26 @@ export default function CreateListon({ tiposPremio }: CreateListonProps) {
                 {errors.descripcion && (
                   <p className="text-sm text-red-600">{errors.descripcion}</p>
                 )}
+              </div>
+
+              {/* Opciones adicionales */}
+              <div className="space-y-2">
+                <Label>Opciones</Label>
+                <div className="flex items-center gap-3">
+                  <input
+                    id="addTrofeo"
+                    type="checkbox"
+                    checked={addTrofeo}
+                    onChange={(e) => {
+                      setAddTrofeo(e.target.checked);
+                      setData('add_trofeo', e.target.checked ? '1' : '0');
+                    }}
+                    className="h-4 w-4"
+                  />
+                  <label htmlFor="addTrofeo" className="text-sm">
+                    Crear <strong>trofeo</strong> automáticamente si es primer lugar (activar para crear trofeo adicional)
+                  </label>
+                </div>
               </div>
 
               {/* Botones */}

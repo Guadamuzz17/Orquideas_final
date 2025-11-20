@@ -16,6 +16,7 @@ class Trofeo extends Model
         'id_clase',
         'id_grupp',
         'categoria',
+        'tiene_trofeo',
         'fecha_ganador',
         'tipo_premio',
         'tipo_liston',
@@ -26,7 +27,8 @@ class Trofeo extends Model
     ];
 
     protected $casts = [
-        'fecha_ganador' => 'date'
+        'fecha_ganador' => 'date',
+        'tiene_trofeo' => 'boolean'
     ];
 
     // Scopes para filtrar por tipo

@@ -136,36 +136,73 @@ class ReportesController extends Controller
             'tipo_liston' => 'nullable|string',
         ]);
 
-        $query = Trofeo::listones()
-            ->with(['inscripcion.participante', 'inscripcion.orquidea.grupo', 'inscripcion.orquidea.clase'])
-            ->orderBy('fecha_ganador', 'desc')
-            ->orderBy('tipo_liston', 'asc');
+        // We'll build a dataset of inscripciones that have trofeos in the requested filters
+        $trofeoQuery = Trofeo::query();
 
-        // Aplicar filtros
         if ($request->fecha_desde) {
-            $query->whereDate('fecha_ganador', '>=', $request->fecha_desde);
+            $trofeoQuery->whereDate('fecha_ganador', '>=', $request->fecha_desde);
         }
 
         if ($request->fecha_hasta) {
-            $query->whereDate('fecha_ganador', '<=', $request->fecha_hasta);
+            $trofeoQuery->whereDate('fecha_ganador', '<=', $request->fecha_hasta);
         }
 
         if ($request->tipo_liston) {
-            $query->where('tipo_liston', 'LIKE', '%' . $request->tipo_liston . '%');
+            $trofeoQuery->where('tipo_liston', 'LIKE', '%' . $request->tipo_liston . '%');
         }
 
-        $listones = $query->get();
+        $inscripcionIds = $trofeoQuery->pluck('id_inscripcion')->unique()->filter()->values()->all();
 
-        // Estadísticas para el reporte
+        $inscripciones = \App\Models\Inscripcion::with(['participante.aso', 'orquidea.grupo', 'orquidea.clase'])
+            ->whereIn('id_nscr', $inscripcionIds)
+            ->get();
+
+        // Load tipos de premio (to build dynamic columns)
+        $tiposPremio = TipoPremio::activos()->ordenadosPorPosicion()->get();
+
+        // Prepare statistics
+        $total = count($inscripciones);
         $estadisticas = [
-            'total_listones' => $listones->count(),
+            'total_listones' => $total,
             'fecha_generacion' => now()->format('d/m/Y H:i:s'),
             'periodo' => $this->getPeriodoTexto($request->fecha_desde, $request->fecha_hasta),
             'filtro_tipo' => $request->tipo_liston,
-            'tipos_distribucion' => $listones->groupBy('tipo_liston')->map->count(),
+            'tipos_distribucion' => collect([]),
         ];
 
-        $pdf = Pdf::loadView('reportes.listones-pdf', compact('listones', 'estadisticas'))
+        // Build rows for the PDF view: each inscripcion with flags per tipo
+        $rows = $inscripciones->map(function($ins) use ($tiposPremio) {
+            $participant = optional($ins->participante)->nombre ?? 'Sin participante';
+            $orquidea = optional($ins->orquidea)->nombre_planta ?? 'Sin orquídea';
+            $clase = optional(optional($ins->orquidea)->clase)->nombre_clase ?? '';
+            $grupo = optional(optional($ins->orquidea)->grupo)->nombre_grupo ?? '';
+            $claseGrupo = trim(($clase ? $clase : '') . ($clase && $grupo ? ' / ' : '') . ($grupo ? $grupo : '')) ?: 'N/A';
+            $aso = optional(optional($ins->participante)->aso)->nombre ?? 'N/A';
+
+            $flags = [];
+            foreach ($tiposPremio as $tipo) {
+                $has = Trofeo::where('id_inscripcion', $ins->id_nscr)
+                    ->where('id_tipo_premio', $tipo->id_tipo_premio)
+                    ->exists();
+                $flags[] = $has ? 'X' : '';
+            }
+
+            $listonExists = Trofeo::where('id_inscripcion', $ins->id_nscr)
+                ->where('tipo_premio', 'liston')
+                ->exists();
+
+            return [
+                'correlativo' => $ins->correlativo,
+                'participante' => $participant,
+                'orquidea' => $orquidea,
+                'clase_grupo' => $claseGrupo,
+                'aso' => $aso,
+                'flags' => $flags,
+                'liston' => $listonExists ? 'X' : '',
+            ];
+        });
+
+        $pdf = Pdf::loadView('reportes.listones-pdf', compact('rows', 'estadisticas', 'tiposPremio'))
             ->setPaper('a4', 'landscape')
             ->setOptions([
                 'isHtml5ParserEnabled' => true,

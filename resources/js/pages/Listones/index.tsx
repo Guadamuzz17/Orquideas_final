@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,6 +42,9 @@ interface Liston {
   tipo_liston: string;
   descripcion: string;
   fecha_otorgado: string;
+  tiene_trofeo?: boolean;
+  tipo_premio?: string;
+  premio_nombre?: string;
 }
 
 interface ListonesIndexProps {
@@ -52,6 +55,16 @@ interface ListonesIndexProps {
 export default function ListonesIndex({ listones = [], error }: ListonesIndexProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedListon, setSelectedListon] = useState<Liston | null>(null);
+  const [trofeoMap, setTrofeoMap] = useState<Record<number, boolean>>({});
+
+  useEffect(() => {
+    // initialize map from props
+    const map: Record<number, boolean> = {};
+    (listones || []).forEach((l) => {
+      if (l && l.id_liston != null) map[l.id_liston] = !!l.tiene_trofeo;
+    });
+    setTrofeoMap(map);
+  }, [listones]);
 
   const filteredListones = useMemo(() => {
     if (!searchTerm || !listones || listones.length === 0) return listones || [];
@@ -96,6 +109,18 @@ export default function ListonesIndex({ listones = [], error }: ListonesIndexPro
     if (tipoLower.includes('bronce') || tipoLower.includes('tercero')) return 'bg-orange-100 text-orange-800 border-orange-200';
     if (tipoLower.includes('mención')) return 'bg-blue-100 text-blue-800 border-blue-200';
     return 'bg-green-100 text-green-800 border-green-200';
+  };
+
+  const getPositionBadge = (tipo: string) => {
+    if (!tipo) return null;
+    const t = tipo.toLowerCase();
+    if (t.includes('prim') || t.includes('oro') || /\b1\b/.test(t)) return { label: '1º', color: 'bg-yellow-500 text-white' };
+    if (t.includes('seg') || t.includes('plata') || /\b2\b/.test(t)) return { label: '2º', color: 'bg-gray-400 text-white' };
+    if (t.includes('bronc') || t.includes('terc') || /\b3\b/.test(t)) return { label: '3º', color: 'bg-orange-600 text-white' };
+    if (t.includes('mención') || t.includes('mencion') || t.includes('mh')) return { label: 'MH', color: 'bg-blue-500 text-white' };
+    if (t.includes('aao')) return { label: 'AAO', color: 'bg-purple-500 text-white' };
+    if (t.includes('listón') || t.includes('liston')) return { label: 'L', color: 'bg-green-500 text-white' };
+    return { label: 'P', color: 'bg-indigo-500 text-white' };
   };
 
   return (
@@ -168,40 +193,98 @@ export default function ListonesIndex({ listones = [], error }: ListonesIndexPro
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                      <CardTitle className="text-lg">#{liston.correlativo}</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          #{liston.correlativo}
+                          {(() => {
+                            const badge = getPositionBadge(liston.tipo_liston || liston.premio_nombre || '');
+                            if (!badge) return null;
+                            return (
+                              <span className={`inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-full shadow-sm ${badge.color}`}>
+                                {badge.label}
+                              </span>
+                            );
+                          })()}
+                        </CardTitle>
+                        {trofeoMap[liston.id_liston] && (
+                          <Award className="h-5 w-5 text-yellow-500" aria-label="Tiene trofeo" />
+                        )}
+                      </div>
                       <Badge className={getTipoListonColor(liston.tipo_liston)}>
-                        {liston.tipo_liston}
+                        {liston.premio_nombre || liston.tipo_liston}
                       </Badge>
                     </div>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => setSelectedListon(liston)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>¿Eliminar listón?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Se eliminará permanentemente el listón otorgado a "{liston.participante}".
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => selectedListon && handleDelete(selectedListon)}
-                            className="bg-red-600 hover:bg-red-700"
+                    <div className="flex items-center gap-2">
+                      <label className="inline-flex items-center text-xs text-gray-600 mr-2">
+                        <input
+                          type="checkbox"
+                          className="form-checkbox h-4 w-4 text-yellow-500"
+                          checked={!!trofeoMap[liston.id_liston]}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            // optimistic UI
+                            setTrofeoMap(prev => ({ ...prev, [liston.id_liston]: checked }));
+                            // Use fetch instead of Inertia router to avoid Inertia expecting an Inertia response
+                            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                            const csrf = csrfMeta ? (csrfMeta as HTMLMetaElement).content : '';
+                            fetch(route('listones.toggle-trofeo', liston.id_liston), {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrf,
+                                'X-Requested-With': 'XMLHttpRequest',
+                              },
+                              body: JSON.stringify({ tiene_trofeo: checked ? 1 : 0 }),
+                            })
+                              .then(async (res) => {
+                                if (res.ok) {
+                                  toast.success(checked ? 'Marcado como trofeo' : 'Desmarcado trofeo');
+                                } else {
+                                  const data = await res.json().catch(() => null);
+                                  toast.error((data && data.message) || 'Error actualizando trofeo');
+                                  // revert optimistic UI
+                                  setTrofeoMap(prev => ({ ...prev, [liston.id_liston]: !checked }));
+                                }
+                              })
+                              .catch(() => {
+                                toast.error('Error actualizando trofeo');
+                                setTrofeoMap(prev => ({ ...prev, [liston.id_liston]: !checked }));
+                              });
+                          }}
+                        />
+                        <span className="ml-2">Trofeo</span>
+                      </label>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => setSelectedListon(liston)}
                           >
-                            Eliminar
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>¿Eliminar listón?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Esta acción no se puede deshacer. Se eliminará permanentemente el listón otorgado a "{liston.participante}".
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => selectedListon && handleDelete(selectedListon)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Eliminar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">

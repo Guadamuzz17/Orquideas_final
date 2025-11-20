@@ -146,6 +146,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/listones/search-inscripciones', [ListonController::class, 'searchInscripciones'])
         ->name('listones.search-inscripciones');
 
+    // Toggle trofeo (mark/unmark trofeo for a liston)
+    Route::post('/listones/{id}/toggle-trofeo', [ListonController::class, 'toggleTrofeo'])
+        ->name('listones.toggle-trofeo');
+
     // Rutas de recursos para listones
     Route::resource('listones', ListonController::class);
 
