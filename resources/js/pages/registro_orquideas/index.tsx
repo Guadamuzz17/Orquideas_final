@@ -73,8 +73,8 @@ export default function OrquideasIndex({ orquideas, participantes, grupos, clase
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Registro de Orquídeas" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <h1 className="text-2xl font-bold">Orquideas Registradas</h1>
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <h1 className="text-xl sm:text-2xl font-bold">Orquideas Registradas</h1>
 
         <div>
           <Breadcrumb>
@@ -92,59 +92,62 @@ export default function OrquideasIndex({ orquideas, participantes, grupos, clase
           </Breadcrumb>
         </div>
 
-        <div className='flex justify-between items-center'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
           <div className="text-sm text-muted-foreground">
             Total de orquídeas registradas: {tableData.length}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Botones de descarga de reportes */}
             <Button
               onClick={() => window.open(route('orquideas.reporte.pdf'), '_blank')}
               variant="outline"
-              className="bg-red-50 hover:bg-red-100 text-red-700 border-red-300"
+              size="sm"
+              className="bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30"
             >
-              <FileText className="mr-2 h-4 w-4" />
+              <FileText className="mr-1.5 h-4 w-4" />
               PDF
             </Button>
 
             <Button
               onClick={() => window.open(route('orquideas.reporte.excel'), '_blank')}
               variant="outline"
-              className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
+              size="sm"
+              className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
             >
-              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              <FileSpreadsheet className="mr-1.5 h-4 w-4" />
               Excel
             </Button>
 
             <Button
               onClick={() => window.open(route('orquideas.reporte.csv'), '_blank')}
               variant="outline"
-              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300"
+              size="sm"
+              className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30"
             >
-              <Download className="mr-2 h-4 w-4" />
+              <Download className="mr-1.5 h-4 w-4" />
               CSV
             </Button>
 
-            <div className="h-6 w-px bg-gray-300 mx-2"></div>
+            <div className="hidden sm:block h-6 w-px bg-border mx-1"></div>
 
-            <Button asChild className="bg-blue-600 hover:bg-blue-700">
+            <Button asChild variant="outline" size="sm">
               <a href="/docsDonwload/ClasesOrquideas.pdf" target="_blank" rel="noopener noreferrer" download>
-                <Download className="mr-2 h-4 w-4" />
-                Descargar Formato Inscripción
+                <Download className="mr-1.5 h-4 w-4" />
+                Formato PDF
               </a>
             </Button>
 
-            <Button asChild className="bg-green-600 hover:bg-green-700">
+            <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
               <Link href={route('orquideas.create')}>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-1.5 h-4 w-4" />
                 Registrar Orquídea
               </Link>
             </Button>
           </div>
         </div>
 
-        <div className="container mx-auto">
+        <div className="w-full overflow-hidden">
           <DataTable columns={columns(participantes, grupos, clases)} data={tableData} />
         </div>
       </div>

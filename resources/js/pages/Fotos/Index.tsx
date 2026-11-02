@@ -77,57 +77,57 @@ export default function FotosIndex({ fotos }: PageProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Fotografías" />
 
-            <div className="py-6">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div className="py-4 sm:py-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
                     {/* Header */}
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Fotografías de Eventos</h1>
-                            <p className="text-gray-600">Gestiona las fotografías de los eventos</p>
+                            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Fotografías de Eventos</h1>
+                            <p className="text-sm text-muted-foreground">Gestiona las fotografías de los eventos</p>
                         </div>
-                        <Link href="/fotos/create">
-                            <Button className="bg-blue-600 hover:bg-blue-700">
+                        <Link href="/fotos/create" className="w-fit">
+                            <Button className="bg-primary hover:bg-primary/90">
                                 📸 Subir Nueva Foto
                             </Button>
                         </Link>
                     </div>
 
                     {/* Estadísticas */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Card>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <Card className="border-border">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-600">Total de Fotos</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Total de Fotos</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-blue-600">{fotos.total}</div>
+                                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{fotos.total}</div>
                             </CardContent>
                         </Card>
-                        <Card>
+                        <Card className="border-border">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-600">Página Actual</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Página Actual</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-green-600">
+                                <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                                     {fotos.current_page} de {fotos.last_page}
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
+                        <Card className="border-border">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-600">Por Página</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Por Página</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-purple-600">{fotos.per_page}</div>
+                                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{fotos.per_page}</div>
                             </CardContent>
                         </Card>
                     </div>
 
                     {/* Grid de fotos */}
                     {fotos.data.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                             {fotos.data.map((foto) => (
-                                <Card key={foto.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                                    <div className="aspect-video relative overflow-hidden bg-gray-100">
+                                <Card key={foto.id} className="overflow-hidden hover:shadow-lg transition-shadow border-border">
+                                    <div className="aspect-video relative overflow-hidden bg-muted">
                                         <img
                                             src={foto.url_imagen}
                                             alt={foto.titulo}

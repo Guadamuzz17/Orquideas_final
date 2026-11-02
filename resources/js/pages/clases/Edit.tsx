@@ -65,10 +65,10 @@ export default function EditClase({ clase, grupos }: EditClaseProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Editar Clase - ${clase.nombre_clase}`} />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Editar Clase</h1>
-          <Button asChild variant="outline">
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold">Editar Clase</h1>
+          <Button asChild variant="outline" className="w-fit">
             <Link href={route('clases.index')}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver a Clases
@@ -143,31 +143,31 @@ export default function EditClase({ clase, grupos }: EditClaseProps) {
                   {errors.id_grupo && (
                     <p className="text-sm text-red-600">{errors.id_grupo}</p>
                   )}
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Selecciona el grupo al que pertenecerá esta clase
                   </p>
                 </div>
 
                 {grupos.length === 0 && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <p className="text-sm text-yellow-800">
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                    <p className="text-sm text-amber-700 dark:text-amber-300">
                       No hay grupos disponibles.
-                      <Link href={route('grupos.create')} className="underline ml-1">
+                      <Link href={route('grupos.create')} className="underline ml-1 font-medium">
                         Crear un grupo primero
                       </Link>
                     </p>
                   </div>
                 )}
 
-                <div className="flex gap-4 pt-4">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <Button
                     type="submit"
                     disabled={processing || grupos.length === 0}
-                    className="flex-1"
+                    className="w-full sm:flex-1"
                   >
                     {processing ? 'Actualizando...' : 'Actualizar Clase'}
                   </Button>
-                  <Button type="button" variant="outline" asChild className="flex-1">
+                  <Button type="button" variant="outline" asChild className="w-full sm:flex-1">
                     <Link href={route('clases.index')}>
                       Cancelar
                     </Link>

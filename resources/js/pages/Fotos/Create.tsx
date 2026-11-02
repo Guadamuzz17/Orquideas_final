@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 import { type BreadcrumbItem } from '@/types';
 
 interface FotoFormData {
@@ -48,10 +49,15 @@ export default function FotosCreate() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/fotos', {
+            forceFormData: true,
             onSuccess: () => {
+                toast.success('Fotografía subida exitosamente');
                 reset();
                 setPreviewUrl(null);
             },
+            onError: () => {
+                toast.error('Error al subir la fotografía. Revisa los campos requeridos.');
+            }
         });
     };
 

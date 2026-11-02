@@ -211,10 +211,10 @@ export default function CreateParticipante({
   return (
     <AppLayout>
       <Head title="Crear Participante" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Crear Participante</h1>
-          <Button asChild variant="outline">
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold">Crear Participante</h1>
+          <Button asChild variant="outline" className="w-fit">
             <Link href={route('participantes.index')}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver
@@ -246,10 +246,10 @@ export default function CreateParticipante({
 
         {/* Alerta de evento bloqueado */}
         {isEventoFinalizado && (
-          <Alert variant="destructive" className="bg-red-50 border-red-200">
+          <Alert variant="destructive" className="bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900">
             <Lock className="h-5 w-5" />
-            <AlertTitle className="text-red-800 font-bold">🔒 Evento Finalizado - Formulario Bloqueado</AlertTitle>
-            <AlertDescription className="text-red-700">
+            <AlertTitle className="text-red-800 dark:text-red-300 font-bold">🔒 Evento Finalizado - Formulario Bloqueado</AlertTitle>
+            <AlertDescription className="text-red-700 dark:text-red-200">
               El evento "{eventoActivo?.nombre}" ha finalizado y no se pueden registrar nuevos participantes.
               Por favor, seleccione un evento activo desde el menú de eventos.
             </AlertDescription>
@@ -486,11 +486,11 @@ export default function CreateParticipante({
               </div>
 
               {/* Botones */}
-              <div className="flex gap-4 pt-6">
-                <Button type="submit" disabled={processing} className="flex-1">
+              <div className="flex flex-col sm:flex-row gap-3 pt-6">
+                <Button type="submit" disabled={processing} className="w-full sm:flex-1">
                   {processing ? 'Creando...' : 'Crear Participante'}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => reset()} className="flex-1">
+                <Button type="button" variant="outline" onClick={() => reset()} className="w-full sm:flex-1">
                   Limpiar Formulario
                 </Button>
               </div>

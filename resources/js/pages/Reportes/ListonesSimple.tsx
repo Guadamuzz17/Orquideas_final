@@ -132,8 +132,8 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
 
             <div className="py-6">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
+                    <div className="bg-card text-card-foreground border border-border overflow-hidden shadow-sm sm:rounded-2xl">
+                        <div className="p-6 text-foreground">
                             <h1 className="text-2xl font-bold mb-4">Reportes de Listones y Menciones</h1>
 
                             {error && (
@@ -249,8 +249,8 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
                             </div>
 
                             {/* Descargar Reportes */}
-                            <div className="bg-white border rounded-lg p-6">
-                                <h3 className="text-lg font-semibold mb-4">Generar Reportes</h3>
+                            <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm">
+                                <h3 className="text-lg font-semibold mb-4 text-foreground">Generar Reportes</h3>
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     <Button
                                         onClick={handleDownloadExcel}

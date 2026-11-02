@@ -103,7 +103,7 @@ export function AutocompleteOrquidea({ value, onChange, placeholder, className, 
       />
 
       {mostrarSugerencias && sugerencias.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground border border-border rounded-lg shadow-xl max-h-60 overflow-y-auto">
           <div className="py-1">
             {sugerencias.map((sugerencia, index) => (
               <button
@@ -111,13 +111,13 @@ export function AutocompleteOrquidea({ value, onChange, placeholder, className, 
                 type="button"
                 onClick={() => seleccionarSugerencia(sugerencia)}
                 className={cn(
-                  "w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center justify-between transition-colors",
-                  index === indiceSugerencia && "bg-blue-50"
+                  "w-full px-4 py-2.5 text-left hover:bg-accent hover:text-accent-foreground flex items-center justify-between transition-colors",
+                  index === indiceSugerencia && "bg-accent text-accent-foreground font-medium"
                 )}
               >
                 <span className="text-sm">{sugerencia}</span>
                 {value.toLowerCase() === sugerencia.toLowerCase() && (
-                  <Check className="h-4 w-4 text-green-600" />
+                  <Check className="h-4 w-4 text-emerald-500" />
                 )}
               </button>
             ))}
@@ -126,8 +126,8 @@ export function AutocompleteOrquidea({ value, onChange, placeholder, className, 
       )}
 
       {value.length >= 2 && sugerencias.length === 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
-          <div className="px-4 py-2 text-sm text-gray-500">
+        <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground border border-border rounded-lg shadow-xl">
+          <div className="px-4 py-2.5 text-sm text-muted-foreground">
             Nombre único - Se registrará como nuevo
           </div>
         </div>

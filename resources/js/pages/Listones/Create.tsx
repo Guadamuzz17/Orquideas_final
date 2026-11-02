@@ -138,25 +138,26 @@ export default function CreateListon({ tiposPremio }: CreateListonProps) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Otorgar Listón" />
 
-      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-10">
-        <div className="flex items-center justify-between">
+      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Otorgar Listón</h1>
-            <p className="text-gray-600 mt-2">Asigna listones y menciones honoríficas a participantes</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Otorgar Listón</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">Asigna listones y menciones honoríficas a participantes</p>
           </div>
           <Button
             variant="outline"
             onClick={() => router.visit(route('listones.index'))}
+            className="w-fit"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver
           </Button>
         </div>
 
-        <Card className="max-w-2xl">
+        <Card className="max-w-2xl border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Award className="h-5 w-5" />
+              <Award className="h-5 w-5 text-primary" />
               Información del Listón
             </CardTitle>
             <CardDescription>
@@ -183,30 +184,30 @@ export default function CreateListon({ tiposPremio }: CreateListonProps) {
                   noResultsText="No se encontraron inscripciones"
                 />
                 {errors.inscripcion_id && (
-                  <p className="text-sm text-red-600">{errors.inscripcion_id}</p>
+                  <p className="text-sm text-red-600 dark:text-red-400">{errors.inscripcion_id}</p>
                 )}
               </div>
 
               {/* Información de la inscripción seleccionada */}
               {selectedInscripcion && (
-                <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-                  <h4 className="font-medium text-green-900 mb-2">Inscripción Seleccionada</h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-950/30 p-4">
+                  <h4 className="font-medium text-emerald-800 dark:text-emerald-200 mb-2">Inscripción Seleccionada</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-green-700 font-medium">Correlativo:</span>
-                      <span className="ml-2">#{selectedInscripcion.correlativo}</span>
+                      <span className="text-emerald-700 dark:text-emerald-300 font-medium">Correlativo:</span>
+                      <span className="ml-2 font-bold text-foreground">#{selectedInscripcion.correlativo}</span>
                     </div>
                     <div>
-                      <span className="text-green-700 font-medium">Participante:</span>
-                      <span className="ml-2">{selectedInscripcion.participante_nombre}</span>
+                      <span className="text-emerald-700 dark:text-emerald-300 font-medium">Participante:</span>
+                      <span className="ml-2 text-foreground">{selectedInscripcion.participante_nombre}</span>
                     </div>
                     <div>
-                      <span className="text-green-700 font-medium">Orquídea:</span>
-                      <span className="ml-2">{selectedInscripcion.orquidea_nombre}</span>
+                      <span className="text-emerald-700 dark:text-emerald-300 font-medium">Orquídea:</span>
+                      <span className="ml-2 text-foreground">{selectedInscripcion.orquidea_nombre}</span>
                     </div>
                     <div>
-                      <span className="text-green-700 font-medium">Categoría:</span>
-                      <span className="ml-2">{selectedInscripcion.grupo_nombre} - {selectedInscripcion.clase_nombre}</span>
+                      <span className="text-emerald-700 dark:text-emerald-300 font-medium">Categoría:</span>
+                      <span className="ml-2 text-foreground">{selectedInscripcion.grupo_nombre} - {selectedInscripcion.clase_nombre}</span>
                     </div>
                   </div>
                 </div>
@@ -277,18 +278,19 @@ export default function CreateListon({ tiposPremio }: CreateListonProps) {
               </div>
 
               {/* Botones */}
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => router.visit(route('listones.index'))}
+                  className="w-full sm:w-auto"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
                   disabled={processing || !selectedInscripcion || !data.id_tipo_premio}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   {processing ? (
                     <>

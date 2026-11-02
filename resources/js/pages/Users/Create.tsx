@@ -101,16 +101,16 @@ export default function Create({ roles = [] }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Crear Usuario" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center space-x-2">
-                        <Users className="h-6 w-6" />
-                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        <Users className="h-6 w-6 text-primary" />
+                        <h2 className="font-semibold text-xl text-foreground leading-tight">
                             Crear Nuevo Usuario
                         </h2>
                     </div>
-                    <Link href={route('users.index')}>
+                    <Link href={route('users.index')} className="w-fit">
                         <Button variant="outline">
                             <ArrowLeft className="h-4 w-4 mr-2" />
                             Volver
@@ -120,7 +120,7 @@ export default function Create({ roles = [] }: Props) {
 
                 {/* Formulario */}
                 <div className="max-w-2xl mx-auto w-full">
-                    <Card>
+                    <Card className="border-border">
                         <CardHeader>
                             <CardTitle>Información del Usuario</CardTitle>
                             <CardDescription>
@@ -268,16 +268,16 @@ export default function Create({ roles = [] }: Props) {
                                 </Alert>
 
                                 {/* Botones */}
-                                <div className="flex justify-end space-x-3 pt-4">
-                                    <Link href={route('users.index')}>
-                                        <Button type="button" variant="outline">
+                                <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
+                                    <Link href={route('users.index')} className="w-full sm:w-auto">
+                                        <Button type="button" variant="outline" className="w-full sm:w-auto">
                                             Cancelar
                                         </Button>
                                     </Link>
                                     <Button
                                         type="submit"
                                         disabled={processing}
-                                        className="min-w-[120px]"
+                                        className="w-full sm:w-auto min-w-[120px]"
                                     >
                                         {processing ? (
                                             'Creando...'

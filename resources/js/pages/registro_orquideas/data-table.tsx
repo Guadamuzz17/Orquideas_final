@@ -33,16 +33,23 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
+import { TableSkeleton } from "@/components/ui/table-skeleton"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isLoading?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
+  if (isLoading) {
+    return <TableSkeleton columns={columns.length || 6} rows={6} />
+  }
+
   const safeData = data || []
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -74,19 +81,19 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-        <div className="flex items-center py-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center py-4 gap-3">
         <Input
           placeholder="Buscar por Nombre de Planta"
           value={(table.getColumn("nombre_planta")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("nombre_planta")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="w-full sm:max-w-sm"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns
+            <Button variant="outline" className="w-full sm:w-auto sm:ml-auto">
+              Columnas
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

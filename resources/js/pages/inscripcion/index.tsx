@@ -53,8 +53,8 @@ export default function InscripcionIndex({ inscripciones }: InscripcionIndexProp
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Lista de Inscripciones" />
       
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <h1 className="text-2xl font-bold">Lista de Inscripciones</h1>
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <h1 className="text-xl sm:text-2xl font-bold">Lista de Inscripciones</h1>
         
         <div>
           <Breadcrumb>
@@ -73,7 +73,7 @@ export default function InscripcionIndex({ inscripciones }: InscripcionIndexProp
         </div>
 
         {/* Cards de estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -124,12 +124,12 @@ export default function InscripcionIndex({ inscripciones }: InscripcionIndexProp
           </Card>
         </div>
 
-        <div className='flex justify-between items-center'>
+        <div className='flex flex-wrap justify-between items-center gap-3'>
           <div className="text-sm text-muted-foreground">
             Total de inscripciones: {inscripcionesData.length}
           </div>
           
-          <Button asChild className="bg-green-600 hover:bg-green-700">
+          <Button asChild className="bg-primary hover:bg-primary/90">
             <Link href={route('inscripcion.create')}>
               <Plus className="mr-2 h-4 w-4" />
               Nueva Inscripción
@@ -137,7 +137,7 @@ export default function InscripcionIndex({ inscripciones }: InscripcionIndexProp
           </Button>
         </div>
 
-        <div className="container mx-auto">
+        <div className="w-full overflow-hidden">
           <DataTable columns={columns} data={inscripcionesData} />
         </div>
       </div>

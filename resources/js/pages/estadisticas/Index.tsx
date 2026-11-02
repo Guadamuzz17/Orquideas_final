@@ -172,24 +172,24 @@ export default function Estadisticas({ eventoActual }: { eventoActual: number })
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
                     {/* Header con botones */}
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Estadísticas del Evento</h2>
-                        <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+                        <h2 className="text-xl sm:text-2xl font-bold text-foreground">Estadísticas del Evento</h2>
+                        <div className="flex flex-wrap items-center gap-2">
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={cargarEstadisticas}
                                 disabled={refreshing}
                             >
-                                <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                                <RefreshCw className={`h-4 w-4 mr-1.5 ${refreshing ? 'animate-spin' : ''}`} />
                                 Actualizar
                             </Button>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button size="sm">
-                                        <Download className="h-4 w-4 mr-2" />
+                                        <Download className="h-4 w-4 mr-1.5" />
                                         Exportar
-                                        <ChevronDown className="h-4 w-4 ml-2" />
+                                        <ChevronDown className="h-4 w-4 ml-1.5" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
@@ -213,86 +213,86 @@ export default function Estadisticas({ eventoActual }: { eventoActual: number })
                             </DropdownMenu>
                         </div>
                     </div>                    {/* Resumen General */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                        <Card>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                        <Card className="border-border">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                                    <Users className="h-4 w-4 inline mr-2" />
+                                    <Users className="h-4 w-4 inline mr-2 text-purple-500" />
                                     Participantes
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-purple-600">
+                                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                                     {estadisticas.resumen_general.total_participantes}
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="border-border">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                                    <Flower2 className="h-4 w-4 inline mr-2" />
+                                    <Flower2 className="h-4 w-4 inline mr-2 text-pink-500" />
                                     Inscripciones
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-pink-600">
+                                <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">
                                     {estadisticas.resumen_general.total_inscripciones}
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="border-border">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                                    <Flower2 className="h-4 w-4 inline mr-2" />
+                                    <Flower2 className="h-4 w-4 inline mr-2 text-emerald-500" />
                                     Orquídeas
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-emerald-600">
+                                <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                                     {estadisticas.resumen_general.total_orquideas}
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="border-border">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                                    <Award className="h-4 w-4 inline mr-2" />
+                                    <Award className="h-4 w-4 inline mr-2 text-amber-500" />
                                     Ganadores
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-amber-600">
+                                <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
                                     {estadisticas.resumen_general.total_ganadores}
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="border-border">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                                    <BarChart3 className="h-4 w-4 inline mr-2" />
+                                    <BarChart3 className="h-4 w-4 inline mr-2 text-blue-500" />
                                     Especies
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-blue-600">
+                                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                                     {estadisticas.orquideas.total_especies_diferentes}
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="border-border">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                                    <TrendingUp className="h-4 w-4 inline mr-2" />
+                                    <TrendingUp className="h-4 w-4 inline mr-2 text-indigo-500" />
                                     Promedio
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-indigo-600">
+                                <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                                     {estadisticas.resumen_general.promedio_orquideas_por_participante}
                                 </div>
                                 <p className="text-xs text-muted-foreground">orq/participante</p>
@@ -302,13 +302,15 @@ export default function Estadisticas({ eventoActual }: { eventoActual: number })
 
                     {/* Tabs para diferentes visualizaciones */}
                     <Tabs defaultValue="participantes" className="w-full">
-                        <TabsList className="grid w-full grid-cols-5">
-                            <TabsTrigger value="participantes">Participantes</TabsTrigger>
-                            <TabsTrigger value="orquideas">Orquídeas</TabsTrigger>
-                            <TabsTrigger value="ganadores">Ganadores</TabsTrigger>
-                            <TabsTrigger value="tendencias">Tendencias</TabsTrigger>
-                            <TabsTrigger value="geografia">Geografía</TabsTrigger>
-                        </TabsList>
+                        <div className="overflow-x-auto touch-scroll pb-1">
+                            <TabsList className="inline-flex w-auto sm:grid sm:w-full sm:grid-cols-5 min-w-full">
+                                <TabsTrigger value="participantes" className="text-xs sm:text-sm">Participantes</TabsTrigger>
+                                <TabsTrigger value="orquideas" className="text-xs sm:text-sm">Orquídeas</TabsTrigger>
+                                <TabsTrigger value="ganadores" className="text-xs sm:text-sm">Ganadores</TabsTrigger>
+                                <TabsTrigger value="tendencias" className="text-xs sm:text-sm">Tendencias</TabsTrigger>
+                                <TabsTrigger value="geografia" className="text-xs sm:text-sm">Geografía</TabsTrigger>
+                            </TabsList>
+                        </div>
 
                         {/* Tab Participantes */}
                         <TabsContent value="participantes" className="space-y-4">

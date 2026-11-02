@@ -1,10 +1,19 @@
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
+const getThemeOptions = (): Partial<SweetAlertOptions> => {
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  return {
+    background: isDark ? '#141b2d' : '#ffffff',
+    color: isDark ? '#f8fafc' : '#0f172a',
+  };
+};
+
 export const showSuccessAlert = (title: string, text?: string) => {
   return MySwal.fire({
+    ...getThemeOptions(),
     icon: 'success',
     title,
     text,
@@ -17,6 +26,7 @@ export const showSuccessAlert = (title: string, text?: string) => {
 
 export const showErrorAlert = (title: string, text?: string) => {
   return MySwal.fire({
+    ...getThemeOptions(),
     icon: 'error',
     title,
     text: text || 'Ha ocurrido un error. Por favor, intente nuevamente.',
@@ -27,6 +37,7 @@ export const showErrorAlert = (title: string, text?: string) => {
 
 export const showWarningAlert = (title: string, text?: string) => {
   return MySwal.fire({
+    ...getThemeOptions(),
     icon: 'warning',
     title,
     text,
@@ -37,16 +48,18 @@ export const showWarningAlert = (title: string, text?: string) => {
 
 export const showInfoAlert = (title: string, text?: string) => {
   return MySwal.fire({
+    ...getThemeOptions(),
     icon: 'info',
     title,
     text,
     confirmButtonText: 'Aceptar',
-    confirmButtonColor: '#3b82f6',
+    confirmButtonColor: '#8b5cf6',
   });
 };
 
 export const showConfirmDialog = (title: string, text?: string) => {
   return MySwal.fire({
+    ...getThemeOptions(),
     icon: 'question',
     title,
     text,
@@ -61,6 +74,7 @@ export const showConfirmDialog = (title: string, text?: string) => {
 
 export const showDeleteConfirm = (itemName?: string) => {
   return MySwal.fire({
+    ...getThemeOptions(),
     icon: 'warning',
     title: '¿Está seguro?',
     text: itemName
@@ -77,6 +91,7 @@ export const showDeleteConfirm = (itemName?: string) => {
 
 export const showLoadingAlert = (title: string = 'Procesando...') => {
   return MySwal.fire({
+    ...getThemeOptions(),
     title,
     html: 'Por favor espere',
     allowOutsideClick: false,
@@ -97,6 +112,7 @@ export const showValidationErrors = (errors: Record<string, string | string[]>) 
     .join('<br>');
 
   return MySwal.fire({
+    ...getThemeOptions(),
     icon: 'error',
     title: 'Errores de Validación',
     html: errorMessages,

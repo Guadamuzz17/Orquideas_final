@@ -101,18 +101,18 @@ export default function ShowGanador({ ganador }: ShowGanadorProps) {
     <AppLayout>
       <Head title={`Ganador - ${ganador.inscripcion.participante.nombre}`} />
 
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <div className="flex items-center justify-between">
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Trophy className="h-8 w-8 text-yellow-500" />
+            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3 text-foreground">
+              <Trophy className="h-7 w-7 sm:h-8 sm:w-8 text-amber-500" />
               Información del Ganador
             </h1>
-            <p className="text-gray-500 mt-2">
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
               Detalles completos del ganador, orquídea y listones obtenidos
             </p>
           </div>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="w-fit">
             <Link href={route('ganadores.index')}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver a Ganadores
@@ -120,25 +120,25 @@ export default function ShowGanador({ ganador }: ShowGanadorProps) {
           </Button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
           {/* Información del Ganador */}
-          <Card className="shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-yellow-50 to-amber-50 border-b">
-              <CardTitle className="flex items-center gap-2 text-yellow-800">
+          <Card className="shadow-lg border-border">
+            <CardHeader className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border-b border-border">
+              <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
                 <Trophy className="h-5 w-5" />
                 Información del Premio
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
               <div>
-                <label className="text-sm font-semibold text-gray-600">Posición</label>
+                <label className="text-sm font-semibold text-muted-foreground">Posición</label>
                 <div className="mt-1">
                   {getPosicionBadge(ganador.posicion, ganador.empate)}
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   Fecha de Premiación
                 </label>
@@ -146,42 +146,42 @@ export default function ShowGanador({ ganador }: ShowGanadorProps) {
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                   <Tag className="h-4 w-4" />
                   Correlativo de Inscripción
                 </label>
-                <p className="text-2xl font-bold text-blue-600 mt-1">
+                <p className="text-2xl font-bold text-primary mt-1">
                   #{ganador.inscripcion.correlativo}
                 </p>
               </div>
 
               {ganador.evento && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600">Evento</label>
+                  <label className="text-sm font-semibold text-muted-foreground">Evento</label>
                   <p className="text-lg mt-1">{ganador.evento.nombre_evento}</p>
-                  <p className="text-sm text-gray-500">{formatDate(ganador.evento.fecha_inicio)}</p>
+                  <p className="text-sm text-muted-foreground">{formatDate(ganador.evento.fecha_inicio)}</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Información del Participante */}
-          <Card className="shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-              <CardTitle className="flex items-center gap-2 text-blue-800">
+          <Card className="shadow-lg border-border">
+            <CardHeader className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border-b border-border">
+              <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
                 <User className="h-5 w-5" />
                 Información del Participante
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
               <div>
-                <label className="text-sm font-semibold text-gray-600">Nombre Completo</label>
+                <label className="text-sm font-semibold text-muted-foreground">Nombre Completo</label>
                 <p className="text-xl font-bold mt-1">{ganador.inscripcion.participante.nombre}</p>
               </div>
 
               {ganador.inscripcion.participante.tipoParticipante && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600">Tipo de Participante</label>
+                  <label className="text-sm font-semibold text-muted-foreground">Tipo de Participante</label>
                   <Badge variant="outline" className="mt-1">
                     {ganador.inscripcion.participante.tipoParticipante.Clase}
                   </Badge>
@@ -190,7 +190,7 @@ export default function ShowGanador({ ganador }: ShowGanadorProps) {
 
               {ganador.inscripcion.participante.aso && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                  <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     Asociación
                   </label>
@@ -200,7 +200,7 @@ export default function ShowGanador({ ganador }: ShowGanadorProps) {
 
               {ganador.inscripcion.participante.numero_telefonico && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                  <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                     <Phone className="h-4 w-4" />
                     Teléfono
                   </label>
@@ -210,7 +210,7 @@ export default function ShowGanador({ ganador }: ShowGanadorProps) {
 
               {(ganador.inscripcion.participante.departamento || ganador.inscripcion.participante.municipio) && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                  <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
                     Ubicación
                   </label>
@@ -224,8 +224,8 @@ export default function ShowGanador({ ganador }: ShowGanadorProps) {
 
               {ganador.inscripcion.participante.direccion && (
                 <div>
-                  <label className="text-sm font-semibold text-gray-600">Dirección</label>
-                  <p className="text-sm text-gray-700 mt-1">{ganador.inscripcion.participante.direccion}</p>
+                  <label className="text-sm font-semibold text-muted-foreground">Dirección</label>
+                  <p className="text-sm text-foreground mt-1">{ganador.inscripcion.participante.direccion}</p>
                 </div>
               )}
             </CardContent>
@@ -233,9 +233,9 @@ export default function ShowGanador({ ganador }: ShowGanadorProps) {
         </div>
 
         {/* Información de la Orquídea Ganadora */}
-        <Card className="shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
-            <CardTitle className="flex items-center gap-2 text-green-800">
+        <Card className="shadow-lg border-border">
+          <CardHeader className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-border">
+            <CardTitle className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
               <Flower2 className="h-5 w-5" />
               Orquídea Ganadora
             </CardTitle>

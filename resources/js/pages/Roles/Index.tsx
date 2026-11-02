@@ -74,34 +74,32 @@ export default function Index({ roles }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Roles y Permisos" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-6 sm:p-10">
+            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6 md:p-8">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Roles y Permisos</h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2">Gestiona los roles y permisos del sistema</p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Roles y Permisos</h1>
+                        <p className="text-muted-foreground mt-1 text-sm sm:text-base">Gestiona los roles y permisos del sistema</p>
                     </div>
-                    <Link href={route('roles.create')}>
+                    <Link href={route('roles.create')} className="w-fit">
                         <Button>
                             <Plus className="mr-2 h-4 w-4" />
                             Nuevo Rol
                         </Button>
                     </Link>
                 </div>
-            <Head title="Roles y Permisos" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <ShieldCheck className="h-5 w-5" />
-                                Roles del Sistema
-                            </CardTitle>
-                            <CardDescription>
-                                Gestiona los roles y sus permisos asociados
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
+                <Card className="border-border">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <ShieldCheck className="h-5 w-5 text-primary" />
+                            Roles del Sistema
+                        </CardTitle>
+                        <CardDescription>
+                            Gestiona los roles y sus permisos asociados
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0 sm:p-6">
+                        <div className="overflow-x-auto touch-scroll">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -158,10 +156,9 @@ export default function Index({ roles }: Props) {
                                     )}
                                 </TableBody>
                             </Table>
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
             <AlertDialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
                 <AlertDialogContent>

@@ -140,9 +140,9 @@ class OrquideaController extends Controller
         $orquidea->load(['grupo', 'clase', 'participante']);
         return Inertia::render('orquideas/form', [
             'orquidea' => $orquidea,
-            'grupos' => Grupo::select('id_grupo', 'nombre_grupo')->get(),
-            'clases' => Clase::select('id_clase', 'nombre_clase', 'id_grupp as id_grupo')->get(),
-            'participantes' => Participante::select('id as id_participante', 'nombre as nombre_participante')->get(),
+            'grupos' => Grupo::all(),
+            'clases' => Clase::all(),
+            'participantes' => Participante::all(),
         ]);
     }
 

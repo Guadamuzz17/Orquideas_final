@@ -12,11 +12,11 @@ export default function TestReportes() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Test Reportes" />
             <div className="py-6">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <h1>Test de Reportes</h1>
-                            <p>Esta página de prueba carga correctamente.</p>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="bg-card border border-border overflow-hidden shadow-xs rounded-xl">
+                        <div className="p-6 text-foreground">
+                            <h1 className="text-xl font-bold mb-2">Test de Reportes</h1>
+                            <p className="text-muted-foreground">Esta página de prueba carga correctamente.</p>
                         </div>
                     </div>
                 </div>

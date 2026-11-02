@@ -60,19 +60,19 @@ export default function ShowGrupo({ grupo }: ShowGrupoProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Ver Grupo - ${grupo.nombre_grupo}`} />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Detalles del Grupo</h1>
-          <div className="flex gap-2">
-            <Button asChild variant="default">
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold">Detalles del Grupo</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild variant="default" size="sm">
               <Link href={route('grupos.edit', grupo.id_grupo)}>
-                <Edit className="mr-2 h-4 w-4" />
+                <Edit className="mr-1.5 h-4 w-4" />
                 Editar Grupo
               </Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" size="sm">
               <Link href={route('grupos.index')}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
+                <ArrowLeft className="mr-1.5 h-4 w-4" />
                 Volver a Grupos
               </Link>
             </Button>
@@ -164,15 +164,15 @@ export default function ShowGrupo({ grupo }: ShowGrupoProps) {
                     {grupo.clases.map((clase, index) => (
                       <div
                         key={clase.id_clase}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                        className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold">
                             {index + 1}
                           </div>
                           <div>
-                            <p className="font-medium">{clase.nombre_clase}</p>
-                            <p className="text-sm text-gray-500">ID: {clase.id_clase}</p>
+                            <p className="font-medium text-foreground">{clase.nombre_clase}</p>
+                            <p className="text-sm text-muted-foreground">ID: {clase.id_clase}</p>
                           </div>
                         </div>
                         <Badge variant="secondary">Clase</Badge>

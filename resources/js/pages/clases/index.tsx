@@ -80,8 +80,8 @@ export default function ClasesIndex({ clases, grupos }: ClasesIndexProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Clases de Orquídeas" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <h1 className="text-2xl font-bold">Gestión de Clases de Orquídeas</h1>
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <h1 className="text-xl sm:text-2xl font-bold">Gestión de Clases de Orquídeas</h1>
 
         <div>
           <Breadcrumb>
@@ -99,27 +99,27 @@ export default function ClasesIndex({ clases, grupos }: ClasesIndexProps) {
           </Breadcrumb>
         </div>
 
-        <div className='flex justify-between items-center'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
           <div className="text-sm text-muted-foreground">
             Total de clases registradas: {clases.total}
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button onClick={handleDownloadPDF} className="bg-blue-600 hover:bg-blue-700">
-              <Download className="mr-2 h-4 w-4" />
-              Descargar Clases PDF
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={handleDownloadPDF} variant="outline" size="sm">
+              <Download className="mr-1.5 h-4 w-4" />
+              Descargar PDF
             </Button>
 
-            <Button asChild className="bg-purple-600 hover:bg-purple-700">
+            <Button asChild variant="outline" size="sm">
               <Link href={route('grupos.index')}>
-                <Eye className="mr-2 h-4 w-4" />
+                <Eye className="mr-1.5 h-4 w-4" />
                 Ver Grupos
               </Link>
             </Button>
 
-            <Button asChild className="bg-green-600 hover:bg-green-700">
+            <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
               <Link href={route('clases.create')}>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-1.5 h-4 w-4" />
                 Crear Clase
               </Link>
             </Button>
@@ -128,14 +128,14 @@ export default function ClasesIndex({ clases, grupos }: ClasesIndexProps) {
 
         <div className="grid gap-4">
           {clases.data.map((clase) => (
-            <Card key={clase.id_clase} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
+            <Card key={clase.id_clase} className="hover:shadow-md transition-shadow border-border">
+              <CardHeader className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{clase.nombre_clase}</CardTitle>
-                    <CardDescription className="mt-2">
+                    <CardTitle className="text-base sm:text-lg">{clase.nombre_clase}</CardTitle>
+                    <CardDescription className="mt-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">Grupo:</span>
+                        <span className="text-sm text-muted-foreground">Grupo:</span>
                         <Badge variant="secondary">
                           {clase.grupo ? `${clase.grupo.Cod_Grupo} - ${clase.grupo.nombre_grupo}` : 'Sin grupo'}
                         </Badge>

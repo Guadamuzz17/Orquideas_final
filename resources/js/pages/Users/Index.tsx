@@ -158,16 +158,16 @@ export default function Index({ users, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Gestión de Usuarios" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center space-x-2">
-                        <Users className="h-6 w-6" />
-                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        <Users className="h-6 w-6 text-primary" />
+                        <h2 className="font-semibold text-xl text-foreground leading-tight">
                             Gestión de Usuarios
                         </h2>
                     </div>
-                    <Link href={route('users.create')}>
+                    <Link href={route('users.create')} className="w-fit">
                         <Button>
                             <Plus className="h-4 w-4 mr-2" />
                             Nuevo Usuario
@@ -176,8 +176,8 @@ export default function Index({ users, filters }: Props) {
                 </div>
 
                 {/* Estadísticas */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <Card className="border-border">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Total Usuarios</CardTitle>
                             <Users className="h-4 w-4 text-muted-foreground" />
@@ -187,32 +187,32 @@ export default function Index({ users, filters }: Props) {
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="border-border">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Verificados</CardTitle>
-                            <UserCheck className="h-4 w-4 text-green-600" />
+                            <UserCheck className="h-4 w-4 text-emerald-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-green-600">{stats.verified}</div>
+                            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.verified}</div>
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="border-border">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Sin Verificar</CardTitle>
-                            <UserX className="h-4 w-4 text-orange-600" />
+                            <UserX className="h-4 w-4 text-amber-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-orange-600">{stats.unverified}</div>
+                            <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.unverified}</div>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Filtros */}
-                <Card>
+                <Card className="border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center space-x-2">
-                            <Filter className="h-4 w-4" />
+                            <Filter className="h-4 w-4 text-muted-foreground" />
                             <span>Filtros</span>
                         </CardTitle>
                     </CardHeader>
@@ -252,7 +252,7 @@ export default function Index({ users, filters }: Props) {
                 </Card>
 
                 {/* Lista de usuarios */}
-                <Card>
+                <Card className="border-border">
                     <CardHeader>
                         <CardTitle>Usuarios Registrados</CardTitle>
                         <CardDescription>
@@ -264,29 +264,29 @@ export default function Index({ users, filters }: Props) {
                             {users.data.map((user) => (
                                 <div
                                     key={user.id}
-                                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-border bg-card rounded-lg hover:bg-muted/40 transition-colors gap-3"
                                 >
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <span className="text-blue-600 font-semibold">
+                                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
+                                            <span className="text-primary font-semibold">
                                                 {user.name.charAt(0).toUpperCase()}
                                             </span>
                                         </div>
                                         <div>
-                                            <h3 className="font-medium">{user.name}</h3>
-                                            <p className="text-sm text-gray-500">{user.email}</p>
+                                            <h3 className="font-medium text-foreground">{user.name}</h3>
+                                            <p className="text-sm text-muted-foreground">{user.email}</p>
                                             {user.rol && (
-                                                <p className="text-xs text-blue-600 font-medium">
+                                                <p className="text-xs text-primary font-medium">
                                                     Rol: {user.rol.nombre}
                                                 </p>
                                             )}
-                                            <p className="text-xs text-gray-400">
+                                            <p className="text-xs text-muted-foreground">
                                                 Registrado: {new Date(user.created_at).toLocaleDateString()}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center space-x-3">
+                                    <div className="flex items-center justify-between sm:justify-end space-x-3 pt-2 sm:pt-0 border-t sm:border-0 border-border">
                                         <Badge variant={user.email_verified_at ? "default" : "secondary"}>
                                             {user.email_verified_at ? "Verificado" : "Sin verificar"}
                                         </Badge>

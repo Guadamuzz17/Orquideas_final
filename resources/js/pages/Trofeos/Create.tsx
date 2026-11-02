@@ -1,309 +1,225 @@
-"use client"
+import { useState, useMemo } from "react";
+import { ArrowLeft, Trophy, Search, Check, Save } from "lucide-react";
+import { Head, Link, useForm } from "@inertiajs/react";
+import AppLayout from "@/layouts/app-layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { type BreadcrumbItem } from "@/types";
 
-import { useState, useEffect } from "react"
-import { Menu, ChevronDown } from "lucide-react"
-import axios from "axios"
-import Swal from "sweetalert2"
+const breadcrumbs: BreadcrumbItem[] = [
+  { title: "Dashboard", href: "/dashboard" },
+  { title: "Trofeos Asignados", href: "/trofeos" },
+  { title: "Asignar Trofeo", href: "/trofeos/create" },
+];
 
-interface Orchid {
-  id_orquidea: number
-  nombre_orquidea: string
-  clase: {
-    nombre_clase: string
-  }
-  grupo: {
-    nombre_grupo: string
-  }
-  participante?: string
-  correlativo?: string
+interface OrchidItem {
+  id_orquidea: number;
+  nombre_orquidea: string;
+  clase: string;
+  grupo: string;
 }
 
-export default function Create() {
-  const [orchids, setOrchids] = useState<Orchid[]>([])
-  const [loading, setLoading] = useState(false)
-  const [searchFilters, setSearchFilters] = useState({
-    orquidea: "",
-    participante: "",
-    grupo: "",
-    clase: "",
-    correlativo: "",
-  })
-  const [filteredOrchids, setFilteredOrchids] = useState<Orchid[]>([])
-  const [selectedOrchid, setSelectedOrchid] = useState<number | null>(null)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+interface CreateProps {
+  orquideas?: OrchidItem[];
+}
 
-  // Función para navegar sin usar Next.js router
-  const navigateTo = (path: string) => {
-    window.location.href = path
-  }
+const CATEGORIAS_TROFEO = [
+  "Mejor de la Exposición",
+  "Mejor Especie Nacional",
+  "Mejor Híbrido",
+  "Mejor Orquídea Miniatura",
+  "Mejor Cultivo",
+  "Trofeo Especial del Jurado",
+  "Primer Lugar General",
+];
 
-  useEffect(() => {
-    const fetchOrchids = async () => {
-      try {
-        setLoading(true)
-        const response = await axios.get('http://localhost:3000/api/trofeos/crear') // Ajusta la URL según tu backend
-        setOrchids(response.data)
-        setFilteredOrchids(response.data)
-      } catch (error) {
-        console.error('Error fetching orchids:', error)
-        Swal.fire({
-          title: 'Error',
-          text: 'No se pudieron cargar las orquídeas',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        })
-      } finally {
-        setLoading(false)
-      }
-    }
+export default function Create({ orquideas = [] }: CreateProps) {
+  const [search, setSearch] = useState("");
+  const [selectedOrchid, setSelectedOrchid] = useState<OrchidItem | null>(null);
 
-    fetchOrchids()
-  }, [])
+  const { data, setData, post, processing, errors } = useForm({
+    id_orquidea: "",
+    categoria: "",
+  });
 
-  useEffect(() => {
-    let filtered = orchids
+  const filteredOrchids = useMemo(() => {
+    if (!search.trim()) return orquideas.slice(0, 15);
+    const q = search.toLowerCase();
+    return orquideas.filter(
+      (o) =>
+        (o.nombre_orquidea || "").toLowerCase().includes(q) ||
+        (o.clase || "").toLowerCase().includes(q) ||
+        (o.grupo || "").toLowerCase().includes(q)
+    ).slice(0, 30);
+  }, [search, orquideas]);
 
-    Object.entries(searchFilters).forEach(([key, value]) => {
-      if (value) {
-        filtered = filtered.filter((orchid) => {
-          switch (key) {
-            case "orquidea":
-              return orchid.nombre_orquidea.toLowerCase().includes(value.toLowerCase())
-            case "participante":
-              return orchid.participante?.toLowerCase().includes(value.toLowerCase())
-            case "grupo":
-              return orchid.grupo.nombre_grupo.toLowerCase().includes(value.toLowerCase())
-            case "clase":
-              return orchid.clase.nombre_clase.toLowerCase().includes(value.toLowerCase())
-            case "correlativo":
-              return orchid.correlativo?.toLowerCase().includes(value.toLowerCase())
-            default:
-              return true
-          }
-        })
-      }
-    })
+  const handleSelect = (orchid: OrchidItem) => {
+    setSelectedOrchid(orchid);
+    setData("id_orquidea", String(orchid.id_orquidea));
+  };
 
-    setFilteredOrchids(filtered)
-  }, [searchFilters, orchids])
-
-  const handleFilterChange = (field: string, value: string) => {
-    setSearchFilters((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!selectedOrchid) {
-      Swal.fire({
-        title: 'Error',
-        text: 'Por favor selecciona una orquídea antes de asignar el trofeo.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      })
-      return
-    }
-
-    try {
-      setLoading(true)
-      await axios.post('http://localhost:3000/api/trofeos', { // Ajusta la URL según tu backend
-        id_orquidea: selectedOrchid,
-        categoria: 'Ganador Absoluto'
-      })
-      
-      Swal.fire({
-        title: 'Éxito',
-        text: 'Trofeo asignado correctamente',
-        icon: 'success',
-        confirmButtonText: 'OK'
-      }).then(() => {
-        navigateTo('/trofeos')
-      })
-    } catch (error) {
-      console.error('Error assigning trophy:', error)
-      Swal.fire({
-        title: 'Error',
-        text: 'No se pudo asignar el trofeo',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const selectedOrchidData = orchids.find((o) => o.id_orquidea === selectedOrchid)
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    post(route("trofeos.store"));
+  };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className={`bg-gray-800 text-white w-64 min-h-screen p-4 ${sidebarOpen ? "block" : "hidden"} md:block`}>
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-300">Admin Panel</h2>
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Asignar Nuevo Trofeo" />
+
+      <div className="flex flex-1 flex-col gap-5 p-4 md:p-6 max-w-4xl mx-auto w-full">
+        <div className="flex items-center gap-3">
+          <Button asChild variant="ghost" size="icon" className="rounded-xl">
+            <Link href={route("trofeos.index")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+              <Trophy className="h-7 w-7 text-amber-500" />
+              Asignar Trofeo a Orquídea
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Seleccione una orquídea inscrita y la distinción o trofeo otorgado
+            </p>
+          </div>
         </div>
 
-        <nav className="space-y-2">
-          <button
-            onClick={() => navigateTo('/')}
-            className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg p-3 transition-colors w-full text-left"
-          >
-            <span>🏠</span>
-            <span>Inicio</span>
-          </button>
-
-          <button className="flex items-center space-x-3 text-white bg-gray-700 rounded-lg p-3 w-full text-left">
-            <span>🏆</span>
-            <span>Dar Trofeo a orquídea</span>
-          </button>
-
-          <button
-            onClick={() => navigateTo('/trofeos')}
-            className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg p-3 transition-colors w-full text-left"
-          >
-            <span>📋</span>
-            <span>Gestionar Trofeos</span>
-          </button>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1">
-        {/* Mobile menu button */}
-        <div className="md:hidden bg-white p-4 border-b">
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 hover:text-gray-900">
-            <Menu size={24} />
-          </button>
-        </div>
-
-        {/* Header */}
-        <div className="bg-blue-500 text-white p-6">
-          <h1 className="text-2xl font-bold">Asignar Trofeo al Ganador Absoluto</h1>
-        </div>
-
-        {/* Instructions */}
-        <div className="bg-white p-6 border-b">
-          <p className="text-gray-700">
-            <span className="font-semibold">Instrucciones:</span> Escribe el nombre de la orquídea, participante, grupo
-            (por ejemplo: <span className="text-pink-500 font-semibold">Grupo A</span>), clase o correlativo para
-            filtrar las opciones disponibles.
-          </p>
-        </div>
-
-        {/* Search Filters */}
-        <div className="bg-white p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Search Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <input
-                type="text"
-                placeholder="Buscar Orquídea"
-                value={searchFilters.orquidea}
-                onChange={(e) => handleFilterChange("orquidea", e.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-
-              <input
-                type="text"
-                placeholder="Buscar Participante"
-                value={searchFilters.participante}
-                onChange={(e) => handleFilterChange("participante", e.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-
-              <input
-                type="text"
-                placeholder="Buscar Grupo (Ej: Grupo A)"
-                value={searchFilters.grupo}
-                onChange={(e) => handleFilterChange("grupo", e.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-
-              <input
-                type="text"
-                placeholder="Buscar Clase"
-                value={searchFilters.clase}
-                onChange={(e) => handleFilterChange("clase", e.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-
-              <input
-                type="text"
-                placeholder="Buscar Correlativo"
-                value={searchFilters.correlativo}
-                onChange={(e) => handleFilterChange("correlativo", e.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Orchid Selection */}
-            <div className="space-y-4">
-              <label className="block text-sm font-medium text-gray-700">Orquídea</label>
-
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Paso 1: Selección de orquídea */}
+          <Card className="rounded-2xl border-border shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold flex items-center gap-2">
+                <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold">1</span>
+                Buscar y Seleccionar Orquídea
+              </CardTitle>
+              <CardDescription>
+                Filtra por nombre de planta, clase o grupo
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex justify-between items-center"
-                >
-                  <span className={selectedOrchidData ? "text-gray-900" : "text-gray-500"}>
-                    {selectedOrchidData ? selectedOrchidData.nombre_orquidea : "Seleccione una Orquídea"}
-                  </span>
-                  <ChevronDown
-                    size={20}
-                    className={`text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Buscar por nombre de orquídea..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 rounded-xl"
+                />
+              </div>
 
-                {dropdownOpen && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {loading ? (
-                      <div className="px-4 py-3 text-gray-500 text-center">Cargando orquídeas...</div>
-                    ) : filteredOrchids.length > 0 ? (
-                      filteredOrchids.map((orchid) => (
-                        <button
-                          key={orchid.id_orquidea}
-                          type="button"
-                          onClick={() => {
-                            setSelectedOrchid(orchid.id_orquidea)
-                            setDropdownOpen(false)
-                          }}
-                          className="w-full text-left px-4 py-3 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none border-b border-gray-100 last:border-b-0"
-                        >
-                          <div className="font-medium text-gray-900">{orchid.nombre_orquidea}</div>
-                          {orchid.participante && (
-                            <div className="text-sm text-gray-600">Participante: {orchid.participante}</div>
-                          )}
-                          <div className="text-sm text-gray-600">Grupo: {orchid.grupo.nombre_grupo}</div>
-                          <div className="text-sm text-gray-600">Clase: {orchid.clase.nombre_clase}</div>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-4 py-3 text-gray-500 text-center">
-                        No se encontraron orquídeas que coincidan con los filtros
+              {selectedOrchid && (
+                <div className="p-3.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-medium text-primary">Orquídea Seleccionada:</p>
+                    <p className="font-semibold text-foreground">{selectedOrchid.nombre_orquidea}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{selectedOrchid.clase} • {selectedOrchid.grupo}</p>
+                  </div>
+                  <Badge className="bg-primary text-primary-foreground font-normal">
+                    Seleccionada
+                  </Badge>
+                </div>
+              )}
+
+              {errors.id_orquidea && (
+                <p className="text-xs text-destructive font-medium">{errors.id_orquidea}</p>
+              )}
+
+              <div className="max-h-56 overflow-y-auto rounded-xl border border-border divide-y divide-border touch-scroll">
+                {filteredOrchids.length > 0 ? (
+                  filteredOrchids.map((orchid) => (
+                    <button
+                      key={orchid.id_orquidea}
+                      type="button"
+                      onClick={() => handleSelect(orchid)}
+                      className={`w-full text-left p-3 flex items-center justify-between hover:bg-accent hover:text-accent-foreground transition-colors ${
+                        selectedOrchid?.id_orquidea === orchid.id_orquidea ? "bg-accent/80 font-medium" : ""
+                      }`}
+                    >
+                      <div className="min-w-0 pr-2">
+                        <p className="text-sm font-medium text-foreground truncate">{orchid.nombre_orquidea}</p>
+                        <p className="text-xs text-muted-foreground truncate">{orchid.clase} • {orchid.grupo}</p>
                       </div>
-                    )}
+                      {selectedOrchid?.id_orquidea === orchid.id_orquidea && (
+                        <Check className="h-4 w-4 text-primary shrink-0" />
+                      )}
+                    </button>
+                  ))
+                ) : (
+                  <div className="p-6 text-center text-sm text-muted-foreground">
+                    No se encontraron orquídeas con ese término.
                   </div>
                 )}
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Submit Button */}
-            <div className="flex justify-center">
-              <button
-                type="submit"
-                disabled={loading || !selectedOrchid}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition-colors disabled:cursor-not-allowed"
-              >
-                {loading ? "Asignando..." : "Asignar Trofeo"}
-              </button>
-            </div>
-          </form>
-        </div>
+          {/* Paso 2: Categoría o Nombre del Trofeo */}
+          <Card className="rounded-2xl border-border shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold flex items-center gap-2">
+                <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold">2</span>
+                Categoría del Trofeo
+              </CardTitle>
+              <CardDescription>
+                Elige una categoría sugerida o escribe una personalizada
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIAS_TROFEO.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setData("categoria", cat)}
+                    className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                      data.categoria === cat
+                        ? "bg-primary text-primary-foreground border-primary font-medium shadow-sm"
+                        : "bg-muted/50 border-border text-foreground hover:bg-accent"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="categoria">Nombre / Categoría del Trofeo</Label>
+                <Input
+                  id="categoria"
+                  type="text"
+                  placeholder="Ej: Mejor Especie Nacional"
+                  value={data.categoria}
+                  onChange={(e) => setData("categoria", e.target.value)}
+                  className="rounded-xl"
+                  required
+                />
+                {errors.categoria && (
+                  <p className="text-xs text-destructive font-medium">{errors.categoria}</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button asChild variant="outline" className="rounded-xl">
+              <Link href={route("trofeos.index")}>Cancelar</Link>
+            </Button>
+            <Button
+              type="submit"
+              disabled={processing || !data.id_orquidea || !data.categoria}
+              className="rounded-xl shadow-md min-w-[140px]"
+            >
+              <Save className="mr-2 h-4 w-4" />
+              {processing ? "Guardando..." : "Asignar Trofeo"}
+            </Button>
+          </div>
+        </form>
       </div>
-    </div>
-  )
+    </AppLayout>
+  );
 }

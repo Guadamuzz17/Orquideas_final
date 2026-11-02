@@ -60,20 +60,20 @@ export default function ShowClase({ clase }: ShowClaseProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Ver Clase - ${clase.nombre_clase}`} />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Detalles de la Clase</h1>
-          <div className="flex gap-2">
-            <Button asChild variant="default">
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold">Detalles de la Clase</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild variant="default" size="sm">
               <Link href={route('clases.edit', clase.id_clase)}>
-                <Edit className="mr-2 h-4 w-4" />
+                <Edit className="mr-1.5 h-4 w-4" />
                 Editar Clase
               </Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" size="sm">
               <Link href={route('clases.index')}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Volver a Clases
+                <ArrowLeft className="mr-1.5 h-4 w-4" />
+                Volver
               </Link>
             </Button>
           </div>
@@ -160,39 +160,39 @@ export default function ShowClase({ clase }: ShowClaseProps) {
             <CardContent>
               {clase.grupo ? (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-4">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-600">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400">
                         <Tag className="h-6 w-6" />
                       </div>
                       <div>
                         <p className="font-semibold text-lg">{clase.grupo.nombre_grupo}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           Código: <Badge variant="outline">{clase.grupo.Cod_Grupo}</Badge>
                         </p>
                       </div>
                     </div>
-                    <Button asChild variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm" className="w-fit">
                       <Link href={route('grupos.show', clase.grupo.id_grupo)}>
                         Ver Grupo
                       </Link>
                     </Button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border">
                     <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-500">Nombre del Grupo</p>
+                      <p className="text-sm font-medium text-muted-foreground">Nombre del Grupo</p>
                       <p className="text-base">{clase.grupo.nombre_grupo}</p>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-500">Código del Grupo</p>
+                      <p className="text-sm font-medium text-muted-foreground">Código del Grupo</p>
                       <p className="text-base">{clase.grupo.Cod_Grupo}</p>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">No hay grupo asociado a esta clase</p>
+                  <p className="text-muted-foreground mb-4">No hay grupo asociado a esta clase</p>
                   <Button asChild variant="outline">
                     <Link href={route('clases.edit', clase.id_clase)}>
                       Asignar Grupo

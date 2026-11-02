@@ -396,18 +396,18 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Inscripción de Orquídeas" />
 
-      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-10">
+      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6 md:p-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Inscripción de Orquídeas</h1>
-            <p className="text-gray-600 mt-2">Registra las orquídeas de los participantes para el concurso</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Inscripción de Orquídeas</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">Registra las orquídeas de los participantes para el concurso</p>
           </div>
         </div>
 
         {/* Alerta informativa */}
-        <Alert className="border-amber-200 bg-amber-50">
-          <AlertTriangle className="h-4 w-4 text-amber-600" />
-          <AlertDescription className="text-amber-800">
+        <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200">
+          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          <AlertDescription className="text-amber-800 dark:text-amber-200">
             <strong>Recuerda:</strong> al finalizar la inscripción de tus orquídeas, descarga el comprobante de preinscripción y entrégalo a la asociación.
           </AlertDescription>
         </Alert>
@@ -444,18 +444,18 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
                 </div>
 
                 {selectedParticipante && (
-                  <Alert className="border-green-200 bg-green-50">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <AlertDescription className="text-green-800">
+                  <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/40 text-green-800 dark:text-green-200">
+                    <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    <AlertDescription className="text-green-800 dark:text-green-200">
                       Participante seleccionado: <strong>{selectedParticipante.nombre}</strong>
                     </AlertDescription>
                   </Alert>
                 )}
 
                 {/* Información del último correlativo */}
-                <Alert className="border-blue-200 bg-blue-50">
-                  <Calendar className="h-4 w-4 text-blue-600" />
-                  <AlertDescription className="text-blue-800">
+                <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/40 text-blue-800 dark:text-blue-200">
+                  <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <AlertDescription className="text-blue-800 dark:text-blue-200">
                     <strong>Último correlativo asignado:</strong> {ultimoCorrelativo}
                     {ultimoCorrelativo > 0 && (
                       <span className="block text-sm mt-1">
@@ -494,17 +494,17 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
                       className="w-full"
                     />
                     {selectedOrquidea && (
-                      <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
-                        <div className="flex items-center justify-between">
+                      <div className="mt-2 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-md">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <div>
-                            <div className="font-medium text-green-900">{selectedOrquidea.nombre_planta}</div>
-                            <div className="text-sm text-green-700">
+                            <div className="font-medium text-green-900 dark:text-green-200">{selectedOrquidea.nombre_planta}</div>
+                            <div className="text-sm text-green-700 dark:text-green-300">
                               {selectedOrquidea.grupo?.nombre_grupo} - {selectedOrquidea.clase?.nombre_clase}
                             </div>
                           </div>
                           <div className="flex gap-2">
                             <Badge variant="secondary">Total: {selectedOrquidea.cantidad}</Badge>
-                            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                            <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
                               Disponibles: {(() => {
                                 const vecesSeleccionada = orquideasSeleccionadas.filter(
                                   selected => selected.id_orquidea === selectedOrquidea.id_orquidea
@@ -577,18 +577,18 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
               </CardHeader>
               <CardContent>
                 {orquideasSeleccionadas.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <Leaf className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                    <p>No hay orquídeas seleccionadas</p>
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Leaf className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4" />
+                    <p className="font-medium">No hay orquídeas seleccionadas</p>
                     <p className="text-sm">Selecciona un participante y sus orquídeas para comenzar</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <div className="space-y-3">
                       {orquideasSeleccionadas.map((orquidea, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex-1">
-                            <p className="font-medium">{orquidea.nombre_planta}</p>
+                        <div key={index} className="flex items-center justify-between p-3 border border-border bg-card rounded-lg">
+                          <div className="flex-1 pr-2">
+                            <p className="font-medium text-foreground">{orquidea.nombre_planta}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge variant="secondary">Correlativo: {orquidea.correlativo}</Badge>
                             </div>
@@ -607,14 +607,14 @@ export default function CreateInscripcion({ participantes }: CreateInscripcionPr
                     <Separator />
 
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         Total: {orquideasSeleccionadas.length} orquídea{orquideasSeleccionadas.length !== 1 ? 's' : ''}
                       </p>
                     </div>
 
                     <Button
                       onClick={finalizarInscripcion}
-                      className="w-full bg-green-600 hover:bg-green-700"
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                       disabled={processing}
                     >
                       {processing ? 'Procesando...' : 'Finalizar Inscripción'}

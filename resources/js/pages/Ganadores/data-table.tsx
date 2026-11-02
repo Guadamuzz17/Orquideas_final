@@ -33,16 +33,23 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
+import { TableSkeleton } from "@/components/ui/table-skeleton"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isLoading?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
+  if (isLoading) {
+    return <TableSkeleton columns={columns.length || 7} rows={6} />
+  }
+
   const safeData = data || []
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -74,50 +81,53 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-        <div className="flex items-center py-4 gap-4">
-        <Input
-          placeholder="Buscar por participante..."
-          value={(table.getColumn("inscripcion_participante_nombre")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("inscripcion_participante_nombre")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      <div className="flex flex-col gap-3 py-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Input
+            placeholder="Buscar por participante..."
+            value={(table.getColumn("inscripcion_participante_nombre")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("inscripcion_participante_nombre")?.setFilterValue(event.target.value)
+            }
+            className="w-full"
+          />
+          
+          <Input
+            placeholder="Buscar por orquídea..."
+            value={(table.getColumn("inscripcion_orquidea_nombre_planta")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("inscripcion_orquidea_nombre_planta")?.setFilterValue(event.target.value)
+            }
+            className="w-full"
+          />
+          
+          <Input
+            placeholder="Buscar por grupo..."
+            value={(table.getColumn("inscripcion_orquidea_grupo_nombre_grupo")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("inscripcion_orquidea_grupo_nombre_grupo")?.setFilterValue(event.target.value)
+            }
+            className="w-full"
+          />
+          
+          <Input
+            placeholder="Buscar por correlativo..."
+            value={(table.getColumn("inscripcion_correlativo")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("inscripcion_correlativo")?.setFilterValue(event.target.value)
+            }
+            className="w-full"
+          />
+        </div>
         
-        <Input
-          placeholder="Buscar por orquídea..."
-          value={(table.getColumn("inscripcion_orquidea_nombre_planta")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("inscripcion_orquidea_nombre_planta")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        
-        <Input
-          placeholder="Buscar por grupo..."
-          value={(table.getColumn("inscripcion_orquidea_grupo_nombre_grupo")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("inscripcion_orquidea_grupo_nombre_grupo")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        
-        <Input
-          placeholder="Buscar por correlativo..."
-          value={(table.getColumn("inscripcion_correlativo")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("inscripcion_correlativo")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columnas
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+        <div className="flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                Columnas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
             {table
               .getAllColumns()
               .filter(
@@ -139,6 +149,7 @@ export function DataTable<TData, TValue>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
       </div>
     <div className="rounded-md border">
       <Table>

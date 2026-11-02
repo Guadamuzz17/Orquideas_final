@@ -1,6 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 
 interface LoginProps {
     status?: string;
@@ -17,7 +18,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const [showOrchid, setShowOrchid] = useState(false);
 
     useEffect(() => {
-        const timer = setTimeout(() => setShowOrchid(true), 1000);
+        const timer = setTimeout(() => setShowOrchid(true), 800);
         return () => clearTimeout(timer);
     }, []);
 
@@ -34,236 +35,162 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <div className="min-h-screen bg-white flex">
-            <Head title="Iniciar Sesión" />
+        <div className="min-h-screen bg-background text-foreground flex flex-col lg:flex-row relative selection:bg-purple-500 selection:text-white">
+            <Head title="Iniciar Sesión - Asociación de Orquideología" />
+
+            {/* Selector de modo oscuro en la esquina superior derecha */}
+            <div className="absolute top-4 right-4 z-30">
+                <AppearanceToggleDropdown className="bg-card/80 dark:bg-card/80 backdrop-blur-md rounded-full border border-border shadow-sm p-0.5" />
+            </div>
 
             {/* Logo UMG - Superior Izquierda */}
             <motion.div
-                className="absolute top-6 left-6 z-10"
-                initial={{ opacity: 0, x: -50 }}
+                className="absolute top-4 left-4 z-20"
+                initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 0.6 }}
             >
-                <img src="/images/umg2.png" alt="Universidad Mariano Gálvez" className="w-20 h-20 object-contain" />
+                <img src="/images/umg2.png" alt="Universidad Mariano Gálvez" className="w-14 h-14 sm:w-16 sm:h-16 object-contain" />
             </motion.div>
 
-            {/* Lado Izquierdo - Logo AAO y Orquídea */}
-            <div className="hidden lg:flex lg:w-1/2 bg-white relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-20 left-20 w-48 h-48 border border-blue-300 rounded-full"></div>
-                    <div className="absolute bottom-32 right-16 w-36 h-36 border border-blue-300 rounded-full"></div>
-                    <div className="absolute top-1/2 left-1/4 w-24 h-24 border border-blue-300 rounded-full"></div>
+            {/* Lado Izquierdo - Logo AAO y Orquídea (Visible en escritorio y tablet amplia) */}
+            <div className="hidden lg:flex lg:w-1/2 bg-card/60 dark:bg-card/30 border-r border-border relative overflow-hidden flex-col items-center justify-center p-12">
+                <div className="absolute inset-0 opacity-10 dark:opacity-5 pointer-events-none">
+                    <div className="absolute top-20 left-20 w-48 h-48 border border-purple-400 rounded-full"></div>
+                    <div className="absolute bottom-32 right-16 w-36 h-36 border border-purple-400 rounded-full"></div>
+                    <div className="absolute top-1/2 left-1/4 w-24 h-24 border border-purple-400 rounded-full"></div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center w-full p-12 relative z-10">
+                <div className="flex flex-col items-center justify-center w-full max-w-md relative z-10 text-center">
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
+                        initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1, delay: 0.3 }}
-                        className="mb-8"
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="mb-6"
                     >
                         <img
                             src="/images/Logo-fotor-bg-remover-2024090519443.png"
                             alt="Asociación Altaverapacense de Orquideología"
-                            className="w-64 h-auto object-contain"
+                            className="w-56 sm:w-64 h-auto object-contain mx-auto drop-shadow-md"
                         />
                     </motion.div>
 
-                    {/* Orquídea Animada con efecto de polvo */}
+                    {/* Orquídea Animada */}
                     {showOrchid && (
-                        <div className="relative">
+                        <div className="relative my-4">
                             <motion.div
                                 initial={{ opacity: 0, scale: 0 }}
                                 animate={{
                                     opacity: 1,
-                                    scale: [0, 1.2, 1],
-                                    rotate: [0, 5, -5, 0],
+                                    scale: [0, 1.15, 1],
+                                    rotate: [0, 4, -4, 0],
                                 }}
                                 transition={{
                                     duration: 1.5,
-                                    scale: {
-                                        times: [0, 0.6, 1],
-                                        duration: 1.5,
-                                    },
-                                    rotate: {
-                                        repeat: Number.POSITIVE_INFINITY,
-                                        duration: 4,
-                                        ease: "easeInOut",
-                                    },
+                                    scale: { times: [0, 0.6, 1], duration: 1.5 },
+                                    rotate: { repeat: Number.POSITIVE_INFINITY, duration: 5, ease: "easeInOut" },
                                 }}
-                                className="text-purple-500 relative z-10"
+                                className="text-primary relative z-10"
                             >
-                                <svg width="120" height="120" viewBox="0 0 120 120" className="drop-shadow-lg">
+                                <svg width="100" height="100" viewBox="0 0 120 120" className="drop-shadow-lg">
                                     <motion.path
                                         d="M60 20 C40 30, 40 50, 60 60 C80 50, 80 30, 60 20 Z"
-                                        fill="rgba(147, 51, 234, 0.8)"
+                                        fill="rgba(168, 85, 247, 0.85)"
+                                        initial={{ pathLength: 0, scale: 0 }}
+                                        animate={{ pathLength: 1, scale: 1 }}
+                                        transition={{ duration: 1, delay: 0.3 }}
+                                    />
+                                    <motion.path
+                                        d="M20 60 C30 40, 50 40, 60 60 C50 80, 30 80, 20 60 Z"
+                                        fill="rgba(192, 132, 252, 0.75)"
                                         initial={{ pathLength: 0, scale: 0 }}
                                         animate={{ pathLength: 1, scale: 1 }}
                                         transition={{ duration: 1, delay: 0.5 }}
                                     />
                                     <motion.path
-                                        d="M20 60 C30 40, 50 40, 60 60 C50 80, 30 80, 20 60 Z"
-                                        fill="rgba(168, 85, 247, 0.7)"
+                                        d="M100 60 C90 40, 70 40, 60 60 C70 80, 90 80, 100 60 Z"
+                                        fill="rgba(192, 132, 252, 0.75)"
                                         initial={{ pathLength: 0, scale: 0 }}
                                         animate={{ pathLength: 1, scale: 1 }}
                                         transition={{ duration: 1, delay: 0.7 }}
                                     />
                                     <motion.path
-                                        d="M100 60 C90 40, 70 40, 60 60 C70 80, 90 80, 100 60 Z"
-                                        fill="rgba(168, 85, 247, 0.7)"
-                                        initial={{ pathLength: 0, scale: 0 }}
-                                        animate={{ pathLength: 1, scale: 1 }}
-                                        transition={{ duration: 1, delay: 0.9 }}
-                                    />
-                                    <motion.path
                                         d="M60 100 C40 90, 40 70, 60 60 C80 70, 80 90, 60 100 Z"
-                                        fill="rgba(192, 132, 252, 0.6)"
+                                        fill="rgba(216, 180, 254, 0.65)"
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        transition={{ duration: 0.8, delay: 1.1 }}
+                                        transition={{ duration: 0.8, delay: 0.9 }}
                                     />
                                     <motion.circle
                                         cx="60"
                                         cy="60"
                                         r="8"
-                                        fill="rgba(126, 34, 206, 0.9)"
+                                        fill="rgba(147, 51, 234, 0.95)"
                                         initial={{ scale: 0 }}
-                                        animate={{ scale: [0, 1.5, 1] }}
-                                        transition={{ duration: 0.8, delay: 1.3 }}
+                                        animate={{ scale: [0, 1.4, 1] }}
+                                        transition={{ duration: 0.8, delay: 1.1 }}
                                     />
                                 </svg>
-                            </motion.div>
-
-                            {/* Partículas de polvo mágico */}
-                            {[...Array(12)].map((_, i) => (
-                                <motion.div
-                                    key={i}
-                                    className="absolute w-2 h-2 bg-purple-400 rounded-full"
-                                    style={{
-                                        left: "50%",
-                                        top: "50%",
-                                    }}
-                                    initial={{
-                                        scale: 0,
-                                        x: 0,
-                                        y: 0,
-                                        opacity: 0,
-                                    }}
-                                    animate={{
-                                        scale: [0, 1, 0.5, 0],
-                                        x: [
-                                            0,
-                                            Math.cos((i * 30 * Math.PI) / 180) * (40 + Math.random() * 30),
-                                            Math.cos((i * 30 * Math.PI) / 180) * (60 + Math.random() * 40),
-                                        ],
-                                        y: [
-                                            0,
-                                            Math.sin((i * 30 * Math.PI) / 180) * (40 + Math.random() * 30),
-                                            Math.sin((i * 30 * Math.PI) / 180) * (60 + Math.random() * 40),
-                                        ],
-                                        opacity: [0, 0.8, 0.4, 0],
-                                    }}
-                                    transition={{
-                                        duration: 3 + Math.random() * 2,
-                                        delay: 1.5 + i * 0.1,
-                                        repeat: Number.POSITIVE_INFINITY,
-                                        repeatDelay: 2 + Math.random() * 3,
-                                        ease: "easeOut",
-                                    }}
-                                />
-                            ))}
-
-                            {/* Partículas más pequeñas y rápidas */}
-                            {[...Array(8)].map((_, i) => (
-                                <motion.div
-                                    key={`small-${i}`}
-                                    className="absolute w-1 h-1 bg-purple-300 rounded-full"
-                                    style={{
-                                        left: "50%",
-                                        top: "50%",
-                                    }}
-                                    initial={{
-                                        scale: 0,
-                                        x: 0,
-                                        y: 0,
-                                        opacity: 0,
-                                    }}
-                                    animate={{
-                                        scale: [0, 1, 0],
-                                        x: [0, Math.cos((i * 45 * Math.PI) / 180) * (20 + Math.random() * 25)],
-                                        y: [0, Math.sin((i * 45 * Math.PI) / 180) * (20 + Math.random() * 25)],
-                                        opacity: [0, 1, 0],
-                                    }}
-                                    transition={{
-                                        duration: 1.5 + Math.random(),
-                                        delay: 2 + i * 0.15,
-                                        repeat: Number.POSITIVE_INFINITY,
-                                        repeatDelay: 1.5 + Math.random() * 2,
-                                        ease: "easeOut",
-                                    }}
-                                />
-                            ))}
-
-                            {/* Brillo central */}
-                            <motion.div
-                                className="absolute inset-0 flex items-center justify-center"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: [0, 0.3, 0] }}
-                                transition={{
-                                    duration: 2,
-                                    delay: 1.8,
-                                    repeat: Number.POSITIVE_INFINITY,
-                                    repeatDelay: 3,
-                                }}
-                            >
-                                <div className="w-24 h-24 bg-purple-400 rounded-full blur-xl opacity-30" />
                             </motion.div>
                         </div>
                     )}
 
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 2.5 }}
-                        className="text-blue-800 text-center text-lg font-light mt-6"
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.2 }}
+                        className="mt-4"
                     >
-                        Bienvenido al Sistema de AAO
-                    </motion.p>
+                        <h3 className="text-xl font-semibold text-foreground">Asociación de Orquideología</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Sistema de Juzgamiento y Registro de Exposiciones
+                        </p>
+                    </motion.div>
                 </div>
             </div>
 
-            {/* Lado Derecho - Formulario */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-blue-600 to-blue-800">
+            {/* Lado Derecho - Formulario Responsivo */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 md:p-12 min-h-screen bg-gradient-to-br from-slate-900/10 via-purple-950/10 to-indigo-950/20 dark:from-slate-950 dark:via-purple-950/30 dark:to-background safe-bottom safe-top">
                 <motion.div
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="w-full max-w-md"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="w-full max-w-md my-auto pt-12 lg:pt-0"
                 >
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
+                    {/* Header para móviles */}
+                    <div className="lg:hidden text-center mb-6">
+                        <img
+                            src="/images/Logo-fotor-bg-remover-2024090519443.png"
+                            alt="Logo AAO"
+                            className="w-24 h-auto object-contain mx-auto mb-3"
+                        />
+                        <h1 className="text-xl font-bold text-foreground">Asociación de Orquideología</h1>
+                    </div>
+
+                    <div className="bg-card text-card-foreground rounded-2xl shadow-xl dark:shadow-2xl border border-border p-6 sm:p-8 backdrop-blur-sm">
                         <motion.div
-                            initial={{ opacity: 0, y: -20 }}
+                            initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5 }}
-                            className="text-center mb-8"
+                            transition={{ delay: 0.3 }}
+                            className="text-center mb-6"
                         >
-                            <h2 className="text-3xl font-bold text-gray-800 mb-2">Iniciar Sesión</h2>
-                            <p className="text-gray-600">Ingresa tus credenciales para continuar</p>
+                            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-1.5">Iniciar Sesión</h2>
+                            <p className="text-sm text-muted-foreground">Ingresa tus credenciales para continuar</p>
                         </motion.div>
 
                         {status && (
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
+                                initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="mb-4 font-medium text-sm text-green-600 bg-green-50 p-3 rounded-lg"
+                                className="mb-4 font-medium text-sm text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl"
                             >
                                 {status}
                             </motion.div>
                         )}
 
-                        <form onSubmit={submit} className="space-y-6">
-                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        <form onSubmit={submit} className="space-y-5">
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
                                     Correo Electrónico
                                 </label>
                                 <input
@@ -271,16 +198,17 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     type="email"
                                     name="email"
                                     value={data.email}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-black"
+                                    className="w-full px-4 py-2.5 sm:py-3 text-sm bg-background text-foreground border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent transition-all placeholder:text-muted-foreground"
                                     autoComplete="username"
                                     onChange={handleInputChange}
-                                    placeholder="tu@email.com"
+                                    placeholder="admin@orquideas.com"
+                                    required
                                 />
-                                {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email}</div>}
-                            </motion.div>
+                                {errors.email && <div className="text-destructive text-xs mt-1.5 font-medium">{errors.email}</div>}
+                            </div>
 
-                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 }}>
-                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
                                     Contraseña
                                 </label>
                                 <input
@@ -288,71 +216,57 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     type="password"
                                     name="password"
                                     value={data.password}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-black"
+                                    className="w-full px-4 py-2.5 sm:py-3 text-sm bg-background text-foreground border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent transition-all placeholder:text-muted-foreground"
                                     autoComplete="current-password"
                                     onChange={handleInputChange}
                                     placeholder="••••••••"
+                                    required
                                 />
-                                {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password}</div>}
-                            </motion.div>
+                                {errors.password && <div className="text-destructive text-xs mt-1.5 font-medium">{errors.password}</div>}
+                            </div>
 
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.8 }}
-                                className="flex items-center justify-between"
-                            >
-                                <label className="flex items-center">
+                            <div className="flex items-center justify-between text-sm">
+                                <label className="flex items-center cursor-pointer select-none">
                                     <input
                                         type="checkbox"
                                         name="remember"
                                         checked={data.remember}
                                         onChange={handleInputChange}
-                                        className="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500"
+                                        className="rounded border-input text-primary shadow-sm focus:ring-primary h-4 w-4"
                                     />
-                                    <span className="ml-2 text-sm text-gray-600">Recordarme</span>
+                                    <span className="ml-2 text-xs sm:text-sm text-muted-foreground">Recordarme</span>
                                 </label>
 
                                 {canResetPassword && (
                                     <a
                                         href={route('password.request')}
-                                        className="text-sm text-blue-600 hover:text-blue-500 transition-colors"
+                                        className="text-xs sm:text-sm text-primary hover:underline transition-colors"
                                     >
                                         ¿Olvidaste tu contraseña?
                                     </a>
                                 )}
-                            </motion.div>
+                            </div>
 
                             <motion.button
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.9 }}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                                whileHover={{ scale: 1.01 }}
+                                whileTap={{ scale: 0.99 }}
                                 type="submit"
                                 disabled={processing}
-                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50"
+                                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-3 px-4 rounded-xl font-medium text-sm sm:text-base shadow-lg shadow-purple-500/20 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all disabled:opacity-50 cursor-pointer"
                             >
                                 {processing ? "Iniciando sesión..." : "Iniciar Sesión"}
                             </motion.button>
                         </form>
 
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 1 }}
-                            className="mt-6 text-center"
-                        >
-                            <p className="text-gray-600">
-                                ¿No tienes una cuenta?{" "}
-                                <a
-                                    href={route('register')}
-                                    className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
-                                >
-                                    Regístrate aquí
-                                </a>
-                            </p>
-                        </motion.div>
+                        <div className="mt-6 text-center text-xs sm:text-sm text-muted-foreground">
+                            ¿No tienes una cuenta?{" "}
+                            <a
+                                href={route('register')}
+                                className="text-primary font-medium hover:underline transition-colors"
+                            >
+                                Regístrate aquí
+                            </a>
+                        </div>
                     </div>
                 </motion.div>
             </div>

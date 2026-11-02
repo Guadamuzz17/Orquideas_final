@@ -56,6 +56,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { NavUser } from '@/components/nav-user'
+import { PWAInstallPrompt } from '@/components/pwa-install-prompt'
 import { Link, usePage } from '@inertiajs/react'
 
 // Datos del sistema
@@ -256,6 +257,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { url, props: pageProps } = usePage()
   const { auth, eventoActivo } = pageProps as any
   const userPermissions = auth?.permissions || []
+  const { isMobile, setOpenMobile, state } = useSidebar()
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
 
   // Detectar si hay un evento activo
   const hayEventoActivo = eventoActivo && eventoActivo.id
@@ -338,7 +346,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="none" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -348,22 +356,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-green-600 text-white">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-green-600 text-white shrink-0">
                     <Leaf className="size-4" />
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
+                  <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                     <span className="truncate font-semibold">
                       {hayEventoActivo ? eventoActivo.nombre : data.teams[0].name}
                     </span>
-                    <span className="truncate text-xs">
+                    <span className="truncate text-xs text-muted-foreground">
                       {hayEventoActivo ? `Evento ${eventoActivo.estado}` : data.teams[0].plan}
                     </span>
                   </div>
-                  <ChevronUp className="ml-auto" />
+                  <ChevronUp className="ml-auto group-data-[collapsible=icon]:hidden" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56 rounded-lg"
                 align="start"
                 side="bottom"
                 sideOffset={4}
@@ -395,7 +403,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navegación Principal</SidebarGroupLabel>
+          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">Navegación Principal</SidebarGroupLabel>
           <SidebarMenu>
             {filteredNavMain.map((item) => {
               const isItemActive = url === item.url || (item.items && item.items.some(subItem => url === subItem.url || url.startsWith(subItem.url + '/')));
@@ -409,7 +417,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       tooltip={item.title}
                       isActive={isItemActive}
                     >
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleNavClick} prefetch>
                         <item.icon />
                         <span>{item.title}</span>
                       </Link>
@@ -418,7 +426,53 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 );
               }
 
-              // Si tiene subitems, mostrarlos siempre abiertos
+              // Si está colapsado en desktop, mostrar DropdownMenu lateral flotante
+              if (state === 'collapsed' && !isMobile) {
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton tooltip={item.title} isActive={isItemActive}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="right" align="start" sideOffset={10} className="min-w-56 rounded-lg shadow-lg">
+                        <div className="px-2.5 py-1.5 text-xs font-semibold text-muted-foreground border-b border-border/60">
+                          {item.title}
+                        </div>
+                        <div className="p-1">
+                          {item.items.map((subItem) => (
+                            <DropdownMenuItem
+                              key={subItem.title}
+                              asChild={!subItem.action}
+                              onClick={
+                                subItem.action === 'download' ? handleDownloadPDF :
+                                subItem.action === 'download-inscripcion' ? handleDownloadFormatoInscripcion :
+                                undefined
+                              }
+                              className={url === subItem.url || url.startsWith(subItem.url + '/') ? 'bg-sidebar-accent font-medium' : ''}
+                            >
+                              {subItem.action === 'download' || subItem.action === 'download-inscripcion' ? (
+                                <div className="flex items-center cursor-pointer w-full">
+                                  <Download className="mr-2 h-4 w-4" />
+                                  <span>{subItem.title}</span>
+                                </div>
+                              ) : (
+                                <Link href={subItem.url} className="w-full flex items-center" prefetch>
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              )}
+                            </DropdownMenuItem>
+                          ))}
+                        </div>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </SidebarMenuItem>
+                );
+              }
+
+              // Si está expandido o en móvil, mostrar con SidebarMenuSub
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton tooltip={item.title} isActive={isItemActive}>
@@ -443,7 +497,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               <span>{subItem.title}</span>
                             </div>
                           ) : (
-                            <Link href={subItem.url}>
+                            <Link href={subItem.url} onClick={handleNavClick} prefetch>
                               <span>{subItem.title}</span>
                             </Link>
                           )}
@@ -459,6 +513,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
+        <PWAInstallPrompt />
         <NavUser />
       </SidebarFooter>
 

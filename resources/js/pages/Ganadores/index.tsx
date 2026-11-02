@@ -77,9 +77,9 @@ export default function GanadoresIndex({ ganadores }: GanadoresIndexProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Lista de Ganadores" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">  
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Trophy className="h-6 w-6 text-yellow-600" />
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">  
+        <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+          <Trophy className="h-6 w-6 text-amber-500" />
           Lista de Ganadores
         </h1>
         
@@ -100,7 +100,7 @@ export default function GanadoresIndex({ ganadores }: GanadoresIndexProps) {
         </div>
 
         {/* Cards de estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -162,12 +162,12 @@ export default function GanadoresIndex({ ganadores }: GanadoresIndexProps) {
           </Card>
         </div>
 
-        <div className='flex justify-between items-center'>
+        <div className='flex flex-wrap justify-between items-center gap-3'>
           <div className="text-sm text-muted-foreground">
             Total de ganadores: {tableData.length}
           </div>
           
-          <Button asChild className="bg-yellow-600 hover:bg-yellow-700">
+          <Button asChild className="bg-amber-600 hover:bg-amber-700 text-white">
             <Link href={route('ganadores.create')}>
               <Plus className="mr-2 h-4 w-4" />
               Asignar Ganador
@@ -175,7 +175,7 @@ export default function GanadoresIndex({ ganadores }: GanadoresIndexProps) {
           </Button>
         </div>
 
-        <div className="container mx-auto">
+        <div className="w-full overflow-hidden">
           <DataTable columns={columns} data={tableData} />
         </div>
       </div>

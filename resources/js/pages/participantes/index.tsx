@@ -66,8 +66,8 @@ export default function ParticipantesIndex({ participantes }: ParticipantesIndex
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Participantes" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">  
-        <h1 className="text-2xl font-bold">Participantes</h1>
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">  
+        <h1 className="text-xl sm:text-2xl font-bold">Participantes</h1>
         
         <div>
           <Breadcrumb>
@@ -85,7 +85,7 @@ export default function ParticipantesIndex({ participantes }: ParticipantesIndex
           </Breadcrumb>
         </div>
 
-        <div className='flex justify-between items-center'>
+        <div className='flex flex-wrap justify-between items-center gap-3'>
           <Button asChild variant="outline">
             <Link href={route('participantes.formato')}>
               <Plus className="mr-2 h-4 w-4" />
@@ -93,7 +93,7 @@ export default function ParticipantesIndex({ participantes }: ParticipantesIndex
             </Link>
           </Button>
           
-          <Button asChild className="bg-blue-600 hover:bg-blue-700">
+          <Button asChild className="bg-primary hover:bg-primary/90">
             <Link href={route('participantes.create')}>
               <Plus className="mr-2 h-4 w-4" />
               Registrar Participante
@@ -101,7 +101,7 @@ export default function ParticipantesIndex({ participantes }: ParticipantesIndex
           </Button>
         </div>
 
-        <div className="container mx-auto">
+        <div className="w-full overflow-hidden">
           <DataTable columns={columns} data={tableData} />
         </div>
       </div>

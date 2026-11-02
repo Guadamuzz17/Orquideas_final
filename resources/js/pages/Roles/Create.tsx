@@ -90,9 +90,9 @@ export default function Create({ permisos }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Crear Rol" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-6 sm:p-10">
+            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6 md:p-8 max-w-4xl mx-auto w-full">
                     <form onSubmit={handleSubmit}>
-                        <Card>
+                        <Card className="border-border">
                             <CardHeader>
                                 <CardTitle>Información del Rol</CardTitle>
                                 <CardDescription>
@@ -202,13 +202,13 @@ export default function Create({ permisos }: Props) {
                             </CardContent>
                         </Card>
 
-                        <div className="mt-6 flex justify-end gap-4">
-                            <Link href={route('roles.index')}>
-                                <Button type="button" variant="outline">
+                        <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end gap-3">
+                            <Link href={route('roles.index')} className="w-full sm:w-auto">
+                                <Button type="button" variant="outline" className="w-full sm:w-auto">
                                     Cancelar
                                 </Button>
                             </Link>
-                            <Button type="submit" disabled={processing}>
+                            <Button type="submit" disabled={processing} className="w-full sm:w-auto">
                                 <Save className="mr-2 h-4 w-4" />
                                 {processing ? 'Guardando...' : 'Guardar Rol'}
                             </Button>

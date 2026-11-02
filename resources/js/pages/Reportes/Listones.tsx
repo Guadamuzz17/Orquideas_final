@@ -342,24 +342,24 @@ export default function ListonesReportes({ estadisticas, listones_recientes }: P
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
+                                        <tbody className="bg-card divide-y divide-border text-foreground">
                                             {(listones_recientes || []).filter(liston => liston && liston.id).map((liston) => (
-                                                <tr key={liston.id} className="hover:bg-gray-50">
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <tr key={liston.id} className="hover:bg-muted/50 transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                                                         {liston.correlativo || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                                                         {liston.participante || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                                                         {liston.orquidea || 'N/A'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                                             {liston.tipo_liston || 'Sin especificar'}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                                                         {liston.fecha_ganador ? formatDate(liston.fecha_ganador) : 'N/A'}
                                                     </td>
                                                 </tr>

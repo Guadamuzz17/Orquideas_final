@@ -82,19 +82,19 @@ export default function Edit({ tipoPremio }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Editar Tipo de Premio" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-6 sm:p-10">
-                <div className="flex items-center justify-between">
+            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6 md:p-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Editar Tipo de Premio</h1>
-                        <p className="text-gray-600 mt-2">Modifica la información del tipo de premio</p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Editar Tipo de Premio</h1>
+                        <p className="text-muted-foreground mt-1 text-sm sm:text-base">Modifica la información del tipo de premio</p>
                     </div>
-                    <Button variant="outline" onClick={() => router.visit(route('tipo-premios.index'))}>
+                    <Button variant="outline" onClick={() => router.visit(route('tipo-premios.index'))} className="w-fit">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Volver
                     </Button>
                 </div>
 
-                <Card className="max-w-2xl">
+                <Card className="max-w-2xl border-border">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Award className="h-5 w-5" />
@@ -115,7 +115,7 @@ export default function Edit({ tipoPremio }: Props) {
                                     placeholder="Ej: Primer Lugar"
                                 />
                                 {errors.nombre_premio && (
-                                    <p className="text-sm text-red-600">{errors.nombre_premio}</p>
+                                    <p className="text-sm text-red-600 dark:text-red-400">{errors.nombre_premio}</p>
                                 )}
                             </div>
 
@@ -129,7 +129,7 @@ export default function Edit({ tipoPremio }: Props) {
                                     placeholder="Descripción opcional del premio"
                                 />
                                 {errors.descripcion && (
-                                    <p className="text-sm text-red-600">{errors.descripcion}</p>
+                                    <p className="text-sm text-red-600 dark:text-red-400">{errors.descripcion}</p>
                                 )}
                             </div>
 
@@ -144,9 +144,9 @@ export default function Edit({ tipoPremio }: Props) {
                                     placeholder="1"
                                     className="max-w-xs"
                                 />
-                                <p className="text-sm text-gray-500">Orden de visualización del premio</p>
+                                <p className="text-sm text-muted-foreground">Orden de visualización del premio</p>
                                 {errors.posicion && (
-                                    <p className="text-sm text-red-600">{errors.posicion}</p>
+                                    <p className="text-sm text-red-600 dark:text-red-400">{errors.posicion}</p>
                                 )}
                             </div>
 
@@ -160,12 +160,12 @@ export default function Edit({ tipoPremio }: Props) {
                                             onClick={() => setData('color', colorOption.value)}
                                             className={`flex items-center gap-2 rounded-md border-2 px-3 py-2 text-sm transition-all ${
                                                 data.color === colorOption.value
-                                                    ? 'border-indigo-500 bg-indigo-50'
-                                                    : 'border-gray-300 hover:border-gray-400'
+                                                    ? 'border-primary bg-primary/10'
+                                                    : 'border-border hover:border-primary/50'
                                             }`}
                                         >
                                             <span
-                                                className="h-4 w-4 rounded-full"
+                                                className="h-4 w-4 rounded-full border border-border"
                                                 style={{ backgroundColor: colorOption.value }}
                                             ></span>
                                             <span>{colorOption.name}</span>
@@ -177,7 +177,7 @@ export default function Edit({ tipoPremio }: Props) {
                                         type="color"
                                         value={data.color}
                                         onChange={(e) => setData('color', e.target.value)}
-                                        className="h-10 w-20 cursor-pointer rounded border"
+                                        className="h-10 w-20 cursor-pointer rounded border border-border bg-transparent"
                                     />
                                     <Input
                                         type="text"
@@ -189,7 +189,7 @@ export default function Edit({ tipoPremio }: Props) {
                                     />
                                 </div>
                                 {errors.color && (
-                                    <p className="text-sm text-red-600">{errors.color}</p>
+                                    <p className="text-sm text-red-600 dark:text-red-400">{errors.color}</p>
                                 )}
                             </div>
 
@@ -199,20 +199,21 @@ export default function Edit({ tipoPremio }: Props) {
                                     id="activo"
                                     checked={data.activo}
                                     onChange={(e) => setData('activo', e.target.checked)}
-                                    className="h-4 w-4 rounded border-gray-300"
+                                    className="h-4 w-4 rounded border-border"
                                 />
                                 <Label htmlFor="activo" className="cursor-pointer">Activo</Label>
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-4">
+                            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
                                 <Button
                                     type="button"
                                     variant="outline"
                                     onClick={() => router.visit(route('tipo-premios.index'))}
+                                    className="w-full sm:w-auto"
                                 >
                                     Cancelar
                                 </Button>
-                                <Button type="submit" disabled={processing}>
+                                <Button type="submit" disabled={processing} className="w-full sm:w-auto">
                                     <Save className="mr-2 h-4 w-4" />
                                     Actualizar
                                 </Button>

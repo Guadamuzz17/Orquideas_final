@@ -79,8 +79,8 @@ export default function GruposIndex({ grupos }: GruposIndexProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Grupos de Orquídeas" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <h1 className="text-2xl font-bold">Gestión de Grupos de Orquídeas</h1>
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <h1 className="text-xl sm:text-2xl font-bold">Gestión de Grupos de Orquídeas</h1>
 
         <div>
           <Breadcrumb>
@@ -98,29 +98,29 @@ export default function GruposIndex({ grupos }: GruposIndexProps) {
           </Breadcrumb>
         </div>
 
-        <div className='flex justify-between items-center'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
           <div className="text-sm text-muted-foreground">
             Total de grupos registrados: {grupos.total}
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button onClick={handleDownloadPDF} className="bg-blue-600 hover:bg-blue-700">
-              <Download className="mr-2 h-4 w-4" />
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={handleDownloadPDF} variant="outline" size="sm">
+              <Download className="mr-1.5 h-4 w-4" />
               Descargar Clases PDF
             </Button>
 
-            <Button asChild className="bg-green-600 hover:bg-green-700">
+            <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
               <Link href={route('grupos.create')}>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-1.5 h-4 w-4" />
                 Crear Grupo
               </Link>
             </Button>
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {grupos.data.map((grupo) => (
-            <Card key={grupo.id_grupo} className="hover:shadow-lg transition-shadow">
+            <Card key={grupo.id_grupo} className="hover:shadow-lg transition-shadow border-border">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>

@@ -127,30 +127,30 @@ export default function ListonesIndex({ listones = [], error }: ListonesIndexPro
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Listones - Menciones Honoríficas" />
 
-      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-10">
+      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6 md:p-8">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-4">
+          <div className="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg mb-4">
             <p className="font-medium">Error al cargar listones:</p>
             <p className="text-sm">{error}</p>
           </div>
         )}
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Listones y Menciones Honoríficas</h1>
-            <p className="text-gray-600 mt-2">Gestiona los listones y menciones otorgados a participantes</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Listones y Menciones Honoríficas</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">Gestiona los listones y menciones otorgados a participantes</p>
           </div>
-          <Link href={route('listones.create')}>
-            <Button className="bg-green-600 hover:bg-green-700">
+          <Link href={route('listones.create')} className="w-fit">
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
               <Plus className="mr-2 h-4 w-4" />
               Otorgar Listón
             </Button>
           </Link>
         </div>
 
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-2">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar por correlativo, participante, orquídea o tipo..."
               value={searchTerm}
@@ -158,19 +158,19 @@ export default function ListonesIndex({ listones = [], error }: ListonesIndexPro
               className="pl-10"
             />
           </div>
-          <Badge variant="outline" className="bg-blue-50 text-blue-700">
+          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 w-fit">
             Total: {filteredListones.length} listones
           </Badge>
         </div>
 
         {filteredListones.length === 0 ? (
-          <Card>
+          <Card className="border-border">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Award className="h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <Award className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 {searchTerm ? 'No se encontraron resultados' : 'No hay listones otorgados'}
               </h3>
-              <p className="text-gray-600 text-center mb-6">
+              <p className="text-muted-foreground text-center mb-6">
                 {searchTerm
                   ? 'Intenta con otros términos de búsqueda'
                   : 'Comienza otorgando listones y menciones honoríficas a los participantes'
@@ -178,7 +178,7 @@ export default function ListonesIndex({ listones = [], error }: ListonesIndexPro
               </p>
               {!searchTerm && (
                 <Link href={route('listones.create')}>
-                  <Button className="bg-green-600 hover:bg-green-700">
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
                     <Plus className="mr-2 h-4 w-4" />
                     Otorgar Primer Listón
                   </Button>
@@ -189,7 +189,7 @@ export default function ListonesIndex({ listones = [], error }: ListonesIndexPro
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredListones.map((liston) => (
-              <Card key={liston.id_liston} className="hover:shadow-lg transition-shadow">
+              <Card key={liston.id_liston} className="hover:shadow-lg transition-shadow border-border">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">

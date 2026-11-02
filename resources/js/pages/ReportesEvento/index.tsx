@@ -78,18 +78,20 @@ export default function ReportesEventoIndex({ evento }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Reportes - ${evento.nombre_evento}`} />
 
-      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-10">
+      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6 md:p-8">
         {/* Header con información del evento */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-6">
-          <div className="flex items-center gap-4">
-            <FileSpreadsheet className="h-12 w-12" />
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900/60 dark:to-indigo-950/60 border border-blue-500/20 text-white rounded-xl shadow-md p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-white/10 backdrop-blur">
+              <FileSpreadsheet className="h-6 w-6" />
+            </div>
             <div>
-              <h1 className="text-3xl font-bold">Reportes por Eventos</h1>
-              <p className="text-blue-100 mt-1">
-                Generando reportes para: <span className="font-semibold">{evento.nombre_evento}</span>
+              <h1 className="text-2xl sm:text-3xl font-bold">Reportes por Eventos</h1>
+              <p className="text-blue-100 mt-1 text-sm sm:text-base">
+                Generando reportes para: <span className="font-semibold underline">{evento.nombre_evento}</span>
               </p>
               {evento.fecha_inicio && (
-                <p className="text-sm text-blue-100 mt-1">
+                <p className="text-xs sm:text-sm text-blue-200 mt-1">
                   Período: {new Date(evento.fecha_inicio).toLocaleDateString('es-ES')}
                   {evento.fecha_fin && ` - ${new Date(evento.fecha_fin).toLocaleDateString('es-ES')}`}
                 </p>
@@ -99,7 +101,7 @@ export default function ReportesEventoIndex({ evento }: Props) {
         </div>
 
         {/* Filtros de fecha */}
-        <Card>
+        <Card className="border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />

@@ -154,10 +154,10 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
     <AppLayout>
       <Head title="Registrar Orquídea" />
 
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Registrar Nueva Orquídea</h1>
-          <Button asChild variant="outline">
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold">Registrar Nueva Orquídea</h1>
+          <Button asChild variant="outline" className="w-fit">
             <Link href={route('orquideas.index')}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver al Catálogo
@@ -167,19 +167,19 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
 
         {/* Alerta de evento bloqueado */}
         {isEventoFinalizado && (
-          <Alert variant="destructive" className="bg-red-50 border-red-200">
+          <Alert variant="destructive" className="bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900">
             <Lock className="h-5 w-5" />
-            <AlertTitle className="text-red-800 font-bold">🔒 Evento Finalizado - Formulario Bloqueado</AlertTitle>
-            <AlertDescription className="text-red-700">
+            <AlertTitle className="text-red-800 dark:text-red-300 font-bold">🔒 Evento Finalizado - Formulario Bloqueado</AlertTitle>
+            <AlertDescription className="text-red-700 dark:text-red-200">
               El evento "{eventoActivo?.nombre}" ha finalizado y no se pueden registrar nuevas orquídeas.
               Por favor, seleccione un evento activo desde el menú de eventos.
             </AlertDescription>
           </Alert>
         )}
 
-        <Card className={`shadow-lg ${isEventoFinalizado ? 'opacity-60 pointer-events-none' : ''}`}>
-          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
-            <CardTitle className="flex items-center gap-2 text-green-800">
+        <Card className={`shadow-lg border-border ${isEventoFinalizado ? 'opacity-60 pointer-events-none' : ''}`}>
+          <CardHeader className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-border">
+            <CardTitle className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
               <Flower2 className="h-5 w-5" />
               Información de la Orquídea
               {isEventoFinalizado && <Lock className="h-4 w-4 text-red-600 ml-auto" />}
@@ -189,7 +189,7 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Nombre de la Planta con Autocompletado */}
               <div className="space-y-2">
@@ -202,11 +202,11 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
                   placeholder="Ej: Cattleya mossiae, Phalaenopsis amabilis..."
                   error={!!errors.nombre_planta}
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   💡 Empiece a escribir para ver sugerencias de nombres existentes
                 </p>
                 {errors.nombre_planta && (
-                  <p className="text-sm text-red-600">{errors.nombre_planta}</p>
+                  <p className="text-sm text-red-600 dark:text-red-400">{errors.nombre_planta}</p>
                 )}
               </div>
 
@@ -361,7 +361,7 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
               <div className="space-y-4">
                 <Label className="text-sm font-medium">Foto de la Orquídea</Label>
 
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-400 transition-colors">
+                <div className="border-2 border-dashed border-border bg-card rounded-lg p-6 text-center hover:border-primary transition-colors">
                   <input
                     type="file"
                     accept="image/*"
@@ -375,9 +375,9 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
                       <img
                         src={previewUrl}
                         alt="Preview"
-                        className="mx-auto h-32 w-32 object-cover rounded-lg"
+                        className="mx-auto h-32 w-32 object-cover rounded-lg border border-border"
                       />
-                      <div className="text-green-600 font-medium">
+                      <div className="text-emerald-600 dark:text-emerald-400 font-medium">
                         Archivo seleccionado: {selectedFile?.name}
                       </div>
                       <Button
@@ -391,8 +391,8 @@ export default function CreateOrquidea({ grupos, clases, participantes }: Create
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <Upload className="mx-auto h-8 w-8 text-gray-400" />
-                      <div className="text-gray-600">Arrastra una imagen aquí o haz clic para seleccionar</div>
+                      <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+                      <div className="text-muted-foreground">Arrastra una imagen aquí o haz clic para seleccionar</div>
                       <Button
                         type="button"
                         variant="outline"

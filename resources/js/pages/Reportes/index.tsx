@@ -29,31 +29,25 @@ export default function ReportesIndex() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Reportes" />
-      <div className="space-y-6 flex flex-col items-center">
-        <div className="flex items-center justify-center w-full">
-          <h1 className="text-2xl font-semibold">Reportes</h1>
+      <div className="flex h-full flex-1 flex-col items-center gap-6 p-4 sm:p-6 md:p-8 w-full max-w-4xl mx-auto">
+        <div className="flex items-center justify-between w-full">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold">Generación de Reportes</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Reportes en PDF y hojas de cálculo Excel</p>
+          </div>
         </div>
 
         {/* El evento se toma del backend via session('evento_activo') */}
 
       {page === 1 && (
-        <Card className="max-w-xl">
+        <Card className="w-full max-w-xl border-border">
           <CardHeader>
-            <CardTitle>Listado General</CardTitle>
-            <CardDescription>Genera el reporte para el evento seleccionado.</CardDescription>
+            <CardTitle>Listado General de Inscripciones</CardTitle>
+            <CardDescription>Genera el reporte para el evento activo.</CardDescription>
           </CardHeader>
-          <CardFooter>
-            {/* //<Button
-              onClick={() => {
-                const url = `/reportes/inscripciones/pdf`
-                window.open(url, "_blank")
-              }}
-            >
-              Generar reporte
-            </Button> */}
+          <CardFooter className="flex flex-wrap gap-2">
             <Button
               variant="outline"
-              className="ml-2"
               onClick={() => {
                 const url = `/reportes/inscripciones/excel`
                 window.open(url, "_blank")
@@ -66,7 +60,7 @@ export default function ReportesIndex() {
       )}
 
       {page === 2 && (
-        <Card className="max-w-xl">
+        <Card className="w-full max-w-xl border-border">
           <CardHeader>
             <CardTitle>Plantas por Clases</CardTitle>
             <CardDescription>Filtra por clase.</CardDescription>

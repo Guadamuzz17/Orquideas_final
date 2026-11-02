@@ -159,17 +159,17 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Asignar Ganador" />
 
-      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-10">
-        <div className="flex items-center justify-between">
+      <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <Trophy className="h-8 w-8 text-yellow-600" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-2">
+              <Trophy className="h-7 w-7 sm:h-8 sm:w-8 text-amber-500" />
               Asignar Ganador
             </h1>
-            <p className="text-gray-600 mt-2">Designa ganadores para las orquídeas inscritas</p>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">Designa ganadores para las orquídeas inscritas</p>
           </div>
 
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="w-fit">
             <Link href={route('ganadores.index')}>
               <Users className="mr-2 h-4 w-4" />
               Ver Ganadores
@@ -178,7 +178,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
         </div>
 
         {/* Filtros de búsqueda */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="filtro-participante">Buscar Participante</Label>
             <Input
@@ -221,18 +221,18 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
         </div>
 
         {/* Instrucciones */}
-        <Alert className="border-blue-200 bg-blue-50">
-          <Search className="h-4 w-4 text-blue-600" />
-          <AlertDescription className="text-blue-800">
+        <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/40 text-blue-800 dark:text-blue-200">
+          <Search className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <AlertDescription className="text-blue-800 dark:text-blue-200">
             <strong>Instrucciones:</strong> Escriba el nombre de la orquídea, participante o grupo (por ejemplo: A) para filtrar.
           </AlertDescription>
         </Alert>
 
         {/* Formulario en Card */}
-        <Card>
+        <Card className="border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-yellow-600" />
+              <Trophy className="h-5 w-5 text-amber-500" />
               Asignar Ganador
             </CardTitle>
             <CardDescription>
@@ -250,7 +250,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
                   </SelectTrigger>
                   <SelectContent>
                     {inscripcionesFiltradas.length === 0 ? (
-                      <div className="p-2 text-sm text-gray-500">
+                      <div className="p-2 text-sm text-muted-foreground">
                         No hay inscripciones disponibles con los filtros actuales
                       </div>
                     ) : (
@@ -259,7 +259,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
                           <div className="flex items-center gap-2">
                             <Badge variant="secondary">#{inscripcion.correlativo}</Badge>
                             <span>{inscripcion.orquidea?.nombre_planta || 'Sin nombre'}</span>
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-muted-foreground">
                               - {inscripcion.participante?.nombre || 'Sin participante'}
                             </span>
                           </div>
@@ -269,18 +269,18 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
                   </SelectContent>
                 </Select>
                 {errors.id_inscripcion && (
-                  <p className="text-sm text-red-600 mt-1">{errors.id_inscripcion}</p>
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.id_inscripcion}</p>
                 )}
-                <div className="text-sm text-gray-600 mt-1">
+                <div className="text-sm text-muted-foreground mt-1">
                   <strong>Inscripciones disponibles:</strong> {inscripcionesFiltradas.length}
                 </div>
               </div>
 
               {/* Información de la orquídea seleccionada */}
               {selectedInscripcion && (
-                <Alert className="border-green-200 bg-green-50">
-                  <Leaf className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-green-800">
+                <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/40 text-green-800 dark:text-green-200">
+                  <Leaf className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <AlertDescription className="text-green-800 dark:text-green-200">
                     <div className="space-y-1">
                       <div><strong>Orquídea:</strong> {selectedInscripcion.orquidea.nombre_planta}</div>
                       <div><strong>Participante:</strong> {selectedInscripcion.participante.nombre}</div>
@@ -294,9 +294,9 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
 
               {/* Mostrar información de categoría (solo informativa) */}
               {selectedInscripcion && (
-                <Alert className="border-yellow-200 bg-yellow-50">
-                  <Award className="h-4 w-4 text-yellow-600" />
-                  <AlertDescription className="text-yellow-800">
+                <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200">
+                  <Award className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <AlertDescription className="text-amber-800 dark:text-amber-200">
                     <div className="space-y-1">
                       <div><strong>Categoría de la orquídea:</strong></div>
                       <div>• <strong>Grupo:</strong> {selectedInscripcion.orquidea.grupo?.nombre_grupo}</div>
@@ -346,7 +346,7 @@ export default function CreateGanador({ participantes, grupos, clases, inscripci
                 <Button
                   type="submit"
                   disabled={processing}
-                  className="w-full bg-yellow-600 hover:bg-yellow-700"
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                 >
                   <Trophy className="mr-2 h-4 w-4" />
                   {processing ? 'Asignando ganador...' : 'Asignar Ganador'}
