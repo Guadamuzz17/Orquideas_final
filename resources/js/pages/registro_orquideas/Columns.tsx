@@ -8,9 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useForm, router } from '@inertiajs/react'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 import { useState } from 'react'
-import { showDeleteConfirm } from '@/utils/sweetalert'
 import {
   Select,
   SelectContent,
@@ -260,15 +259,12 @@ export const columns = (
             descripcion: '',
           })
 
-          const handleDelete = async (id: number, nombre: string) => {
-            const result = await showDeleteConfirm(nombre)
-            if (result.isConfirmed) {
-              router.delete(route('orquideas.destroy', id), {
-                preserveScroll: true,
-                onSuccess: () => toast.success('Orquídea eliminada'),
-                onError: () => toast.error('Error al eliminar')
-              })
-            }
+          const handleDelete = (id: number) => {
+            router.delete(route('orquideas.destroy', id), {
+              preserveScroll: true,
+              onSuccess: () => toast.success('Orquídea eliminada correctamente'),
+              onError: () => toast.error('Error al eliminar la orquídea')
+            });
           }
 
           const handleEditSubmit = (e: React.FormEvent, id: number) => {
@@ -294,8 +290,6 @@ export const columns = (
 
           return (
             <div className="flex justify-end items-center gap-2">
-              <Toaster position="top-right" richColors expand visibleToasts={3} />
-
               <Drawer>
                 <DrawerTrigger asChild>
                   <Button variant="ghost">Ver</Button>
@@ -548,7 +542,7 @@ export const columns = (
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction className="bg-destructive hover:bg-destructive/90"
-                          onClick={() => handleDelete(orquidea.id_orquidea, orquidea.nombre_planta)}>
+                          onClick={() => handleDelete(orquidea.id_orquidea)}>
                           Confirmar
                         </AlertDialogAction>
                       </AlertDialogFooter>

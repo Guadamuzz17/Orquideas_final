@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
 
 interface EstadisticasProps {
     total_listones: number;
@@ -87,7 +88,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
             document.body.removeChild(link);
         } catch (error) {
             console.error('Error al descargar Excel:', error);
-            alert('Error al descargar el archivo Excel');
+            toast.error('Error al descargar el archivo Excel');
         }
     };
 
@@ -105,7 +106,7 @@ export default function ListonesReportes({ estadisticas, listones_recientes, gru
             document.body.removeChild(link);
         } catch (error) {
             console.error('Error al descargar PDF:', error);
-            alert('Error al descargar el archivo PDF');
+            toast.error('Error al descargar el archivo PDF');
         }
     };
 

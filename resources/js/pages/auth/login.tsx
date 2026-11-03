@@ -269,16 +269,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 {processing ? "Iniciando sesión..." : "Iniciar Sesión"}
                             </motion.button>
                         </form>
-
-                        <div className="mt-6 text-center text-xs sm:text-sm text-muted-foreground">
-                            ¿No tienes una cuenta?{" "}
-                            <a
-                                href={route('register')}
-                                className="text-primary font-medium hover:underline transition-colors"
-                            >
-                                Regístrate aquí
-                            </a>
-                        </div>
                     </div>
                 </motion.div>
             </div>

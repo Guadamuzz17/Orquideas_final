@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { ChevronLeft, Save } from 'lucide-react';
-import Swal from 'sweetalert2';
+import { toast } from 'sonner';
 
 interface Permiso {
     id: number;
@@ -54,20 +54,10 @@ export default function Edit({ rol, permisos, permisosAsignados }: Props) {
         e.preventDefault();
         put(route('roles.update', rol.id), {
             onSuccess: () => {
-                Swal.fire({
-                    title: '¡Éxito!',
-                    text: 'El rol ha sido actualizado exitosamente.',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar',
-                });
+                toast.success('El rol ha sido actualizado exitosamente');
             },
             onError: () => {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Hubo un problema al actualizar el rol. Verifica los datos.',
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar',
-                });
+                toast.error('Hubo un problema al actualizar el rol. Verifica los datos.');
             },
         });
     };

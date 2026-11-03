@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { chatbotConfig, detectModuleFromUrl, ModuleQA } from '../lib/chatbotConfig';
 import { router } from '@inertiajs/react';
 import { HelpCircle, X, Search, ChevronDown, ChevronRight, Sparkles, MessageCircle, AlertCircle, TrendingUp, Lightbulb } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Tipos para estadísticas de búsqueda
 type SearchAttempt = {
@@ -334,8 +335,9 @@ export default function Chatbot() {
                         </p>
                         <button
                           onClick={() => {
-                            // Aquí podrías abrir un modal de contacto o redireccionar
-                            alert('Funcionalidad de contacto a soporte.\n\nEn producción, esto abriría un formulario de contacto o chat en vivo.');
+                            toast.info('Funcionalidad de contacto a soporte en preparación.', {
+                              description: 'Próximamente podrás enviar solicitudes de asistencia directa.'
+                            });
                             setShowSupportContact(false);
                             setSearchAttempts([]);
                           }}

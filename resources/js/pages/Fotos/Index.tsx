@@ -7,7 +7,18 @@ import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import Swal from 'sweetalert2';
+import { toast } from 'sonner';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface FotoEvento {
     id: number;
@@ -40,28 +51,15 @@ export default function FotosIndex({ fotos }: PageProps) {
         { title: 'Fotografías', href: '#' },
     ];
 
-    const handleDelete = async (id: number, titulo: string) => {
-        const result = await Swal.fire({
-            title: '¿Estás seguro?',
-            text: `Se eliminará la fotografía "${titulo}" de forma permanente.`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar',
+    const handleDelete = (id: number) => {
+        router.delete(`/fotos/${id}`, {
+            onSuccess: () => {
+                toast.success('Fotografía eliminada con éxito');
+            },
+            onError: () => {
+                toast.error('No se pudo eliminar la fotografía');
+            },
         });
-
-        if (result.isConfirmed) {
-            router.delete(`/fotos/${id}`, {
-                onSuccess: () => {
-                    Swal.fire('¡Eliminado!', 'La fotografía ha sido eliminada.', 'success');
-                },
-                onError: () => {
-                    Swal.fire('Error', 'No se pudo eliminar la fotografía.', 'error');
-                },
-            });
-        }
     };
 
     const formatearFecha = (fecha?: string) => {
@@ -161,14 +159,35 @@ export default function FotosIndex({ fotos }: PageProps) {
                                                         ✏️ Editar
                                                     </Button>
                                                 </Link>
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(foto.id, foto.titulo)}
-                                                    className="flex-1"
-                                                >
-                                                    🗑️
-                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="sm"
+                                                            className="flex-1"
+                                                            title="Eliminar fotografía"
+                                                        >
+                                                            🗑️
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>¿Eliminar fotografía?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                Se eliminará permanentemente la fotografía "{foto.titulo}". Esta acción no se puede deshacer.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={() => handleDelete(foto.id)}
+                                                                className="bg-red-600 hover:bg-red-700"
+                                                            >
+                                                                Eliminar
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
                                             </div>
                                         </div>
                                     </CardContent>

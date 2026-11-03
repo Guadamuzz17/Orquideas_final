@@ -10,9 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { router, useForm } from '@inertiajs/react'
-import { Toaster, toast } from 'sonner'
+import { toast } from 'sonner'
 import React, { useState } from 'react'
-import { showDeleteConfirm } from '@/utils/sweetalert'
 
 import {
   Dialog,
@@ -188,28 +187,25 @@ export const columns: ColumnDef<Participante>[] = [
               id_aso: participante.id_aso.toString(),
           });
 
-          const handleDelete = async (id: number, nombre: string) => {
-              const result = await showDeleteConfirm(nombre);
-              if (result.isConfirmed) {
-                router.delete(route('participantes.destroy', id), {
-                  preserveScroll: true
-                });
-              }
-            }
+          const handleDelete = (id: number) => {
+            router.delete(route('participantes.destroy', id), {
+              preserveScroll: true,
+              onSuccess: () => toast.success('Participante eliminado correctamente'),
+              onError: () => toast.error('Error al eliminar el participante')
+            });
+          };
 
-            const handleEditSubmit = (e: React.FormEvent, id: number) => {
-              e.preventDefault();
-              put(route('participantes.update', id), {
-                onSuccess: () => toast.success('Participante actualizado correctamente'),
-                onError: () => toast.error('Error al actualizar el participante'),
-                preserveScroll: true
-              });
-            };
+          const handleEditSubmit = (e: React.FormEvent, id: number) => {
+            e.preventDefault();
+            put(route('participantes.update', id), {
+              onSuccess: () => toast.success('Participante actualizado correctamente'),
+              onError: () => toast.error('Error al actualizar el participante'),
+              preserveScroll: true
+            });
+          };
 
           return (
             <div className="flex justify-end items-center gap-2">
-              <Toaster position="top-right" richColors expand visibleToasts={3} />
-
               <Drawer>
                 <DrawerTrigger asChild>
                   <Button variant="ghost">Ver</Button>
@@ -381,7 +377,7 @@ export const columns: ColumnDef<Participante>[] = [
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction className="bg-destructive hover:bg-destructive/90"
-                          onClick={() => handleDelete(participante.id, participante.nombre)}>
+                          onClick={() => handleDelete(participante.id)}>
                           Confirmar
                         </AlertDialogAction>
                       </AlertDialogFooter>

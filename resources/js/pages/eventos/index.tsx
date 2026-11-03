@@ -57,6 +57,7 @@ interface EventosIndexProps {
 
 export default function EventosIndex({ eventos }: EventosIndexProps) {
   const [mostrarFinalizados, setMostrarFinalizados] = useState(false);
+  const [eventoParaConfirmar, setEventoParaConfirmar] = useState<Evento | null>(null);
 
   // Filtrar eventos según el toggle
   const eventosFiltrados = mostrarFinalizados
@@ -69,14 +70,11 @@ export default function EventosIndex({ eventos }: EventosIndexProps) {
     router.delete(route('eventos.destroy', id));
   };
 
-  const handleSeleccionar = (id: number, estado: string) => {
-    if (estado === 'finalizado') {
-      // Advertencia pero permitir selección
-      if (confirm('⚠️ Este evento está finalizado. No podrás registrar nuevas orquídeas ni participantes. ¿Deseas continuar?')) {
-        router.post(route('eventos.seleccionar', id));
-      }
+  const handleSeleccionar = (evento: Evento) => {
+    if (evento.estado === 'finalizado') {
+      setEventoParaConfirmar(evento);
     } else {
-      router.post(route('eventos.seleccionar', id));
+      router.post(route('eventos.seleccionar', evento.id_evento));
     }
   };
 
@@ -210,7 +208,7 @@ export default function EventosIndex({ eventos }: EventosIndexProps) {
 
                     {/* Botón seleccionar */}
                     <Button
-                      onClick={() => handleSeleccionar(evento.id_evento, evento.estado)}
+                      onClick={() => handleSeleccionar(evento)}
                       className={`w-full rounded-xl ${
                         evento.estado === 'finalizado'
                           ? 'bg-amber-600 hover:bg-amber-700 text-white'
@@ -335,6 +333,46 @@ export default function EventosIndex({ eventos }: EventosIndexProps) {
             </div>
           </div>
         )}
+
+        {/* Modal estético para confirmación de evento finalizado */}
+        <AlertDialog
+          open={!!eventoParaConfirmar}
+          onOpenChange={(open) => !open && setEventoParaConfirmar(null)}
+        >
+          <AlertDialogContent className="rounded-2xl border-border bg-card shadow-2xl max-w-md">
+            <AlertDialogHeader className="space-y-3">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-inner">
+                <AlertTriangle className="h-7 w-7" />
+              </div>
+              <AlertDialogTitle className="text-center text-lg font-bold">
+                Evento Finalizado (Modo Consulta)
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center text-muted-foreground text-sm">
+                Este evento ha concluido. Podrás consultar el catálogo de orquídeas, participantes, premiaciones y reportes en modo de solo lectura.
+              </AlertDialogDescription>
+              {eventoParaConfirmar && (
+                <div className="p-3 bg-muted/60 rounded-xl border border-border/60 text-sm font-semibold text-foreground text-center">
+                  {eventoParaConfirmar.nombre_evento}
+                </div>
+              )}
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-center gap-2 mt-4">
+              <AlertDialogCancel className="rounded-xl">
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (eventoParaConfirmar) {
+                    router.post(route('eventos.seleccionar', eventoParaConfirmar.id_evento));
+                  }
+                }}
+                className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-medium shadow-md"
+              >
+                Acceder al Evento
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </SimpleLayout>
   );

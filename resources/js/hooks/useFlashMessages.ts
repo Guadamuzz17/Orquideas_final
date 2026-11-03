@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
-import { showSuccessAlert, showErrorAlert, showWarningAlert, showInfoAlert, showValidationErrors } from '@/utils/sweetalert';
+import { toast } from 'sonner';
 
 interface FlashMessages {
   success?: string;
@@ -30,23 +30,31 @@ export const useFlashMessages = () => {
     lastFlashRef.current = flashId;
 
     if (flash.success) {
-      showSuccessAlert('¡Éxito!', flash.success);
+      toast.success(flash.success);
     }
 
     if (flash.error) {
-      showErrorAlert('Error', flash.error);
+      toast.error(flash.error);
     }
 
     if (flash.warning) {
-      showWarningAlert('Advertencia', flash.warning);
+      toast.warning(flash.warning);
     }
 
     if (flash.info) {
-      showInfoAlert('Información', flash.info);
+      toast.info(flash.info);
     }
 
     if (flash.errors && Object.keys(flash.errors).length > 0) {
-      showValidationErrors(flash.errors);
+      const errorList = Object.entries(flash.errors)
+        .map(([field, messages]) => {
+          const arr = Array.isArray(messages) ? messages : [messages];
+          return `${field}: ${arr.join(', ')}`;
+        })
+        .join('\n');
+      toast.error('Errores de validación', {
+        description: errorList,
+      });
     }
   }, [props.flash]);
 };

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 interface FotoEvento {
     id: number;
@@ -203,7 +204,7 @@ export default function FotosShow({ foto }: PageProps) {
                                     onClick={() => {
                                         const apiUrl = `${window.location.origin}/api/fotos`;
                                         navigator.clipboard.writeText(apiUrl);
-                                        alert('URL de la API copiada al portapapeles');
+                                        toast.success('URL de la API copiada al portapapeles');
                                     }}
                                 >
                                     🔗 Copiar URL de API

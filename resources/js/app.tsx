@@ -5,6 +5,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 import Chatbot from './components/Chatbot';
+import { Toaster } from './components/ui/sonner';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -18,6 +19,7 @@ createInertiaApp({
             <>
                 <App {...props} />
                 <Chatbot />
+                <Toaster position="top-right" closeButton richColors />
             </>
         );
     },

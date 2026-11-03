@@ -23,7 +23,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import Swal from 'sweetalert2';
+import { toast } from 'sonner';
 
 interface Rol {
     id: number;
@@ -50,21 +50,11 @@ export default function Index({ roles }: Props) {
     const handleDelete = (id: number) => {
         router.delete(route('roles.destroy', id), {
             onSuccess: () => {
-                Swal.fire({
-                    title: '¡Eliminado!',
-                    text: 'El rol ha sido eliminado exitosamente.',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar',
-                });
+                toast.success('El rol ha sido eliminado exitosamente');
                 setDeleteId(null);
             },
             onError: (errors) => {
-                Swal.fire({
-                    title: 'Error',
-                    text: errors[0] || 'No se pudo eliminar el rol. Puede que tenga usuarios asignados.',
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar',
-                });
+                toast.error(errors[0] || 'No se pudo eliminar el rol. Puede que tenga usuarios asignados.');
                 setDeleteId(null);
             },
         });

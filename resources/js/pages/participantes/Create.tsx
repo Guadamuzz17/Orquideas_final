@@ -10,9 +10,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Slash, ArrowLeft, Search, User, Recycle, AlertCircle, Lock } from "lucide-react";
 import { Breadcrumb, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from 'sonner';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 
 interface TipoParticipante {
   id_tipo: number;
@@ -112,70 +121,45 @@ export default function CreateParticipante({
     }
   }, [searchQuery]);
 
+  const [participanteReciclar, setParticipanteReciclar] = useState<ParticipantePrevio | null>(null);
+
   // Función para reciclar datos de participante
-  const handleRecycleParticipant = async (participante: ParticipantePrevio) => {
-    const result = await Swal.fire({
-      title: '♻️ ¿Reciclar datos de participante?',
-      html: `
-        <div class="text-left space-y-2">
-          <p class="font-semibold text-lg mb-3">${participante.nombre}</p>
-          <p><strong>Teléfono:</strong> ${participante.numero_telefonico}</p>
-          <p><strong>Dirección:</strong> ${participante.direccion}</p>
-          <p><strong>Tipo:</strong> ${participante.tipo.Clase}</p>
-          <p><strong>Asociación:</strong> ${participante.aso.Clase}</p>
-          <p><strong>Ubicación:</strong> ${participante.municipio.nombre_municipio}, ${participante.departamento.nombre_departamento}</p>
-          <p class="mt-4 text-sm text-muted-foreground">
-            <i class="fas fa-info-circle"></i> Este participante ha estado en <strong>${participante.eventos_participados}</strong> evento(s) anterior(es).
-            <br>Último evento: <strong>${participante.evento_previo}</strong>
-          </p>
-          <div class="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-lg">
-            <p class="text-sm text-foreground">
-              <i class="fas fa-lightbulb text-primary"></i> <strong>Nota:</strong> Esto copiará automáticamente todos los datos del participante para crear un nuevo registro en el evento actual. No se modificará la información original.
-            </p>
-          </div>
-        </div>
-      `,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3b82f6',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: '<i class="fas fa-recycle"></i> Sí, reciclar datos',
-      cancelButtonText: '<i class="fas fa-times"></i> No, crear nuevo',
-      width: '600px',
-      customClass: {
-        popup: 'text-left'
-      }
+  const handleRecycleParticipant = (participante: ParticipantePrevio) => {
+    setParticipanteReciclar(participante);
+  };
+
+  const confirmRecycleParticipant = async () => {
+    if (!participanteReciclar) return;
+    const participante = participanteReciclar;
+
+    // Cargar municipios del departamento seleccionado
+    try {
+      const response = await axios.get(`/participantes/municipios/${participante.id_departamento}`);
+      setMunicipios(response.data);
+    } catch (error) {
+      console.error('Error loading municipios:', error);
+    }
+
+    // Autocompletar formulario con datos reciclados
+    setData({
+      nombre: participante.nombre,
+      numero_telefonico: participante.numero_telefonico,
+      direccion: participante.direccion,
+      id_tipo: participante.id_tipo.toString(),
+      id_departamento: participante.id_departamento.toString(),
+      id_municipio: participante.id_municipio.toString(),
+      id_aso: participante.id_aso.toString(),
     });
 
-    if (result.isConfirmed) {
-      // Cargar municipios del departamento seleccionado
-      try {
-        const response = await axios.get(`/participantes/municipios/${participante.id_departamento}`);
-        setMunicipios(response.data);
-      } catch (error) {
-        console.error('Error loading municipios:', error);
-      }
+    // Limpiar búsqueda y cerrar modal
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowSearchResults(false);
+    setParticipanteReciclar(null);
 
-      // Autocompletar formulario con datos reciclados
-      setData({
-        nombre: participante.nombre,
-        numero_telefonico: participante.numero_telefonico,
-        direccion: participante.direccion,
-        id_tipo: participante.id_tipo.toString(),
-        id_departamento: participante.id_departamento.toString(),
-        id_municipio: participante.id_municipio.toString(),
-        id_aso: participante.id_aso.toString(),
-      });
-
-      // Limpiar búsqueda
-      setSearchQuery('');
-      setSearchResults([]);
-      setShowSearchResults(false);
-
-      toast.success('✅ Datos reciclados exitosamente. Revisa y confirma antes de guardar.', {
-        duration: 4000
-      });
-    }
+    toast.success('Datos del participante importados al formulario. Revisa y confirma antes de guardar.', {
+      duration: 4000
+    });
   };
 
   const handleDepartamentoChange = async (departamentoId: string) => {
@@ -497,6 +481,75 @@ export default function CreateParticipante({
             </form>
           </CardContent>
         </Card>
+
+        {/* Modal estético para reciclaje de datos de participante */}
+        <AlertDialog
+          open={!!participanteReciclar}
+          onOpenChange={(open) => !open && setParticipanteReciclar(null)}
+        >
+          <AlertDialogContent className="rounded-2xl border-border bg-card shadow-2xl max-w-lg">
+            <AlertDialogHeader className="space-y-3">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20 shadow-inner">
+                <Recycle className="h-6 w-6" />
+              </div>
+              <AlertDialogTitle className="text-center text-lg font-bold">
+                ¿Reutilizar datos del participante?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center text-muted-foreground text-sm">
+                Se copiarán los datos para registrarlo en el evento actual. No se alterará su historial previo.
+              </AlertDialogDescription>
+
+              {participanteReciclar && (
+                <div className="mt-3 p-4 bg-muted/50 rounded-xl border border-border/60 text-sm space-y-2 text-left">
+                  <div className="font-semibold text-base text-foreground pb-1 border-b border-border/50 flex items-center justify-between">
+                    <span>{participanteReciclar.nombre}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-normal">
+                      {participanteReciclar.tipo?.Clase}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                    <div>
+                      <span className="text-muted-foreground">Teléfono:</span>{' '}
+                      <span className="font-medium text-foreground">{participanteReciclar.numero_telefonico || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Asociación:</span>{' '}
+                      <span className="font-medium text-foreground">{participanteReciclar.aso?.Clase}</span>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <span className="text-muted-foreground">Dirección:</span>{' '}
+                      <span className="font-medium text-foreground">{participanteReciclar.direccion}</span>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <span className="text-muted-foreground">Municipio:</span>{' '}
+                      <span className="font-medium text-foreground">
+                        {participanteReciclar.municipio?.nombre_municipio}, {participanteReciclar.departamento?.nombre_departamento}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="pt-2 text-xs text-muted-foreground border-t border-border/50">
+                    Historial: <strong>{participanteReciclar.eventos_participados}</strong> evento(s) previo(s).
+                    {participanteReciclar.evento_previo && (
+                      <span> Último evento: <strong>{participanteReciclar.evento_previo}</strong></span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-end gap-2 mt-4">
+              <AlertDialogCancel className="rounded-xl">
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmRecycleParticipant}
+                className="rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-md flex items-center gap-2"
+              >
+                <Recycle className="h-4 w-4" />
+                Importar Datos
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AppLayout>
   );

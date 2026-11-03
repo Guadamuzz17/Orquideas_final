@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { ChevronLeft, Save } from 'lucide-react';
-import Swal from 'sweetalert2';
+import { toast } from 'sonner';
 
 interface Permiso {
     id: number;
@@ -45,20 +45,10 @@ export default function Create({ permisos }: Props) {
         e.preventDefault();
         post(route('roles.store'), {
             onSuccess: () => {
-                Swal.fire({
-                    title: '¡Éxito!',
-                    text: 'El rol ha sido creado exitosamente.',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar',
-                });
+                toast.success('El rol ha sido creado exitosamente');
             },
             onError: () => {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Hubo un problema al crear el rol. Verifica los datos.',
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar',
-                });
+                toast.error('Hubo un problema al crear el rol. Verifica los datos.');
             },
         });
     };

@@ -7,7 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { showDeleteConfirm } from "@/utils/sweetalert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { type BreadcrumbItem } from "@/types";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -47,11 +58,10 @@ export default function TrofeosIndex({ trofeos = [] }: TrofeosIndexProps) {
     });
   }, [filters, trofeos]);
 
-  const handleDelete = (id: number, nombreOrquidea: string) => {
-    showDeleteConfirm(`Trofeo de la orquídea "${nombreOrquidea}"`).then((result) => {
-      if (result.isConfirmed) {
-        router.delete(route("trofeos.destroy", id));
-      }
+  const handleDelete = (id: number) => {
+    router.delete(route("trofeos.destroy", id), {
+      onSuccess: () => toast.success("Trofeo eliminado exitosamente"),
+      onError: () => toast.error("Error al eliminar el trofeo"),
     });
   };
 
@@ -165,15 +175,35 @@ export default function TrofeosIndex({ trofeos = [] }: TrofeosIndexProps) {
                           {trophy.fecha_ganador}
                         </TableCell>
                         <TableCell className="text-right whitespace-nowrap">
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={() => handleDelete(trophy.id_trofeo, trophy.nombre_orquidea)}
-                            className="h-8 w-8 rounded-lg"
-                            title="Eliminar trofeo"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="destructive"
+                                size="icon"
+                                className="h-8 w-8 rounded-lg"
+                                title="Eliminar trofeo"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>¿Eliminar trofeo?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Esta acción no se puede deshacer. Se eliminará el trofeo asignado a la orquídea "{trophy.nombre_orquidea}".
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(trophy.id_trofeo)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  Eliminar
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </TableCell>
                       </TableRow>
                     ))
