@@ -28,19 +28,19 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
         <AuthLayout title="Nueva Contraseña" description="Sistema de Gestión de Orquídeas">
             <Head title="Restablecer Contraseña" />
 
-            <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 px-4">
+            <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
                 <div className="w-full max-w-md">
                     <div className="mb-8 text-center">
-                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500">
-                            <Lock className="h-8 w-8 text-white" />
+                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg">
+                            <Lock className="h-8 w-8" />
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900">Nueva Contraseña</h1>
-                        <p className="mt-2 text-gray-600">
+                        <h1 className="text-3xl font-bold text-foreground">Nueva Contraseña</h1>
+                        <p className="mt-2 text-muted-foreground">
                             Ingresa tu nueva contraseña para restablecer el acceso a tu cuenta
                         </p>
                     </div>
 
-                    <div className="rounded-lg bg-white p-8 shadow-xl">
+                    <div className="rounded-xl bg-card text-card-foreground border border-border p-8 shadow-xl">
                         <form onSubmit={submit} className="space-y-6">
                             <div>
                                 <Label htmlFor="email">Correo Electrónico</Label>
@@ -49,7 +49,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                     type="email"
                                     name="email"
                                     value={data.email}
-                                    className="mt-1 bg-gray-50"
+                                    className="mt-1 bg-muted/50"
                                     disabled
                                 />
                             </div>

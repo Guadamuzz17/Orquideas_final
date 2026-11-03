@@ -101,14 +101,14 @@ export default function ListonesIndex({ listones = [], error }: ListonesIndexPro
   };
 
   const getTipoListonColor = (tipo: string) => {
-    if (!tipo) return 'bg-green-100 text-green-800 border-green-200';
+    if (!tipo) return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-700/60';
 
     const tipoLower = tipo.toLowerCase();
-    if (tipoLower.includes('oro') || tipoLower.includes('primero')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    if (tipoLower.includes('plata') || tipoLower.includes('segundo')) return 'bg-gray-100 text-gray-800 border-gray-200';
-    if (tipoLower.includes('bronce') || tipoLower.includes('tercero')) return 'bg-orange-100 text-orange-800 border-orange-200';
-    if (tipoLower.includes('mención')) return 'bg-blue-100 text-blue-800 border-blue-200';
-    return 'bg-green-100 text-green-800 border-green-200';
+    if (tipoLower.includes('oro') || tipoLower.includes('primero')) return 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700/60';
+    if (tipoLower.includes('plata') || tipoLower.includes('segundo')) return 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800/80 dark:text-slate-200 dark:border-slate-700';
+    if (tipoLower.includes('bronce') || tipoLower.includes('tercero')) return 'bg-orange-100 text-orange-900 border-orange-300 dark:bg-orange-950/60 dark:text-orange-300 dark:border-orange-700/60';
+    if (tipoLower.includes('mención') || tipoLower.includes('mencion')) return 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-700/60';
+    return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-700/60';
   };
 
   const getPositionBadge = (tipo: string) => {

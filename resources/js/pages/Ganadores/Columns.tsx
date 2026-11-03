@@ -71,12 +71,12 @@ export type Ganador = {
 
 const getPosicionBadge = (posicion: number, empate: boolean) => {
   const badges = {
-    1: { emoji: "🥇", text: "1° Lugar", color: "bg-yellow-100 text-yellow-800 border-yellow-300" },
-    2: { emoji: "🥈", text: "2° Lugar", color: "bg-gray-100 text-gray-800 border-gray-300" },
-    3: { emoji: "🥉", text: "3° Lugar", color: "bg-orange-100 text-orange-800 border-orange-300" }
+    1: { emoji: "🥇", text: "1° Lugar", color: "bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700/60 shadow-xs" },
+    2: { emoji: "🥈", text: "2° Lugar", color: "bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800/80 dark:text-slate-200 dark:border-slate-700 shadow-xs" },
+    3: { emoji: "🥉", text: "3° Lugar", color: "bg-orange-100 text-orange-900 border-orange-300 dark:bg-orange-950/60 dark:text-orange-300 dark:border-orange-700/60 shadow-xs" }
   };
   
-  const badge = badges[posicion as keyof typeof badges];
+  const badge = badges[posicion as keyof typeof badges] || { emoji: "🏅", text: `${posicion}° Lugar`, color: "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-700/60 shadow-xs" };
   const empateText = empate ? " (Empate)" : "";
   
   return (

@@ -56,12 +56,12 @@ export default function FotosShow({ foto }: PageProps) {
                     {/* Header */}
                     <div className="flex justify-between items-start">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900">{foto.titulo}</h1>
+                            <h1 className="text-3xl font-bold text-foreground">{foto.titulo}</h1>
                             <div className="flex items-center gap-4 mt-2">
                                 <Badge variant="secondary">
                                     📅 {formatearFecha(foto.fecha_evento)}
                                 </Badge>
-                                <span className="text-sm text-gray-500">
+                                <span className="text-sm text-muted-foreground">
                                     Subida el {formatearFechaCompleta(foto.created_at)}
                                 </span>
                             </div>
@@ -140,37 +140,37 @@ export default function FotosShow({ foto }: PageProps) {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div>
-                                        <label className="text-sm font-medium text-gray-600">ID</label>
-                                        <p className="text-gray-900">#{foto.id}</p>
+                                        <label className="text-sm font-medium text-muted-foreground">ID</label>
+                                        <p className="text-foreground">#{foto.id}</p>
                                     </div>
                                     <div>
-                                        <label className="text-sm font-medium text-gray-600">Fecha del Evento</label>
-                                        <p className="text-gray-900">
+                                        <label className="text-sm font-medium text-muted-foreground">Fecha del Evento</label>
+                                        <p className="text-foreground">
                                             {formatearFecha(foto.fecha_evento)}
                                         </p>
                                     </div>
                                     <div>
-                                        <label className="text-sm font-medium text-gray-600">Fecha de Subida</label>
-                                        <p className="text-gray-900">
+                                        <label className="text-sm font-medium text-muted-foreground">Fecha de Subida</label>
+                                        <p className="text-foreground">
                                             {formatearFechaCompleta(foto.created_at)}
                                         </p>
                                     </div>
                                     {foto.updated_at !== foto.created_at && (
                                         <div>
-                                            <label className="text-sm font-medium text-gray-600">Última Modificación</label>
-                                            <p className="text-gray-900">
+                                            <label className="text-sm font-medium text-muted-foreground">Última Modificación</label>
+                                            <p className="text-foreground">
                                                 {formatearFechaCompleta(foto.updated_at)}
                                             </p>
                                         </div>
                                     )}
                                     <div>
-                                        <label className="text-sm font-medium text-gray-600">URL Pública</label>
+                                        <label className="text-sm font-medium text-muted-foreground">URL Pública</label>
                                         <div className="flex gap-2">
                                             <input
                                                 type="text"
                                                 value={foto.url_imagen}
                                                 readOnly
-                                                className="text-xs bg-gray-50 border rounded px-2 py-1 flex-1"
+                                                className="text-xs bg-muted/50 border border-border rounded px-2 py-1 flex-1 text-foreground"
                                             />
                                             <Button
                                                 variant="outline"

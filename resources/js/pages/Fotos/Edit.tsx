@@ -207,9 +207,9 @@ export default function FotosEdit({ foto }: PageProps) {
                                 </div>
 
                                 {/* Información adicional */}
-                                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">ℹ️ Información de la fotografía</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                <div className="mt-6 p-4 bg-muted/40 border border-border rounded-lg">
+                                    <h4 className="text-sm font-semibold text-foreground mb-2">ℹ️ Información de la fotografía</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                                         <div>
                                             <span className="font-medium">ID:</span> #{foto.id}
                                         </div>

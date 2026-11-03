@@ -137,16 +137,16 @@ export function Autocomplete({
           className="pl-10 pr-10"
         />
         {loading && (
-          <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 animate-spin" />
+          <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 animate-spin" />
         )}
       </div>
 
       {isOpen && (
-        <Card className="absolute z-50 w-full mt-1 max-h-60 overflow-auto shadow-lg">
+        <Card className="absolute z-50 w-full mt-1 max-h-60 overflow-auto shadow-lg border-border bg-popover text-popover-foreground">
           <CardContent className="p-0">
             {loading ? (
-              <div className="p-3 text-center text-gray-500">
-                <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2" />
+              <div className="p-3 text-center text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2 text-primary" />
                 Buscando...
               </div>
             ) : options.length > 0 ? (
@@ -154,17 +154,17 @@ export function Autocomplete({
                 {options.map((option, index) => (
                   <div
                     key={option.id}
-                    className={`p-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0 ${
-                      index === highlightedIndex ? 'bg-blue-50' : ''
+                    className={`p-3 cursor-pointer hover:bg-accent hover:text-accent-foreground border-b border-border/50 last:border-b-0 transition-colors ${
+                      index === highlightedIndex ? 'bg-accent/80 text-accent-foreground font-medium' : ''
                     }`}
                     onClick={() => handleSelect(option)}
                     onMouseEnter={() => setHighlightedIndex(index)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">{option.label}</div>
+                        <div className="font-medium text-foreground">{option.label}</div>
                         {option.description && (
-                          <div className="text-sm text-gray-500">{option.description}</div>
+                          <div className="text-sm text-muted-foreground">{option.description}</div>
                         )}
                       </div>
                       {option.badge && (
@@ -177,7 +177,7 @@ export function Autocomplete({
                 ))}
               </div>
             ) : searchValue.trim() !== '' ? (
-              <div className="p-3 text-center text-gray-500">
+              <div className="p-3 text-center text-muted-foreground">
                 {noResultsText}
               </div>
             ) : null}

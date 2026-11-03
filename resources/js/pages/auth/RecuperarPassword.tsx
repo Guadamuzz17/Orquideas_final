@@ -26,13 +26,13 @@ export default function RecuperarPassword() {
                         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500">
                             <Mail className="h-8 w-8 text-white" />
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900">Recuperar Contraseña</h1>
-                        <p className="mt-2 text-gray-600">
+                        <h1 className="text-3xl font-bold text-foreground">Recuperar Contraseña</h1>
+                        <p className="mt-2 text-muted-foreground">
                             Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
                         </p>
                     </div>
 
-                    <div className="rounded-lg bg-white p-8 shadow-xl">
+                    <div className="rounded-xl bg-card text-card-foreground border border-border p-8 shadow-xl">
                         <form onSubmit={submit} className="space-y-6">
                             <div>
                                 <Label htmlFor="email">Correo Electrónico</Label>

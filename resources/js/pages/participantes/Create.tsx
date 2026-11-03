@@ -124,13 +124,13 @@ export default function CreateParticipante({
           <p><strong>Tipo:</strong> ${participante.tipo.Clase}</p>
           <p><strong>Asociación:</strong> ${participante.aso.Clase}</p>
           <p><strong>Ubicación:</strong> ${participante.municipio.nombre_municipio}, ${participante.departamento.nombre_departamento}</p>
-          <p class="mt-4 text-sm text-gray-600">
+          <p class="mt-4 text-sm text-muted-foreground">
             <i class="fas fa-info-circle"></i> Este participante ha estado en <strong>${participante.eventos_participados}</strong> evento(s) anterior(es).
             <br>Último evento: <strong>${participante.evento_previo}</strong>
           </p>
-          <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
-            <p class="text-sm text-blue-800">
-              <i class="fas fa-lightbulb"></i> <strong>Nota:</strong> Esto copiará automáticamente todos los datos del participante para crear un nuevo registro en el evento actual. No se modificará la información original.
+          <div class="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+            <p class="text-sm text-foreground">
+              <i class="fas fa-lightbulb text-primary"></i> <strong>Nota:</strong> Esto copiará automáticamente todos los datos del participante para crear un nuevo registro en el evento actual. No se modificará la información original.
             </p>
           </div>
         </div>
